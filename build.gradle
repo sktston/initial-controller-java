@@ -1,0 +1,49 @@
+plugins {
+	id 'org.springframework.boot' version '2.3.1.RELEASE'
+	id 'io.spring.dependency-management' version '1.0.9.RELEASE'
+	id 'java'
+}
+
+group = 'com.sktelecom.initial'
+version = '0.6.0'
+sourceCompatibility = '11'
+targetCompatibility = '11'
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+	implementation 'org.projectlombok:lombok:1.18.16'
+	compileOnly 'org.projectlombok:lombok'
+	compile group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.8.0'
+	compile group: 'com.google.code.gson', name: 'gson', version: '2.8.6'
+	implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.10'
+	compile 'com.google.zxing:javase:3.3.3'
+	compile group: 'commons-codec', name: 'commons-codec', version: '1.15'
+
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation('org.springframework.boot:spring-boot-starter-test') {
+		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+	}
+
+	implementation 'com.google.code.findbugs:jsr305:3.0.2'
+}
+
+test {
+	useJUnitPlatform()
+}
+
+task faber(type:JavaExec) {
+	group 'application'
+	classpath sourceSets.main.runtimeClasspath
+	main = 'com.sktelecom.initial.controller.faber.Application'
+	args(['--spring.config.location=classpath:/application-faber.properties'])
+}
