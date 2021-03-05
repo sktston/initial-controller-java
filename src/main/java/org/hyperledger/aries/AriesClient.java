@@ -32,6 +32,7 @@ import org.hyperledger.aries.api.ledger.TAAInfo;
 import org.hyperledger.aries.api.message.BasicMessage;
 import org.hyperledger.aries.api.message.PingRequest;
 import org.hyperledger.aries.api.message.PingResponse;
+import org.hyperledger.aries.api.message.SendMessageRequest;
 import org.hyperledger.aries.api.proof.*;
 import org.hyperledger.aries.api.revocation.*;
 import org.hyperledger.aries.api.schema.SchemaSendRequest;
@@ -229,11 +230,11 @@ public class AriesClient extends BaseClient {
     /**
      * Send a basic message to a connection
      * @param connectionId the connection id
-     * @param msg the message
+     * @param messageRequest the message
      * @throws IOException if the request could not be executed due to cancellation, a connectivity problem or timeout.
      */
-    public void connectionsSendMessage(@NonNull String connectionId, @NonNull BasicMessage msg) throws IOException {
-        Request req = buildPost(url + "/connections/" + connectionId + "/send-message", msg);
+    public void connectionsSendMessage(@NonNull String connectionId, @NonNull SendMessageRequest messageRequest) throws IOException {
+        Request req = buildPost(url + "/connections/" + connectionId + "/send-message", messageRequest);
         call(req);
     }
 
