@@ -35,6 +35,7 @@ dependencies {
 	}
 
 	implementation 'com.google.code.findbugs:jsr305:3.0.2'
+	implementation group: 'javax.inject', name: 'javax.inject', version: '1'
 }
 
 test {
