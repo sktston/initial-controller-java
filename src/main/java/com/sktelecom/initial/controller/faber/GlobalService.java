@@ -15,14 +15,13 @@ import org.hyperledger.aries.AriesClient;
 import org.hyperledger.aries.api.connection.CreateInvitationParams;
 import org.hyperledger.aries.api.connection.CreateInvitationRequest;
 import org.hyperledger.aries.api.connection.CreateInvitationResponse;
-import org.hyperledger.aries.api.creddef.CredentialDefinition;
 import org.hyperledger.aries.api.creddef.CredentialDefinitionFilter;
-import org.hyperledger.aries.api.credential.CredentialAttributes;
 import org.hyperledger.aries.api.credential.CredentialExchange;
 import org.hyperledger.aries.api.credential.CredentialProposalRequest;
-import org.hyperledger.aries.api.exception.AriesException;
-import org.hyperledger.aries.api.message.BasicMessage;
 import org.hyperledger.aries.api.message.SendMessageRequest;
+import org.hyperledger.aries.api.proof.PresentProofRequest;
+import org.hyperledger.aries.api.proof.PresentProofRequestConfig;
+import org.hyperledger.aries.api.proof.PresentationExchangeRecord;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
@@ -34,6 +33,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.hyperledger.aries.api.proof.PresentProofRequest.ProofRequest.ProofAttributes.*;
+import static org.hyperledger.aries.api.proof.PresentProofRequest.*;
 
 @RequiredArgsConstructor
 @Service
@@ -134,20 +136,17 @@ public class GlobalService {
 
     public void sendCredentialOffer(String connectionId, JsonObject credentialProposal) throws IOException {
         // uncomment below if you want to get specified credential definition id from alice
-        //String credDefId = credentialProposal.get("cred_def_id").getAsString();
+        //String wantedCredDefId = credentialProposal.get("cred_def_id").getAsString();
 
-        List<CredentialAttributes> attributes = new ArrayList<>();
-        attributes.add(new CredentialAttributes("name", "alice"));
-        attributes.add(new CredentialAttributes("date", "05-2018"));
-        attributes.add(new CredentialAttributes("degree", "maths"));
-        attributes.add(new CredentialAttributes("age", "25"));
-
-        CredentialProposalRequest request = CredentialProposalRequest.builder()
-                .connectionId(connectionId)
-                .credentialDefinitionId(credDefId)
-                .credentialProposal(new CredentialProposalRequest.CredentialPreview(attributes))
+        MyCredentialDefinition credDef = MyCredentialDefinition.builder()
+                .name("alice")
+                .date("05-2018")
+                .degree("maths")
+                .age("25")
                 .build();
-        CredentialExchange response = ac.issueCredentialSend(request).get();
+        CredentialExchange response = ac.issueCredentialSend(
+                new CredentialProposalRequest(connectionId, credDefId, credDef)
+        ).get();
         log.info("response: " + response);
     }
 
@@ -156,47 +155,21 @@ public class GlobalService {
         ac.connectionsSendMessage(connectionId, request);
     }
 
-    /*
-    public void sendProofRequest(String connectionId) {
-        long curUnixTime = System.currentTimeMillis() / 1000L;
-        String body = JsonPath.parse("{" +
-                "  connection_id: '" + connectionId + "'," +
-                "  proof_request: {" +
-                "    name: 'proof_name'," +
-                "    version: '1.0'," +
-                "    requested_attributes: {" +
-                "      attr_name: {" +
-                "        name: 'name'," +
-                "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
-                "        restrictions: [ {cred_def_id: '" + credDefId + "'} ]" +
-                "      }," +
-                "      attr_date: {" +
-                "        name: 'date'," +
-                "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
-                "        restrictions: [ {cred_def_id: '" + credDefId + "'} ]" +
-                "      }," +
-                "      attr_degree: {" +
-                "        name: 'degree'," +
-                "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
-                "        restrictions: [ {cred_def_id: '" + credDefId + "'} ]" +
-                "      }" +
-                "    }," +
-                "    requested_predicates: {" +
-                "      pred_age: {" +
-                "        name: 'age'," +
-                "        p_type: '>='," +
-                "        p_value: 20," +
-                "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
-                "        restrictions: [ {cred_def_id: '" + credDefId + "'} ]" +
-                "      }" +
-                "    }" +
-                "  }" +
-                "}").jsonString();
-        String response = client.requestPOST(agentApiUrl + "/present-proof/send-request", controllerToken, body);
+    public void sendProofRequest(String connectionId) throws IOException {
+        Integer curUnixTime = Math.toIntExact(System.currentTimeMillis() / 1000L);
+        ProofRestrictions resriction =
+                ProofRestrictions.builder().credentialDefinitionId(credDefId).build();
+        ProofNonRevoked nonRevoked =
+                ProofNonRevoked.builder().toEpoch(curUnixTime).build();
+        PresentProofRequestConfig config = PresentProofRequestConfig.builder()
+                .connectionId(connectionId)
+                .appendAttribute(List.of("name", "date", "degree"), resriction)
+                .build();
+        PresentationExchangeRecord response = ac.presentProofSendRequest(
+                new PresentProofRequest(connectionId, ProofRequest.build(config), null, null)
+        ).get();
         log.info("response: " + response);
     }
-
-     */
 
     /*
 

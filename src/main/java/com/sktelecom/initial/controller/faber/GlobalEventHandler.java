@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 import javax.inject.Singleton;
 import java.io.IOException;
+import java.util.Set;
 
 @Singleton
 @Component
@@ -46,16 +47,25 @@ public class GlobalEventHandler extends EventHandler {
 
     @Override
     public void handleBasicMessage(BasicMessage message) {
-        log.info("Basic Message Event: {}", message);
+        log.info("Basic Message Event: state:{}, {}", message.getState(), message);
         if (message.getContent().contains("PrivacyPolicyAgreed")) {
             log.info("PrivacyPolicyAgreed -> sendProofRequest");
-            //sendProofRequest(message.getConnectionId());
+            try {
+                globalService.sendProofRequest(message.getConnectionId());
+            } catch (Exception e) { e.printStackTrace(); }
         }
     }
 
     @Override
     public void handleProof(PresentationExchangeRecord proof) {
         log.info("Present Proof Event: state:{}, {}", proof.getState(), proof);
+        if (proof.getState().equals("verified")) {
+            log.info("state:{} -> printProofResult", proof.getState());
+            try {
+                MyCredentialDefinition myCred = proof.from(MyCredentialDefinition.class);
+                log.info("myCred: " + myCred);
+            } catch (Exception e) { e.printStackTrace(); }
+        }
     }
 
     @Override
