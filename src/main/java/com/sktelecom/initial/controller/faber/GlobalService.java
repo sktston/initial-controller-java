@@ -1,71 +1,51 @@
 package com.sktelecom.initial.controller.faber;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.zxing.BarcodeFormat;
-import com.google.zxing.MultiFormatWriter;
-import com.google.zxing.WriterException;
-import com.google.zxing.client.j2se.MatrixToImageConfig;
-import com.google.zxing.client.j2se.MatrixToImageWriter;
-import com.google.zxing.common.BitMatrix;
-import com.sktelecom.initial.controller.utils.Common;
+import com.jayway.jsonpath.JsonPath;
+import com.sktelecom.initial.controller.utils.HttpClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hyperledger.aries.AriesClient;
-import org.hyperledger.aries.api.connection.CreateInvitationParams;
-import org.hyperledger.aries.api.connection.CreateInvitationRequest;
-import org.hyperledger.aries.api.connection.CreateInvitationResponse;
-import org.hyperledger.aries.api.creddef.CredentialDefinitionFilter;
-import org.hyperledger.aries.api.credential.CredentialExchange;
-import org.hyperledger.aries.api.credential.CredentialProposalRequest;
-import org.hyperledger.aries.api.message.SendMessageRequest;
-import org.hyperledger.aries.api.proof.PresentProofRequest;
-import org.hyperledger.aries.api.proof.PresentProofRequestConfig;
-import org.hyperledger.aries.api.proof.PresentationExchangeRecord;
+import okhttp3.HttpUrl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashMap;
 
-import static org.hyperledger.aries.api.proof.PresentProofRequest.ProofRequest.ProofAttributes.*;
-import static org.hyperledger.aries.api.proof.PresentProofRequest.*;
+import static com.sktelecom.initial.controller.utils.Common.*;
 
 @RequiredArgsConstructor
 @Service
 @Slf4j
 public class GlobalService {
-    private AriesClient ac;
+    private final HttpClient client = new HttpClient();
 
-    @Value("${agentApiUrl}")
-    private String agentApiUrl;
+    @Value("${platformUrl}")
+    private String platformUrl; // platform url
 
-    @Value("${accessToken}")
-    private String accessToken;
+    @Value("${controllerToken}")
+    private String controllerToken; // controller access token
 
     @Value("${credDefId}")
-    private String credDefId;
+    private String credDefId; // credential definition identifier
 
     @Value("${schemaId}")
-    private String schemaId;
+    private String schemaId;  // schema identifier
 
+    @Value("${verifTplId}")
+    private String verifTplId; // verification template identifier
+
+    String agentApiUrl;
     String orgName;
     String orgImageUrl;
     String publicDid;
+    String photoFileName = "images/ci_t.jpg"; // sample image file
 
     // for revocation example
     static boolean enableRevoke = Boolean.parseBoolean(System.getenv().getOrDefault("ENABLE_REVOKE", "false"));
 
     @EventListener(ApplicationReadyEvent.class)
-    public void initializeAfterStartup() throws IOException {
-        ac = AriesClient.builder().url(agentApiUrl).token(accessToken).build();
-
+    public void initializeAfterStartup() {
         provisionController();
 
         log.info("Controller configurations");
@@ -75,140 +55,160 @@ public class GlobalService {
         log.info("- public did: " + publicDid);
         log.info("- credential definition id: " + credDefId);
         log.info("- schema id: " + schemaId);
-        log.info("- controllerAccessToken: " + accessToken);
+        log.info("- verification template id: " + verifTplId);
+        log.info("- controller access token: " + controllerToken);
         log.info("------------------------------");
         log.info("Controller is ready");
     }
 
-    void provisionController() throws IOException {
-        log.info("Controller provision - Started");
+    public void handleEvent(String topic, String body) {
+        String state = topic.equals("problem_report") ? null : JsonPath.read(body, "$.state");
+        log.info("handleEvent >>> topic:" + topic + ", state:" + state + ", body:" + body);
+
+        switch(topic) {
+            case "connections":
+                break;
+            case "issue_credential":
+                if (state.equals("proposal_received")) {
+                    log.info("- Case (topic:" + topic + ", state:" + state + ") -> sendCredentialOffer");
+                    String credentialProposal = JsonPath.parse((LinkedHashMap)JsonPath.read(body, "$.credential_proposal_dict")).jsonString();
+                    sendCredentialOffer(JsonPath.read(body, "$.connection_id"), credentialProposal);
+                }
+                else if (state.equals("credential_acked")) {
+                    log.info("- Case (topic:" + topic + ", state:" + state + ") -> sendPrivacyPolicyOffer");
+                    if (enableRevoke) {
+                        revokeCredential(JsonPath.read(body, "$.revoc_reg_id"), JsonPath.read(body, "$.revocation_id"));
+                    }
+                    sendPrivacyPolicyOffer(JsonPath.read(body, "$.connection_id"));
+                }
+                break;
+            case "basicmessages":
+                String content = JsonPath.read(body, "$.content");
+                if (content.contains("PrivacyPolicyAgreed")) {
+                    log.info("- Case (topic:" + topic + ", state:" + state + ", PrivacyPolicyAgreed) -> sendProofRequest");
+                    sendProofRequest(JsonPath.read(body, "$.connection_id"));
+                }
+                break;
+            case "present_proof":
+                if (state.equals("verified")) {
+                    log.info("- Case (topic:" + topic + ", state:" + state + ") -> Print result");
+                    printProofResult(body);
+                }
+                break;
+            case "problem_report":
+                log.warn("- Case (topic:" + topic + ") -> Print body");
+                log.warn("  - body:" + prettyJson(body));
+                break;
+            case "revocation_registry":
+            case "issuer_cred_rev":
+                break;
+            default:
+                log.warn("- Warning Unexpected topic:" + topic);
+        }
+    }
+
+    void provisionController() {
+        agentApiUrl = platformUrl + "/agent/api";
 
         log.info("TEST - Create invitation-url");
-        try {
-            String invitationUrl = createInvitationUrl();
-            log.info("- SUCCESS");
-            String invitation = Common.parseInvitationUrl(invitationUrl);
-            JsonObject object = new Gson().fromJson(invitation, JsonObject.class);
-            publicDid = object.get("did").getAsString();
-            orgName = object.get("label").getAsString();
-            orgImageUrl = object.get("imageUrl").getAsString();
-        } catch (Exception e) {
-            log.info("- FAILED: Check if accessToken is valid - " + accessToken);
+        String invitationUrl = createInvitationUrl();
+        if (invitationUrl == null) {
+            log.info("- FAILED: Check if accessToken is valid - " + controllerToken);
             System.exit(0);
         }
+        String invitation = parseInvitationUrl(invitationUrl);
+        publicDid = JsonPath.read(invitation, "$.did");
+        orgName = JsonPath.read(invitation, "$.label");
+        orgImageUrl = JsonPath.read(invitation, "$.imageUrl");
+        log.info("- SUCCESS");
 
         if (!credDefId.equals("")) {
             log.info("TEST - Check if credential definition is in ledger");
-            if (ac.credentialDefinitionsGetById(credDefId).isPresent())
-                log.info("- SUCCESS : " + credDefId + " exists");
-            else {
+            String response = client.requestGET(agentApiUrl + "/credential-definitions/" + credDefId, controllerToken);
+            log.info("response: " + response);
+            LinkedHashMap<String, Object> credDef = JsonPath.read(response, "$.credential_definition");
+            if (credDef == null) {
                 log.info("- FAILED: " + credDefId + " does not exists - Check if it is valid");
                 System.exit(0);
             }
+            log.info("- SUCCESS : " + credDefId + " exists");
 
             log.info("TEST - Check if this controller owns the credential definition");
-            CredentialDefinitionFilter filter = CredentialDefinitionFilter.builder().credentialDefinitionId(credDefId).build();
-            if (!ac.credentialDefinitionsCreated(filter).get().getCredentialDefinitionIds().isEmpty())
-                log.info("- YES : This controller can issue with " + credDefId);
-            else
+            String params = "?cred_def_id=" + credDefId;
+            response = client.requestGET(agentApiUrl + "/credential-definitions/created" + params, controllerToken);
+            log.info("response: " + response);
+            ArrayList<String> credDefIds = JsonPath.read(response, "$.credential_definition_ids");
+            if (credDefIds.isEmpty())
                 log.info("- NO: This controller can not issue with " + credDefId);
+            else
+                log.info("- YES : This controller can issue with " + credDefId);
         }
 
         if (!schemaId.equals("")) {
             log.info("TEST - Check if schema is in ledger");
-            if (ac.schemasGetById(schemaId).isPresent())
-                log.info("- SUCCESS : " + schemaId + " exists");
-            else {
+            String response = client.requestGET(agentApiUrl + "/schemas/" + schemaId, controllerToken);
+            log.info("response: " + response);
+            LinkedHashMap<String, Object> schema = JsonPath.read(response, "$.schema");
+            if (schema == null) {
                 log.info("- FAILED: " + schemaId + " does not exists - Check if it is valid");
                 System.exit(0);
             }
+            log.info("- SUCCESS : " + schemaId + " exists");
         }
-        log.info("Controller provision - Finished");
     }
 
-    public String createInvitationUrl() throws IOException {
-        CreateInvitationRequest request = CreateInvitationRequest.builder().build();
-        CreateInvitationParams params = CreateInvitationParams.builder().isPublic(true).build();
-        CreateInvitationResponse response = ac.connectionsCreateInvitation(request, params).get();
-        log.info("createInvitationUrlL invitationUrl: " + response.getInvitationUrl());
-        return response.getInvitationUrl();
-    }
-
-    public void sendCredentialOffer(String connectionId, JsonObject credentialProposal) throws IOException {
-        // uncomment below if you want to get specified credential definition id from alice
-        //String wantedCredDefId = credentialProposal.get("cred_def_id").getAsString();
-
-        MyCredentialDefinition credDef = MyCredentialDefinition.builder()
-                .name("alice")
-                .date("05-2018")
-                .degree("maths")
-                .age("25")
-                .build();
-        CredentialExchange response = ac.issueCredentialSend(
-                new CredentialProposalRequest(connectionId, credDefId, credDef)
-        ).get();
+    public String createInvitationUrl() {
+        String params = "?public=true";
+        String response = client.requestPOST(agentApiUrl + "/connections/create-invitation" + params, controllerToken, "{}");
         log.info("response: " + response);
+        try {
+            return JsonPath.read(response, "$.invitation_url");
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
 
-    public void sendPrivacyPolicyOffer(String connectionId) throws IOException {
-        SendMessageRequest request = new SendMessageRequest("PrivacyPolicyOffer. Content here. If you agree, send me a message. PrivacyPolicyAgreed");
-        ac.connectionsSendMessage(connectionId, request);
-    }
+    public void sendCredentialOffer(String connectionId, String credentialProposal) {
+        // uncomment below if you want to get requested credential definition id from alice
+        //String requestedCredDefId = JsonPath.read(credentialProposal, "$.cred_def_id");
 
-    public void sendProofRequest(String connectionId) throws IOException {
-        Integer curUnixTime = Math.toIntExact(System.currentTimeMillis() / 1000L);
-        ProofRestrictions resriction =
-                ProofRestrictions.builder().credentialDefinitionId(credDefId).build();
-        ProofNonRevoked nonRevoked =
-                ProofNonRevoked.builder().toEpoch(curUnixTime).build();
-        PresentProofRequestConfig config = PresentProofRequestConfig.builder()
-                .connectionId(connectionId)
-                .appendAttribute(List.of("name", "date", "degree"), resriction)
-                .build();
-        PresentationExchangeRecord response = ac.presentProofSendRequest(
-                new PresentProofRequest(connectionId, ProofRequest.build(config), null, null)
-        ).get();
-        log.info("response: " + response);
-    }
-
-    /*
-
-    public void sendProofRequest(String connectionId) {
-        long curUnixTime = System.currentTimeMillis() / 1000L;
+        String encodedImage = "";
+        try {
+            encodedImage = encodeFileToBase64Binary(photoFileName);
+        } catch (Exception e) { e.printStackTrace(); }
         String body = JsonPath.parse("{" +
                 "  connection_id: '" + connectionId + "'," +
-                "  proof_request: {" +
-                "    name: 'proof_name'," +
-                "    version: '1.0'," +
-                "    requested_attributes: {" +
-                "      attr_name: {" +
-                "        name: 'name'," +
-                "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
-                "        restrictions: [ {cred_def_id: '" + credDefId + "'} ]" +
-                "      }," +
-                "      attr_date: {" +
-                "        name: 'date'," +
-                "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
-                "        restrictions: [ {cred_def_id: '" + credDefId + "'} ]" +
-                "      }," +
-                "      attr_degree: {" +
-                "        name: 'degree'," +
-                "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
-                "        restrictions: [ {cred_def_id: '" + credDefId + "'} ]" +
-                "      }" +
-                "    }," +
-                "    requested_predicates: {" +
-                "      pred_age: {" +
-                "        name: 'age'," +
-                "        p_type: '>='," +
-                "        p_value: 20," +
-                "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
-                "        restrictions: [ {cred_def_id: '" + credDefId + "'} ]" +
-                "      }" +
-                "    }" +
+                "  cred_def_id: '" + credDefId + "'," +
+                "  comment: 'credential_comment'," +
+                "  credential_proposal: {" +
+                "    @type: 'did:sov:BzCbsNYhMrjHiqZDTUASHg;spec/issue-credential/1.0/credential-preview'," +
+                "    attributes: [" +
+                "      { name: 'name', value: 'alice' }," +
+                "      { name: 'date', value: '05-2018' }," +
+                "      { name: 'degree', value: 'maths' }," +
+                "      { name: 'age', value: '25' }," +
+                "      { name: 'photo', value: '" + encodedImage + "', mime-type: 'image/jpeg' }" +
+                "    ]" +
                 "  }" +
                 "}").jsonString();
-        String response = client.requestPOST(agentApiUrl + "/present-proof/send-request", controllerToken, body);
+        String response = client.requestPOST(agentApiUrl + "/issue-credential/send", controllerToken, body);
+        log.info("response: " + response);
+    }
+
+    public void sendPrivacyPolicyOffer(String connectionId) {
+        String body = JsonPath.parse("{" +
+                "  content: 'PrivacyPolicyOffer. Content here. If you agree, send me a message. PrivacyPolicyAgreed'," +
+                "}").jsonString();
+        String response = client.requestPOST(agentApiUrl + "/connections/" + connectionId + "/send-message", controllerToken, body);
+        log.info("response: " + response);
+    }
+
+    public void sendProofRequest(String connectionId) {
+        String body = JsonPath.parse("{" +
+                "  connection_id: '" + connectionId + "'," +
+                "  verification_template_id: '" + verifTplId + "'" +
+                "}").jsonString();
+        String response = client.requestPOST(agentApiUrl + "/present-proof/send-verification-request", controllerToken, body);
         log.info("response: " + response);
     }
 
@@ -230,23 +230,5 @@ public class GlobalService {
 
         String response =  client.requestPOST(url, controllerToken, "{}");
         log.info("response: " + response);
-    }
-
-     */
-
-    public byte[] generateQRCode(String text, int width, int height) {
-
-        Assert.hasText(text, "text must not be empty");
-        Assert.isTrue(width > 0, "width must be greater than zero");
-        Assert.isTrue(height > 0, "height must be greater than zero");
-
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        try {
-            BitMatrix matrix = new MultiFormatWriter().encode(text, BarcodeFormat.QR_CODE, width, height);
-            MatrixToImageWriter.writeToStream(matrix, MediaType.IMAGE_PNG.getSubtype(), outputStream, new MatrixToImageConfig());
-        } catch (IOException | WriterException e) {
-            e.printStackTrace();
-        }
-        return outputStream.toByteArray();
     }
 }
