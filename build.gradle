@@ -45,3 +45,9 @@ task faber(type:JavaExec) {
 	main = 'com.sktelecom.initial.controller.faber.Application'
 	args(['--spring.config.location=classpath:/application-faber.properties'])
 }
+task alice(type:JavaExec) {
+	group 'application'
+	classpath sourceSets.main.runtimeClasspath
+	main = 'com.sktelecom.initial.controller.alice.Application'
+	args(['--spring.config.location=classpath:/application-alice.properties'])
+}
