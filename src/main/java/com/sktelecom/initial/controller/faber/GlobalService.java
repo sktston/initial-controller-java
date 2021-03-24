@@ -123,7 +123,7 @@ public class GlobalService {
         log.info("- SUCCESS");
 
         if (!credDefId.equals("")) {
-            log.info("TEST - Check if credential definition is in ledger");
+            log.info("TEST - Check if credential definition is valid");
             String response = client.requestGET(agentApiUrl + "/credential-definitions/" + credDefId, controllerToken);
             log.info("response: " + response);
             LinkedHashMap<String, Object> credDef = JsonPath.read(response, "$.credential_definition");
@@ -145,7 +145,7 @@ public class GlobalService {
         }
 
         if (!schemaId.equals("")) {
-            log.info("TEST - Check if schema is in ledger");
+            log.info("TEST - Check if schema is valid");
             String response = client.requestGET(agentApiUrl + "/schemas/" + schemaId, controllerToken);
             log.info("response: " + response);
             LinkedHashMap<String, Object> schema = JsonPath.read(response, "$.schema");
@@ -154,6 +154,18 @@ public class GlobalService {
                 System.exit(0);
             }
             log.info("- SUCCESS : " + schemaId + " exists");
+        }
+
+        if (!verifTplId.equals("")) {
+            log.info("TEST - Check if verification template is valid");
+            String response = client.requestGET(agentApiUrl + "/verification-templates/" + verifTplId, controllerToken);
+            log.info("response: " + response);
+            LinkedHashMap<String, Object> verifTpl = JsonPath.read(response, "$.verification_template");
+            if (verifTpl == null) {
+                log.info("- FAILED: " + verifTplId + " does not exists - Check if it is valid");
+                System.exit(0);
+            }
+            log.info("- SUCCESS : " + verifTplId + " exists");
         }
     }
 
