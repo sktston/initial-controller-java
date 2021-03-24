@@ -25,22 +25,30 @@ public class GlobalService {
     @Value("${platformUrl}")
     private String platformUrl; // platform url
 
+    @Value("${controllerToken}")
+    private String controllerToken; // controller access token
+
     @Value("${faberControllerUrl}")
     private String faberControllerUrl; // faber controller url to receive invitation-url
 
-    @Value("${controllerUrl}")
-    private String controllerUrl; // controller url to receive webhook message
-
-    private String agentApiUrl;
-
-    // sample alice info
-    private String orgId =  "14587";
-    private String userToken = "18d34d0a-b5cf-4620-bd57-eef8b7fbab45";
-    private String controllerToken = "1301debd-03b2-4cb9-8f9f-ffb04126354a";
+    String agentApiUrl;
+    String orgName;
+    String orgImageUrl;
+    String publicDid;
 
     @EventListener(ApplicationReadyEvent.class)
     public void initializeAfterStartup() {
         provisionController();
+
+        log.info("Controller configurations");
+        log.info("------------------------------");
+        log.info("- organization name: " + orgName);
+        log.info("- organization imageUrl: " + orgImageUrl);
+        log.info("- public did: " + publicDid);
+        log.info("- controller access token: " + controllerToken);
+        log.info("------------------------------");
+        log.info("Controller is ready");
+
         log.info("Receive invitation from faber controller");
         receiveInvitationUrl();
     }
@@ -94,13 +102,28 @@ public class GlobalService {
     public void provisionController() {
         agentApiUrl = platformUrl + "/agent/api";
 
-        String authUrl = platformUrl + "/auth";
-        String webhookUrl = controllerUrl + "/webhooks";
+        log.info("TEST - Create invitation-url");
+        String invitationUrl = createInvitationUrl();
+        if (invitationUrl == null) {
+            log.info("- FAILED: Check if accessToken is valid - " + controllerToken);
+            System.exit(0);
+        }
+        String invitation = parseInvitationUrl(invitationUrl);
+        publicDid = JsonPath.read(invitation, "$.did");
+        orgName = JsonPath.read(invitation, "$.label");
+        orgImageUrl = JsonPath.read(invitation, "$.imageUrl");
+        log.info("- SUCCESS");
+    }
 
-        String body = JsonPath.parse("{ webhookUrl : '" + webhookUrl + "' }").jsonString();
-        log.info("Update webhook url for current user: " + webhookUrl);
-        String response = client.requestPUT(authUrl + "/orgs/" + orgId, userToken, body);
+    public String createInvitationUrl() {
+        String params = "?public=true";
+        String response = client.requestPOST(agentApiUrl + "/connections/create-invitation" + params, controllerToken, "{}");
         log.info("response: " + response);
+        try {
+            return JsonPath.read(response, "$.invitation_url");
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
 
     public void receiveInvitationUrl() {
