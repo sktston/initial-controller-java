@@ -24,7 +24,7 @@ initial 플랫폼 서비스를 사용하기 위한 Java기반의 Issuer, Verifie
 - 검증 항목 선택: person_name, mobile_num 등
 
 검증관리 - 검증 양식 관리 - 모바일 가입 증명 검증 - 상세 보기
-- 검증 양식 ID (`verifTplId`): `0012d683-bdb0-4050-ac85-ae37e59bad09` (예시)
+- 검증 양식 ID (`verifTplId`): `0012d683-bdb0-4050-ac85-ae37e59bad09` (예시) **확인**
 
 발행관리 - 발행 양식 생성 - 샘플 학위증명(1.0)
 - 양식설명: 샘플 증명서 (예시)
@@ -33,10 +33,10 @@ initial 플랫폼 서비스를 사용하기 위한 Java기반의 Issuer, Verifie
 
 발행관리 - 발행 양식 관리 - 샘플 학위증명(1.0)
 - 증명서 발행 설정: 발행 시작
-- 증명서 ID (`CredDefId`): `Qr7Yo4sPs7cXiiVbEYwGsJ:3:CL:1618984624:1ee53b6d-7d8c-461e-910a-623302dc854a` (예시)
+- 증명서 ID (`CredDefId`): `Qr7Yo4sPs7cXiiVbEYwGsJ:3:CL:1618984624:1ee53b6d-7d8c-461e-910a-623302dc854a` (예시) **확인**
 
 기관관리 - 기관 정보
-- `Access Token`: `514ac4f8-e0da-43c9-910d-4894279909b2` (예시)
+- `Access Token`: `514ac4f8-e0da-43c9-910d-4894279909b2` (예시) **확인**
 - Webhook URL: https://issuer-controller.url/webhooks (**서버 주소 및 webhooks 다시 한번 확인**)
 
 #### Holder 생성 및 설정 (Issuer 동작 확인 위함)
@@ -51,7 +51,7 @@ initial 플랫폼 서비스를 사용하기 위한 Java기반의 Issuer, Verifie
 - 기관 사용: 미사용
 
 기관관리 - 기관 정보
-- `Access Token`: `3a0ece13-dd04-419d-b3ea-f12b52e297d7` (예시)
+- `Access Token`: `3a0ece13-dd04-419d-b3ea-f12b52e297d7` (예시) **확인**
 - Webhook URL: https://holder-controller.url/webhooks (**서버 주소 및 webhooks 다시 한번 확인**)
 
 ### 2. properties 설정 - 본 repository 코드
@@ -68,7 +68,7 @@ verifTplId = 작성한 issuer의 `verifTplId`
 server.port = 8041 \
 platformUrl = https://dev-console.myinitial.io (고정) \
 accessToken = holder의 `Access Token` \
-issuerControllerUrl = https://issuer-controller.url
+issuerControllerUrl = https://issuer-controller.url \
 issuerCredDefId = 작성한 issuer의 `CredDefId`
 
 ### 3. issuer 및 holder 실행 - 각 terminal
