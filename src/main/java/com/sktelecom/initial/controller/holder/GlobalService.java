@@ -28,8 +28,8 @@ public class GlobalService {
     // sample mobile credential issuer controller url
     final String sampleMobileIssuerControllerUrl = "http://221.168.33.78:8044";
 
-    @Value("${platformUrl}")
-    private String platformUrl; // platform url
+    @Value("${agentApiUrl}")
+    private String agentApiUrl; // agent service api url
 
     @Value("${accessToken}")
     private String accessToken; // controller access token
@@ -40,7 +40,6 @@ public class GlobalService {
     @Value("${issuerCredDefId}")
     private String issuerCredDefId; // credential definition identifier to receive
 
-    String agentApiUrl;
     String orgName;
     String orgImageUrl;
     String publicDid;
@@ -171,8 +170,6 @@ public class GlobalService {
     }
 
     public void provisionController() {
-        agentApiUrl = platformUrl + "/agent/api";
-
         log.info("TEST - Create invitation-url");
         String invitationUrl = createInvitationUrl();
         if (invitationUrl == null) {
