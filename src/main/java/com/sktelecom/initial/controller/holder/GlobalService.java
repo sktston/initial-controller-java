@@ -45,6 +45,8 @@ public class GlobalService {
     String publicDid;
     String phase;
 
+    int iterations = 100; // for long-term test
+
     @EventListener(ApplicationReadyEvent.class)
     public void initialize() {
         provisionController();
@@ -322,8 +324,14 @@ public class GlobalService {
     public void delayedExit() {
         TimerTask task = new TimerTask() {
             public void run() {
-                log.info("Holder demo completes - Exit");
-                System.exit(0);
+                if (--iterations == 0) {
+                    log.info("Holder demo completes - Exit");
+                    System.exit(0);
+                }
+                else {
+                    log.info("Remaining iterations : " + iterations);
+                    startDemo();
+                }
             }
         };
         Timer timer = new Timer("Timer");
