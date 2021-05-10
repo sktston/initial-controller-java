@@ -59,14 +59,14 @@ initial 플랫폼 서비스를 사용하기 위한 Java기반의 Issuer, Verifie
 
 #### application-issuer.properties
 server.port = 8040 \
-platformUrl = https://dev-console.myinitial.io (고정) \
+agentApiUrl = https://dev-console.myinitial.io/agent/api (고정) \
 accessToken = issuer의 `Access Token` \
 credDefId = 작성한 issuer의 `CredDefId` \
 verifTplId = 작성한 issuer의 `verifTplId`
 
 #### application-holder.properties
 server.port = 8041 \
-platformUrl = https://dev-console.myinitial.io (고정) \
+agentApiUrl = https://dev-console.myinitial.io/agent/api (고정) \
 accessToken = holder의 `Access Token` \
 issuerControllerUrl = https://issuer-controller.url \
 issuerCredDefId = 작성한 issuer의 `CredDefId`
@@ -158,12 +158,18 @@ Revoke된 credential은 Issuer가 (present_proof, verified) 시점에, webhook �
 ### 1. 사전준비
 상용: https://console.myinitial.io
 
+#### Issuer 생성 및 설정
+production 새로 작성
+
+#### Holder 생성 및 설정 (Issuer 동작 확인 위함)
+production 새로 작성
+
 ### 2. properties 설정
 #### application-issuer-prod.properties
-platformUrl = https://console.myinitial.io (고정)
+agentApiUrl = https://console.myinitial.io/agent/api (고정)
 
 #### application-holder-prod.properties
-platformUrl = https://console.myinitial.io (고정)
+agentApiUrl = https://console.myinitial.io/agent/api (고정)
 
 ### 3. issuer 및 holder 실행
 #### issuer 실행

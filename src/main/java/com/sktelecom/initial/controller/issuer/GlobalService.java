@@ -20,8 +20,8 @@ import static com.sktelecom.initial.controller.utils.Common.*;
 public class GlobalService {
     private final HttpClient client = new HttpClient();
 
-    @Value("${platformUrl}")
-    private String platformUrl; // platform url
+    @Value("${agentApiUrl}")
+    private String agentApiUrl; // agent service api url
 
     @Value("${accessToken}")
     private String accessToken; // controller access token
@@ -32,7 +32,6 @@ public class GlobalService {
     @Value("${verifTplId}")
     private String verifTplId; // verification template identifier
 
-    String agentApiUrl;
     String orgName;
     String orgImageUrl;
     String publicDid;
@@ -131,8 +130,6 @@ public class GlobalService {
     }
 
     void provisionController() {
-        agentApiUrl = platformUrl + "/agent/api";
-
         log.info("TEST - Create invitation-url");
         String invitationUrl = createInvitationUrl();
         if (invitationUrl == null) {
