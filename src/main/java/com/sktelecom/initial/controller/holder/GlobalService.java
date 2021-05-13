@@ -75,7 +75,8 @@ public class GlobalService {
         }
     }
 
-    public void handleEvent(String topic, String body) {
+    public void handleEvent(String body) {
+        String topic = JsonPath.read(body, "$.topic");
         String state = topic.equals("problem_report") ? null : JsonPath.read(body, "$.state");
         log.info("handleEvent >>> topic:" + topic + ", state:" + state + ", body:" + body);
 
@@ -135,7 +136,8 @@ public class GlobalService {
         }
     }
 
-    public void handleEventOnPreparation(String topic, String body) {
+    public void handleEventOnPreparation(String body) {
+        String topic = JsonPath.read(body, "$.topic");
         String state = topic.equals("problem_report") ? null : JsonPath.read(body, "$.state");
         log.info("handleEvent >>> topic:" + topic + ", state:" + state + ", body:" + body);
 
