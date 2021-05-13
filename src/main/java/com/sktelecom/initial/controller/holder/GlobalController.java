@@ -17,14 +17,12 @@ public class GlobalController {
     @Autowired
     GlobalService globalService;
 
-    @PostMapping("/webhooks/topic/{topic}")
-    public ResponseEntity webhooksTopicHandler(
-            @PathVariable String topic,
-            @RequestBody String body) {
+    @PostMapping("/webhooks")
+    public ResponseEntity webhooksTopicHandler(@RequestBody String body) {
         if (globalService.phase.equals("preparation"))
-            globalService.handleEventOnPreparation(topic, body);
+            globalService.handleEventOnPreparation(body);
         else
-            globalService.handleEvent(topic, body);
+            globalService.handleEvent(body);
         return ResponseEntity.ok().build();
     }
 

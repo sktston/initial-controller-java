@@ -60,7 +60,8 @@ public class GlobalService {
         log.info("Controller is ready");
     }
 
-    public void handleEvent(String topic, String body) {
+    public void handleEvent(String body) {
+        String topic = JsonPath.read(body, "$.topic");
         String state = topic.equals("problem_report") ? null : JsonPath.read(body, "$.state");
         log.info("handleEvent >>> topic:" + topic + ", state:" + state + ", body:" + body);
 
