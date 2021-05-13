@@ -34,11 +34,9 @@ public class GlobalController {
         return generateQRCode(invitationUrl, 300, 300);
     }
 
-    @PostMapping(value = "/webhooks/topic/{topic}")
-    public ResponseEntity webhooksTopicHandler(
-            @PathVariable String topic,
-            @RequestBody String body) {
-        globalService.handleEvent(topic, body);
+    @PostMapping(value = "/webhooks")
+    public ResponseEntity webhooksTopicHandler(@RequestBody String body) {
+        globalService.handleEvent(body);
         return ResponseEntity.ok().build();
     }
 
