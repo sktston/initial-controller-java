@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ko">
+<script type="text/javascript">
+    var Request = function() {
+        this.getParameter = function(name) {
+            var rtnval = '';
+            var nowAddress = unescape(location.href);
+            var parameters = (nowAddress.slice(nowAddress.indexOf('?') + 1,
+                    nowAddress.length)).split('&');
+            for (var i = 0; i < parameters.length; i++) {
+                var varName = parameters[i].split('=')[0];
+                if (varName.toUpperCase() == name.toUpperCase()) {
+                    rtnval = parameters[i].split('=')[1];
+                    break;
+                }
+            }
+            return rtnval;
+        }
+    }
+    var request = new Request();
+</script>
+
+<head>
+    <meta charset="UTF-8">
+    <title>web-view form</title>
+    <style>
+      * {
+        font-size: 16px;
+        font-family: Consolas, sans-serif;
+      }
+    </style>
+</head>
+
+<body>
+<center>
+<form method="post" action="submit">
+    <input type="hidden" name="presExId" id="presExId" value="presExIdValue" />
+    <script>
+        var presIdValue = request.getParameter('presExId');
+        document.getElementById("presExId").value = presIdValue
+    </script>
+    <p>Please select your preferred item</p>
+    <div>
+        <p>
+            <input type="radio" id="itemChoice1"
+                   name="selectedItemId" value="item1Id">
+            <label for="itemChoice1">item1</label>
+        </p>
+        <p>
+            <input type="radio" id="itemChoice2"
+                   name="selectedItemId" value="item2Id">
+            <label for="itemChoice2">item2</label>
+        </p>
+    </div>
+    <div>
+        <input type="submit" value="Submit">
+    </div>
+</form>
+</center>
+</body>
+
+</html>

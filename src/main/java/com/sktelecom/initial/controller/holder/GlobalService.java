@@ -310,8 +310,18 @@ public class GlobalService {
             // we assume that we show web view to user and user select & submit a item -> POST /web-view/{presExId}
             String[] token = webViewUrl.split("web-view/");
             String presExId = token[1];
-            String body = JsonPath.parse("{ selected_item_id: 'a-single-selected-item-id' }").jsonString();
-            String response = client.requestPOST(issuerControllerUrl + "/web-view/" + presExId, "", body);
+
+            String initialAgreementDecision = JsonPath.parse("{" +
+                    "  type: 'initial_agreement_decision'," +
+                    "  content: {" +
+                    "    agree_yn :'Y'," +
+                    "    signature:'message signature',"+
+                    "  }" +
+                    "}").jsonString();
+
+
+            String body = JsonPath.parse("{ selectedItemId: 'item1Id' }").jsonString();
+            String response = client.requestPOST(issuerControllerUrl + "/web-view/submit", "", body);
             log.info("response: " + response);
         } catch (PathNotFoundException e) {
             log.warn("Invalid content format  -> Ignore");

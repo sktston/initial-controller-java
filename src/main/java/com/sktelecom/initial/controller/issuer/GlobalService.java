@@ -312,14 +312,17 @@ public class GlobalService {
         log.info("response: " + response);
     }
 
-    public void handleWebView(String presExId, String body) {
-        log.info("handleWebView >>> presExId:" + presExId + ", body:" + body);
+    public void handleWebView(String body) {
+        log.info("handleWebView >>> body:" + body);
 
-        String selectedItemId = JsonPath.read(body, "$.selected_item_id");
+        String presExId = JsonPath.read(body, "$.presExId");
+        String selectedItemId = JsonPath.read(body, "$.selectedItemId");
         String presExRecord = presExRecordCache.get(presExId);
+        String connectionId = JsonPath.read(presExRecord, "$.connection_id");
 
         // 3-1-1. 추가 정보 기반으로 증명서 발행
-        log.info("Selected Item Id received -> sendCredentialOffer");
+        log.info("Found connectionId:" + connectionId + " from presExId:" + presExId);
+        log.info("sendCredentialOffer with selectedItemId: " + selectedItemId);
         sendCredentialOffer(JsonPath.read(presExRecord, "$.connection_id"), null, selectedItemId);
 
         presExRecordCache.remove(presExId);
