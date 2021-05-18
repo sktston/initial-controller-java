@@ -323,7 +323,7 @@ public class GlobalService {
         // 3-1-1. 추가 정보 기반으로 증명서 발행
         log.info("Found connectionId:" + connectionId + " from presExId:" + presExId);
         log.info("sendCredentialOffer with selectedItemId: " + selectedItemId);
-        sendCredentialOffer(JsonPath.read(presExRecord, "$.connection_id"), null, selectedItemId);
+        sendCredentialOffer(connectionId, null, selectedItemId);
 
         presExRecordCache.remove(presExId);
     }
