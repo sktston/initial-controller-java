@@ -63,13 +63,13 @@ agentApiUrl = https://dev-console.myinitial.io/agent/api (고정) \
 accessToken = issuer의 `Access Token` \
 credDefId = 작성한 issuer의 `CredDefId` \
 verifTplId = 작성한 issuer의 `verifTplId` \
-webViewUrl = (Optional) Holder에게 보여줄 Web View 페이지 주소
+webViewUrl = `https://issuer-controller.url/web-view/form.html` (Optional) Holder 에게 보여줄 Web View 페이지 주소
 
 #### application-holder.properties
 server.port = 8041 \
 agentApiUrl = https://dev-console.myinitial.io/agent/api (고정) \
 accessToken = holder의 `Access Token` \
-issuerControllerUrl = https://issuer-controller.url \
+issuerInvitationUrl = `https://issuer-controller.url/invitation-url` invitation-url 을 받을 주소 \
 issuerCredDefId = 작성한 issuer의 `CredDefId`
 
 ### 3. issuer 및 holder 실행 - 각 terminal
