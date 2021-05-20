@@ -40,12 +40,10 @@ public class GlobalController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping(value = "/web-view/{presExId}")
-    public String webViewHandler(
-            @PathVariable String presExId,
-            @RequestBody String body) {
-        globalService.handleWebView(presExId, body);
-        return "{}";
+    @PostMapping(value = "/web-view/submit")
+    public ResponseEntity webViewHandler(@RequestBody String body) {
+        globalService.handleWebView(body);
+        return ResponseEntity.ok().build();
     }
 
 }

@@ -32,6 +32,9 @@ public class GlobalService {
     @Value("${verifTplId}")
     private String verifTplId; // verification template identifier
 
+    @Value("${webViewUrl}")
+    private String webViewUrl; // web view form url
+
     String orgName;
     String orgImageUrl;
     String publicDid;
@@ -102,9 +105,10 @@ public class GlobalService {
                 // 3. holder 가 보낸 모바일 가입증명 검증 완료
                 if (state.equals("verified")) {
                     log.info("- Case (topic:" + topic + ", state:" + state + ") -> getPresentationResult");
-                    String presRequest = JsonPath.parse((LinkedHashMap)JsonPath.read(body, "$.presentation_request")).jsonString();
-                    String presentation = JsonPath.parse((LinkedHashMap)JsonPath.read(body, "$.presentation")).jsonString();
-                    String attrs = getPresentationResult(JsonPath.read(body, "$.verified"), presRequest, presentation);
+                    LinkedHashMap<String, String> attrs = getPresentationResult(body);
+                    for(String key : attrs.keySet())
+                        log.info("Requested Attribute - " + key + ": " + attrs.get(key));
+
                     if (enableWebView) {
                         // 3-1. 검증 값 정보로 발행할 증명서가 한정되지 않는 경우 추가 정보 요구
                         log.info("Web View enabled -> sendWebView");
@@ -242,12 +246,15 @@ public class GlobalService {
         log.info("response: " + response);
     }
 
-    public String getPresentationResult(String verified, String presRequest, String presentation) {
+    public LinkedHashMap<String, String> getPresentationResult(String presExRecord) {
+        String verified = JsonPath.read(presExRecord, "$.verified");
         if (!verified.equals("true")) {
             log.info("proof is not verified");
             return null;
         }
 
+        String presRequest = JsonPath.parse((LinkedHashMap)JsonPath.read(presExRecord, "$.presentation_request")).jsonString();
+        String presentation = JsonPath.parse((LinkedHashMap)JsonPath.read(presExRecord, "$.presentation")).jsonString();
         LinkedHashMap<String, Object> requestedAttrs = JsonPath.read(presRequest, "$.requested_attributes");
         LinkedHashMap<String, Object> revealedAttrs = JsonPath.read(presentation, "$.requested_proof.revealed_attrs");
         LinkedHashMap<String, String> attrs = new LinkedHashMap<>();
@@ -258,14 +265,10 @@ public class GlobalService {
                 value = JsonPath.read(revealedAttrs.get(key), "$.raw");
             attrs.put(name, value);
         }
-        log.info("Presentation is verified");
-        for(String key : attrs.keySet())
-            log.info("Requested Attribute - " + key + ": " + attrs.get(key));
-
-        return JsonPath.parse(attrs).jsonString();
+        return attrs;
     }
 
-    public void sendCredentialOffer(String connectionId, String attrs, String selectedItemId) {
+    public void sendCredentialOffer(String connectionId, LinkedHashMap<String, String> attrs, String selectedItemId) {
         // TODO: need to implement business logic to query information for holder
         // we assume that the value is obtained by querying DB (e.g., attrs.mobileNum and selectedItemId)
         LinkedHashMap<String, String> value = new LinkedHashMap<>();
@@ -293,18 +296,18 @@ public class GlobalService {
         log.info("response: " + response);
     }
 
-    public void sendWebView(String connectionId, String attrs, String presExRecord) {
+    public void sendWebView(String connectionId, LinkedHashMap<String, String> attrs, String presExRecord) {
         String presExId = JsonPath.read(presExRecord, "$.presentation_exchange_id");
         presExRecordCache.put(presExId, presExRecord);
 
         // TODO: need to implement business logic to query information for holder and prepare web view
-        // we assume that the GET https://issuer.url/web-view/{presExId} is web view page to select a item by user
-        // Also, we assume that selected item id will be submitted to POST /web-view/{presExId}
+        // we send web view form page (GET webViewUrl?presExId={presExId}) to holder in order to select a item by user
+        // This web view page will submit presExId and selectedItemId to POST /web-view/submit
 
         String initialWebView = JsonPath.parse("{" +
                 "  type : 'initial_web_view',"+
                 "  content: {" +
-                "    web_view_url : 'https://issuer.url/web-view/" + presExId + "'," +
+                "    web_view_url : '" + webViewUrl + "?presExId=" + presExId + "'," +
                 "  }"+
                 "}").jsonString();
         String body = JsonPath.parse("{ content: '" + initialWebView  + "' }").jsonString();
@@ -312,15 +315,19 @@ public class GlobalService {
         log.info("response: " + response);
     }
 
-    public void handleWebView(String presExId, String body) {
-        log.info("handleWebView >>> presExId:" + presExId + ", body:" + body);
+    public void handleWebView(String body) {
+        log.info("handleWebView >>> body:" + body);
 
-        String selectedItemId = JsonPath.read(body, "$.selected_item_id");
+        String presExId = JsonPath.read(body, "$.presExId");
         String presExRecord = presExRecordCache.get(presExId);
+        String connectionId = JsonPath.read(presExRecord, "$.connection_id");
+        LinkedHashMap<String, String> attrs = getPresentationResult(presExRecord);
+        String selectedItemId = JsonPath.read(body, "$.selectedItemId");
 
         // 3-1-1. 추가 정보 기반으로 증명서 발행
-        log.info("Selected Item Id received -> sendCredentialOffer");
-        sendCredentialOffer(JsonPath.read(presExRecord, "$.connection_id"), null, selectedItemId);
+        log.info("Found connectionId:" + connectionId + " from presExId:" + presExId);
+        log.info("sendCredentialOffer with selectedItemId: " + selectedItemId);
+        sendCredentialOffer(connectionId, attrs, selectedItemId);
 
         presExRecordCache.remove(presExId);
     }
