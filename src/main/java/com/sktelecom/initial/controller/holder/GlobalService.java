@@ -305,9 +305,20 @@ public class GlobalService {
             log.info("webViewContent: " + webViewContent);
             String webViewUrl = JsonPath.read(webViewContent, "$.web_view_url");
 
-            // We assume that we show web view to user and user select & submit a item
-            // For simplicity, we use auto submit in demo
-            String response = client.requestGET(webViewUrl + "&auto=true", "");
+            // CODE HERE : Show web view to user and user select & submit a item
+
+            // For automation, we submit a item directly
+            String[] token = webViewUrl.split("/web-view/form.html");
+            String issuerUrl = token[0];
+            String[] token2 = webViewUrl.split("presExId=");
+            String presExId = token2[1];
+
+            String body = JsonPath.parse("{" +
+                    "  presExId: '" + presExId + "'," +
+                    "  selectedItemId: 'item1Id'" +
+                    "}").jsonString();
+
+            String response = client.requestPOST(issuerUrl + "/web-view/submit", "", body);
             log.info("response: " + response);
         } catch (PathNotFoundException e) {
             log.warn("Invalid content format  -> Ignore");
