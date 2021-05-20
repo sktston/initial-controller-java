@@ -62,7 +62,8 @@ server.port = 8040 \
 agentApiUrl = https://dev-console.myinitial.io/agent/api (고정) \
 accessToken = issuer의 `Access Token` \
 credDefId = 작성한 issuer의 `CredDefId` \
-verifTplId = 작성한 issuer의 `verifTplId`
+verifTplId = 작성한 issuer의 `verifTplId` \
+webViewUrl = (Optional) Holder에게 보여줄 Web View 페이지 주소
 
 #### application-holder.properties
 server.port = 8041 \
@@ -129,8 +130,8 @@ Issuer가 Presentation의 정보로 발행 가능한 증명서를 한정하기 �
 |---|---|---|---|
 | POST /connections/{conn_id}/send-message |  |  | basicmessages, received, *initial_web_view |
 
-Holder는 Issuer가 제공한 web view 페이지를 보여주고 사용자가 item 하나를 선택함 \
-본 데모에서는 item 하나를 선택하여 Issuer의 POST https://issuer-controller.url/web-view/{presExId} 를 호출한다는 가정하에 동작함
+Holder는 Issuer가 제공한 web view 페이지 `webViewUrl` 를 보여주고 사용자가 item 하나를 선택함 \
+본 데모에서는 item 하나를 선택하여 Issuer의 POST https://issuer-controller.url/web-view/submit 를 호출한다는 가정하에 동작함
 
 ### Issue Credential
 Issuer는 받은 정보를 기반으로 DB를 qeury하여 증명서를 작성하여 발급함
