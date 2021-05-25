@@ -39,7 +39,7 @@ public class GlobalService {
     String orgImageUrl;
     String publicDid;
 
-    LinkedHashMap<String, String> presExRecordCache = new LinkedHashMap<>();
+    LinkedHashMap<String, String> connIdToCredExId = new LinkedHashMap<>(); // cache to keep credential issuing flow
 
     // for revocation example
     static boolean enableRevoke = Boolean.parseBoolean(System.getenv().getOrDefault("ENABLE_REVOKE", "false"));
@@ -72,19 +72,21 @@ public class GlobalService {
             case "issue_credential":
                 // 1. holder 가 credential 을 요청함 -> 개인정보이용 동의 요청
                 if (state.equals("proposal_received")) {
-                    log.info("- Case (topic:" + topic + ", state:" + state + ") -> isValidCredentialProposal && sendAgreement");
-                    String credentialProposal = JsonPath.parse((LinkedHashMap)JsonPath.read(body, "$.credential_proposal_dict")).jsonString();
-                    if(isValidCredentialProposal(credentialProposal)) {
+                    log.info("- Case (topic:" + topic + ", state:" + state + ") -> checkCredentialProposal && sendAgreement");
+                    if(checkCredentialProposal(body)) {
                         sendAgreement(JsonPath.read(body, "$.connection_id"));
                     }
                 }
                 // 4. holder 가 증명서를 정상 저장하였음 -> 완료 (revocation 은 아래 코드 참조)
                 else if (state.equals("credential_acked")) {
                     log.info("- Case (topic:" + topic + ", state:" + state + ") -> credential issued successfully");
-                    // TODO: should store credential_exchange_id to revoke this credential later
-                    // storeCredExRecord(body);
+
+                    // TODO: should store credential_exchange_id to revoke this credential
+                    // connIdToCredExId is simple example for this
                     if (enableRevoke) {
-                        revokeCredential(JsonPath.read(body, "$.credential_exchange_id"));
+                        String connectionId = JsonPath.read(body, "$.connection_id");
+                        String credExId = connIdToCredExId.get(connectionId);
+                        revokeCredential(credExId);
                     }
                 }
                 break;
@@ -193,11 +195,16 @@ public class GlobalService {
         }
     }
 
-    public boolean isValidCredentialProposal(String credentialProposal) {
+    public boolean checkCredentialProposal(String credExRecord) {
+        String credentialProposal = JsonPath.parse((LinkedHashMap)JsonPath.read(credExRecord, "$.credential_proposal_dict")).jsonString();
         try {
             String requestedCredDefId = JsonPath.read(credentialProposal, "$.cred_def_id");
-            if (requestedCredDefId.equals(credDefId))
+            if (requestedCredDefId.equals(credDefId)){
+                String connectionId = JsonPath.read(credExRecord, "$.connection_id");
+                String credExId = JsonPath.read(credExRecord, "$.credential_exchange_id");
+                connIdToCredExId.put(connectionId, credExId);
                 return true;
+            }
             log.warn("This issuer can issue credDefId:" + credDefId);
             log.warn("But, requested credDefId is " + requestedCredDefId + " -> Ignore");
         } catch (PathNotFoundException e) {
@@ -271,34 +278,32 @@ public class GlobalService {
 
         // value insertion
         String body = JsonPath.parse("{" +
-                "  connection_id: '" + connectionId + "'," +
-                "  cred_def_id: '" + credDefId + "'," +
-                "  credential_proposal: {" +
-                "    attributes: [" +
-                "      { name: 'name', value: '" + value.get("name")  + "' }," +
-                "      { name: 'date', value: " + value.get("date") + "' }," +
-                "      { name: 'degree', value: '" + value.get("degree") + "' }," +
-                "      { name: 'age', value: '" +  value.get("age")  + "' }," +
-                "      { name: 'photo', value: '" + value.get("photo") + "' }" +
-                "    ]" +
+                "  counter_proposal: {" +
+                "    credential_proposal: {" +
+                "      attributes: [" +
+                "        { name: 'name', value: '" + value.get("name")  + "' }," +
+                "        { name: 'date', value: " + value.get("date") + "' }," +
+                "        { name: 'degree', value: '" + value.get("degree") + "' }," +
+                "        { name: 'age', value: '" +  value.get("age")  + "' }," +
+                "        { name: 'photo', value: '" + value.get("photo") + "' }" +
+                "      ]" +
+                "    }" +
                 "  }" +
                 "}").jsonString();
-        String response = client.requestPOST(agentApiUrl + "/issue-credential/send", accessToken, body);
+        String credExId = connIdToCredExId.get(connectionId);
+        String response = client.requestPOST(agentApiUrl + "/issue-credential/records/" + credExId + "/send-offer", accessToken, body);
         log.info("response: " + response);
     }
 
     public void sendWebView(String connectionId, LinkedHashMap<String, String> attrs, String presExRecord) {
-        String presExId = JsonPath.read(presExRecord, "$.presentation_exchange_id");
-        presExRecordCache.put(presExId, presExRecord);
-
         // TODO: need to implement business logic to query information for holder and prepare web view
-        // we send web view form page (GET webViewUrl?presExId={presExId}) to holder in order to select a item by user
-        // This web view page will submit presExId and selectedItemId to POST /web-view/submit
+        // we send web view form page (GET webViewUrl?connectionId={connectionId}) to holder in order to select a item by user
+        // This web view page will submit connectionId and selectedItemId to POST /web-view/submit
 
         String initialWebView = JsonPath.parse("{" +
                 "  type : 'initial_web_view',"+
                 "  content: {" +
-                "    web_view_url : '" + webViewUrl + "?presExId=" + presExId + "'," +
+                "    web_view_url : '" + webViewUrl + "?connectionId=" + connectionId + "'," +
                 "  }"+
                 "}").jsonString();
         String body = JsonPath.parse("{ content: '" + initialWebView  + "' }").jsonString();
@@ -309,18 +314,12 @@ public class GlobalService {
     public void handleWebView(String body) {
         log.info("handleWebView >>> body:" + body);
 
-        String presExId = JsonPath.read(body, "$.presExId");
-        String presExRecord = presExRecordCache.get(presExId);
-        String connectionId = JsonPath.read(presExRecord, "$.connection_id");
-        LinkedHashMap<String, String> attrs = getPresentationResult(presExRecord);
+        String connectionId = JsonPath.read(body, "$.connectionId");
         String selectedItemId = JsonPath.read(body, "$.selectedItemId");
 
         // 3-1-1. 추가 정보 기반으로 증명서 발행
-        log.info("Found connectionId:" + connectionId + " from presExId:" + presExId);
-        log.info("sendCredentialOffer with selectedItemId: " + selectedItemId);
-        sendCredentialOffer(connectionId, attrs, selectedItemId);
-
-        presExRecordCache.remove(presExId);
+        log.info("sendCredentialOffer with connectionId:" + connectionId + ", selectedItemId:" + selectedItemId);
+        sendCredentialOffer(connectionId, null, selectedItemId);
     }
 
     public void revokeCredential(String credExId) {
