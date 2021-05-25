@@ -310,11 +310,11 @@ public class GlobalService {
             // For automation, we submit a item directly
             String[] token = webViewUrl.split("/web-view/form.html");
             String issuerUrl = token[0];
-            String[] token2 = webViewUrl.split("presExId=");
-            String presExId = token2[1];
+            String[] token2 = webViewUrl.split("connectionId=");
+            String connectionId = token2[1];
 
             String body = JsonPath.parse("{" +
-                    "  presExId: '" + presExId + "'," +
+                    "  connectionId: '" + connectionId + "'," +
                     "  selectedItemId: 'item1Id'" +
                     "}").jsonString();
 

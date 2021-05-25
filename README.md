@@ -102,6 +102,7 @@ Holder는 accessToken이 valid 한 지 확인 후, 샘플 모바일 가입증명
 
 ### Connection
 Holder가 https://issuer-controller.url/invitation-url 호출부터 시작
+
 | Issuer API | Holder API | Issuer webhook (topic, state) | Holder webhook (topic, state) |
 |---|---|---|---|
 | POST /connections/create-invitation |  |  |  |
@@ -112,6 +113,7 @@ Holder가 https://issuer-controller.url/invitation-url 호출부터 시작
 
 ### Presentation
 Holder가 (connections, active) 시점에 credential proposal을 보냄
+
 | Issuer API | Holder API | Issuer webhook (topic, state, *msg_type) | Holder webhook (topic, state, *msg_type) |
 |---|---|---|---|
 |  | POST /issue-credential/send-proposal | issue_credential, proposal_received | issue_credential, proposal_sent |
@@ -122,10 +124,12 @@ Holder가 (connections, active) 시점에 credential proposal을 보냄
 |  | POST /present-proof/records/{presExId}/send-presentation | present_proof, presentation_received | present_proof, presentation_sent |
 |  |  | present_proof, verified | present_proof, presentation_acked |
 
+Issuer는 (issue_credential, proposal_received) 시점에 holder가 보낸 credDefId를 확인 후, 추후 issue 과정을 위해 credExId를 저장 해 둠 \
 Issuer는 (present_proof, verified) 시점에 webhook 메시지를 getPresentationResult 하여 요구한 정보 획득
 
 ### (Optional) Web View
 Issuer가 Presentation의 정보로 발행 가능한 증명서를 한정하기 어려운 경우, 추가 정보 획득을 위함
+
 | Issuer API | Holder API | Issuer webhook (topic, state, *msg_type) | Holder webhook (topic, state, *msg_type) |
 |---|---|---|---|
 | POST /connections/{conn_id}/send-message |  |  | basicmessages, received, *initial_web_view |
@@ -134,10 +138,11 @@ Holder는 Issuer가 제공한 web view 페이지 `webViewUrl` 를 보여주고 �
 본 데모에서는 item 하나를 선택하여 Issuer의 POST https://issuer-controller.url/web-view/submit 를 호출한다는 가정하에 동작함
 
 ### Issue Credential
-Issuer는 받은 정보를 기반으로 DB를 qeury하여 증명서를 작성하여 발급함
+Issuer는 받은 정보를 기반으로 DB를 query 하여 증명서를 작성하여 발급함
+
 | Issuer API | Holder API | Issuer webhook (topic, state) | Holder webhook (topic, state) |
 |---|---|---|---|
-| POST /issue-credential/send |  | issue_credential, offer_sent | issue_credential, offer_received |
+| POST /issue-credential/records/{credExId}/send-offer |  | issue_credential, offer_sent | issue_credential, offer_received |
 |  | POST /issue-credential/records/{credExId}/send-request | issue_credential, request_received | issue_credential, request_sent |
 |  |  | issue_credential, credential_issued | issue_credential, credential_received |
 |  |  | issuer_cred_rev, issued |  |
