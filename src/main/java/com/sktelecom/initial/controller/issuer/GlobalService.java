@@ -252,19 +252,10 @@ public class GlobalService {
             log.info("proof is not verified");
             return null;
         }
-
-        String presRequest = JsonPath.parse((LinkedHashMap)JsonPath.read(presExRecord, "$.presentation_request")).jsonString();
-        String presentation = JsonPath.parse((LinkedHashMap)JsonPath.read(presExRecord, "$.presentation")).jsonString();
-        LinkedHashMap<String, Object> requestedAttrs = JsonPath.read(presRequest, "$.requested_attributes");
-        LinkedHashMap<String, Object> revealedAttrs = JsonPath.read(presentation, "$.requested_proof.revealed_attrs");
         LinkedHashMap<String, String> attrs = new LinkedHashMap<>();
-        for(String key : requestedAttrs.keySet()) {
-            String name = JsonPath.read(requestedAttrs.get(key), "$.name");
-            String value = "unrevealed";
-            if (revealedAttrs.containsKey(key))
-                value = JsonPath.read(revealedAttrs.get(key), "$.raw");
-            attrs.put(name, value);
-        }
+        LinkedHashMap<String, Object> revealedAttrs = JsonPath.read(presExRecord, "$.presentation.requested_proof.revealed_attrs");
+        for(String key : revealedAttrs.keySet())
+            attrs.put(key, JsonPath.read(revealedAttrs.get(key), "$.raw"));
         return attrs;
     }
 
