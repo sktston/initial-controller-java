@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ko">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-serialize-object/2.5.0/jquery.serialize-object.min.js"></script>
+
+<!-- get parameters -->
+<script type="text/javascript">
+    var Request = function() {
+        this.getParameter = function(name) {
+            var rtnval = '';
+            var nowAddress = unescape(location.href);
+            var parameters = (nowAddress.slice(nowAddress.indexOf('?') + 1,
+                    nowAddress.length)).split('&');
+            for (var i = 0; i < parameters.length; i++) {
+                var varName = parameters[i].split('=')[0];
+                if (varName.toUpperCase() == name.toUpperCase()) {
+                    rtnval = parameters[i].split('=')[1];
+                    break;
+                }
+            }
+            return rtnval;
+        }
+    }
+    var request = new Request();
+</script>
+
+<!-- json submit -->
+<script>
+    function ajax_send(frm){
+        var formData = $('#dataForm').serializeObject();
+        $.ajax({
+            url : '/web-view/submit',
+            type : 'POST',
+            contentType : 'application/json',
+            data : JSON.stringify(formData),
+            success : function(data){
+            },
+            error: function(xhr, status, error){
+                alert(status);
+            }
+        });
+        return false;
+    }
+</script>
+
+<head>
+    <meta charset="UTF-8">
+    <title>web-view form</title>
+    <style>
+      * {
+        font-size: 16px;
+        font-family: Consolas, sans-serif;
+      }
+    </style>
+</head>
+
+<body>
+<center>
+    <form id="dataForm">
+        <input type="hidden" name="connectionId" id="connectionId" value="connectionIdValue" />
+        <script>
+        var connectionIdValue = request.getParameter('connectionId');
+        document.getElementById("connectionId").value = connectionIdValue
+    </script>
+        <p>발급 받기 원하는 학위 증명서를 선택해 주세요</p>
+        <div>
+            <p>
+                <input type="radio" id="itemChoice1"
+                       name="selectedItemId" value="item1Id" checked>
+                <label for="itemChoice1">컴퓨터공학</label>
+            </p>
+            <p>
+                <input type="radio" id="itemChoice2"
+                       name="selectedItemId" value="item2Id">
+                <label for="itemChoice2">산업공학</label>
+            </p>
+        </div>
+        <div>
+            <input type="button" onclick="ajax_send()" value="Submit">
+        </div>
+    </form>
+</center>
+</body>
+
+</html>

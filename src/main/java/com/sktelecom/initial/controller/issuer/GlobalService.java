@@ -32,11 +32,14 @@ public class GlobalService {
     @Value("${verifTplId}")
     private String verifTplId; // verification template identifier
 
+    @Value("${webViewUrl}")
+    private String webViewUrl; // web view form url
+
     String orgName;
     String orgImageUrl;
     String publicDid;
 
-    LinkedHashMap<String, String> presExRecordCache = new LinkedHashMap<>();
+    LinkedHashMap<String, String> connIdToCredExId = new LinkedHashMap<>(); // cache to keep credential issuing flow
 
     // for revocation example
     static boolean enableRevoke = Boolean.parseBoolean(System.getenv().getOrDefault("ENABLE_REVOKE", "false"));
@@ -69,19 +72,21 @@ public class GlobalService {
             case "issue_credential":
                 // 1. holder 가 credential 을 요청함 -> 개인정보이용 동의 요청
                 if (state.equals("proposal_received")) {
-                    log.info("- Case (topic:" + topic + ", state:" + state + ") -> isValidCredentialProposal && sendAgreement");
-                    String credentialProposal = JsonPath.parse((LinkedHashMap)JsonPath.read(body, "$.credential_proposal_dict")).jsonString();
-                    //if(isValidCredentialProposal(credentialProposal)) {
+                    log.info("- Case (topic:" + topic + ", state:" + state + ") -> checkCredentialProposal && sendAgreement");
+                    if(checkCredentialProposal(body)) {
                         sendAgreement(JsonPath.read(body, "$.connection_id"));
-                    //}
+                    }
                 }
                 // 4. holder 가 증명서를 정상 저장하였음 -> 완료 (revocation 은 아래 코드 참조)
                 else if (state.equals("credential_acked")) {
                     log.info("- Case (topic:" + topic + ", state:" + state + ") -> credential issued successfully");
-                    // TODO: should store credential_exchange_id to revoke this credential later
-                    // storeCredExRecord(body);
+
+                    // TODO: should store credential_exchange_id to revoke this credential
+                    // connIdToCredExId is simple example for this
                     if (enableRevoke) {
-                        revokeCredential(JsonPath.read(body, "$.credential_exchange_id"));
+                        String connectionId = JsonPath.read(body, "$.connection_id");
+                        String credExId = connIdToCredExId.get(connectionId);
+                        revokeCredential(credExId);
                     }
                 }
                 break;
@@ -90,7 +95,6 @@ public class GlobalService {
                 String type = getTypeFromBasicMessage(content);
                 // 2. holder 가 개인정보이용 동의를 보냄 -> 모바일 가입증명 검증 요청
                 if (type != null && type.equals("initial_agreement_decision")) {
-                //if (type != null && type.equals("initial_agreement")) {
                     if (isAgreementAgreed(content)) {
                         log.info("- Case (topic:" + topic + ", state:" + state + ", type:" + type + ") -> AgreementAgreed & sendPresentationRequest");
                         sendPresentationRequest(JsonPath.read(body, "$.connection_id"));
@@ -103,9 +107,10 @@ public class GlobalService {
                 // 3. holder 가 보낸 모바일 가입증명 검증 완료
                 if (state.equals("verified")) {
                     log.info("- Case (topic:" + topic + ", state:" + state + ") -> getPresentationResult");
-                    String presRequest = JsonPath.parse((LinkedHashMap)JsonPath.read(body, "$.presentation_request")).jsonString();
-                    String presentation = JsonPath.parse((LinkedHashMap)JsonPath.read(body, "$.presentation")).jsonString();
-                    String attrs = getPresentationResult(JsonPath.read(body, "$.verified"), presRequest, presentation);
+                    LinkedHashMap<String, String> attrs = getPresentationResult(body);
+                    for(String key : attrs.keySet())
+                        log.info("Requested Attribute - " + key + ": " + attrs.get(key));
+
                     if (enableWebView) {
                         // 3-1. 검증 값 정보로 발행할 증명서가 한정되지 않는 경우 추가 정보 요구
                         log.info("Web View enabled -> sendWebView");
@@ -190,11 +195,16 @@ public class GlobalService {
         }
     }
 
-    public boolean isValidCredentialProposal(String credentialProposal) {
+    public boolean checkCredentialProposal(String credExRecord) {
+        String credentialProposal = JsonPath.parse((LinkedHashMap)JsonPath.read(credExRecord, "$.credential_proposal_dict")).jsonString();
         try {
             String requestedCredDefId = JsonPath.read(credentialProposal, "$.cred_def_id");
-            if (requestedCredDefId.equals(credDefId))
+            if (requestedCredDefId.equals(credDefId)){
+                String connectionId = JsonPath.read(credExRecord, "$.connection_id");
+                String credExId = JsonPath.read(credExRecord, "$.credential_exchange_id");
+                connIdToCredExId.put(connectionId, credExId);
                 return true;
+            }
             log.warn("This issuer can issue credDefId:" + credDefId);
             log.warn("But, requested credDefId is " + requestedCredDefId + " -> Ignore");
         } catch (PathNotFoundException e) {
@@ -231,7 +241,7 @@ public class GlobalService {
             log.warn("Invalid content format  -> Ignore");
         }
 
-        return true;
+        return false;
     }
 
     public void sendPresentationRequest(String connectionId) {
@@ -243,30 +253,20 @@ public class GlobalService {
         log.info("response: " + response);
     }
 
-    public String getPresentationResult(String verified, String presRequest, String presentation) {
+    public LinkedHashMap<String, String> getPresentationResult(String presExRecord) {
+        String verified = JsonPath.read(presExRecord, "$.verified");
         if (!verified.equals("true")) {
             log.info("proof is not verified");
             return null;
         }
-
-        LinkedHashMap<String, Object> requestedAttrs = JsonPath.read(presRequest, "$.requested_attributes");
-        LinkedHashMap<String, Object> revealedAttrs = JsonPath.read(presentation, "$.requested_proof.revealed_attrs");
         LinkedHashMap<String, String> attrs = new LinkedHashMap<>();
-        for(String key : requestedAttrs.keySet()) {
-            String name = JsonPath.read(requestedAttrs.get(key), "$.name");
-            String value = "unrevealed";
-            if (revealedAttrs.containsKey(key))
-                value = JsonPath.read(revealedAttrs.get(key), "$.raw");
-            attrs.put(name, value);
-        }
-        log.info("Presentation is verified");
-        for(String key : attrs.keySet())
-            log.info("Requested Attribute - " + key + ": " + attrs.get(key));
-
-        return JsonPath.parse(attrs).jsonString();
+        LinkedHashMap<String, Object> revealedAttrs = JsonPath.read(presExRecord, "$.presentation.requested_proof.revealed_attrs");
+        for(String key : revealedAttrs.keySet())
+            attrs.put(key, JsonPath.read(revealedAttrs.get(key), "$.raw"));
+        return attrs;
     }
 
-    public void sendCredentialOffer(String connectionId, String attrs, String selectedItemId) {
+    public void sendCredentialOffer(String connectionId, LinkedHashMap<String, String> attrs, String selectedItemId) {
         // TODO: need to implement business logic to query information for holder
         // we assume that the value is obtained by querying DB (e.g., attrs.mobileNum and selectedItemId)
         LinkedHashMap<String, String> value = new LinkedHashMap<>();
@@ -298,22 +298,20 @@ public class GlobalService {
                 "    ]" +
                 "  }" +
                 "}").jsonString();
-        String response = client.requestPOST(agentApiUrl + "/issue-credential/send", accessToken, body);
+        String credExId = connIdToCredExId.get(connectionId);
+        String response = client.requestPOST(agentApiUrl + "/issue-credential/records/" + credExId + "/send-offer", accessToken, body);
         log.info("response: " + response);
     }
 
-    public void sendWebView(String connectionId, String attrs, String presExRecord) {
-        String presExId = JsonPath.read(presExRecord, "$.presentation_exchange_id");
-        presExRecordCache.put(presExId, presExRecord);
-
+    public void sendWebView(String connectionId, LinkedHashMap<String, String> attrs, String presExRecord) {
         // TODO: need to implement business logic to query information for holder and prepare web view
-        // we assume that the GET https://issuer.url/web-view/{presExId} is web view page to select a item by user
-        // Also, we assume that selected item id will be submitted to POST /web-view/{presExId}
+        // we send web view form page (GET webViewUrl?connectionId={connectionId}) to holder in order to select a item by user
+        // This web view page will submit connectionId and selectedItemId to POST /web-view/submit
 
         String initialWebView = JsonPath.parse("{" +
                 "  type : 'initial_web_view',"+
                 "  content: {" +
-                "    web_view_url : 'https://ssi.ybmnet.co.kr/web-view/TOEIC-certificate.php?their_did=UtArAzrfSaTF77mNJVcCrA'," +
+                "    web_view_url : '" + webViewUrl + "?connectionId=" + connectionId + "'," +
                 "  }"+
                 "}").jsonString();
         String body = JsonPath.parse("{ content: '" + initialWebView  + "' }").jsonString();
@@ -321,17 +319,15 @@ public class GlobalService {
         log.info("response: " + response);
     }
 
-    public void handleWebView(String presExId, String body) {
-        log.info("handleWebView >>> presExId:" + presExId + ", body:" + body);
+    public void handleWebView(String body) {
+        log.info("handleWebView >>> body:" + body);
 
-        String selectedItemId = JsonPath.read(body, "$.selected_item_id");
-        String presExRecord = presExRecordCache.get(presExId);
+        String connectionId = JsonPath.read(body, "$.connectionId");
+        String selectedItemId = JsonPath.read(body, "$.selectedItemId");
 
         // 3-1-1. 추가 정보 기반으로 증명서 발행
-        log.info("Selected Item Id received -> sendCredentialOffer");
-        sendCredentialOffer(JsonPath.read(presExRecord, "$.connection_id"), null, selectedItemId);
-
-        presExRecordCache.remove(presExId);
+        log.info("sendCredentialOffer with connectionId:" + connectionId + ", selectedItemId:" + selectedItemId);
+        sendCredentialOffer(connectionId, null, selectedItemId);
     }
 
     public void revokeCredential(String credExId) {
