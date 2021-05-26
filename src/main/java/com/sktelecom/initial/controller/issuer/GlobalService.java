@@ -307,7 +307,7 @@ public class GlobalService {
         String body = JsonPath.parse("{" +
                 "  connection_id: '" + connectionId + "'," +
                 "  cred_def_id: '" + credDefId + "'," +
-                "  credential_proposal: {" +
+                "  credential_preview: {" +
                 "    attributes: [" +
                 "      { name: 'date_of_birth', value: '" + value.get("date_of_birth")  + "' }," +
                 "      { name: 'date_of_test', value: " + value.get("date_of_test") + "' }," +
@@ -321,7 +321,7 @@ public class GlobalService {
                 "    ]" +
                 "  }" +
                 "}").jsonString();
-        String response = client.requestPOST(agentApiUrl + "/issue-credential/send", accessToken, body);
+        String response = client.requestPOST(agentApiUrl + "/issue-credential/send-offer", accessToken, body);
         log.info("response: " + response);
 
     }
