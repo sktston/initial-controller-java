@@ -296,6 +296,7 @@ public class GlobalService {
                 "      { name: 'score_of_total', value: '" + value.get("score_of_total") + "' }" +
                 "    ]" +
                 "  }" +
+                "  }" +
                 "}").jsonString();
         String credExId = connIdToCredExId.get(connectionId);
         String response = client.requestPOST(agentApiUrl + "/issue-credential/records/" + credExId + "/send-offer", accessToken, body);
