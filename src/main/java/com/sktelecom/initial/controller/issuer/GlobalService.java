@@ -282,9 +282,8 @@ public class GlobalService {
 
         // value insertion
         String body = JsonPath.parse("{" +
-                "  connection_id: '" + connectionId + "'," +
-                "  cred_def_id: '" + credDefId + "'," +
-                "  credential_proposal: {" +
+                "  counter_proposal: {" +
+                "    credential_proposal: {" +
                 "    attributes: [" +
                 "      { name: 'date_of_birth', value: '" + value.get("date_of_birth")  + "' }," +
                 "      { name: 'date_of_test', value: " + value.get("date_of_test") + "' }," +
