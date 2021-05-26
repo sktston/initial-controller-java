@@ -64,6 +64,7 @@ public class GlobalService {
     }
 
     public void handleEvent(String body) {
+        //log.info("handleEvent >>> body:" + body);
         String topic = JsonPath.read(body, "$.topic");
         String state = topic.equals("problem_report") ? null : JsonPath.read(body, "$.state");
         log.info("handleEvent >>> topic:" + topic + ", state:" + state + ", body:" + body);
@@ -197,18 +198,28 @@ public class GlobalService {
 
     public boolean checkCredentialProposal(String credExRecord) {
         String credentialProposal = JsonPath.parse((LinkedHashMap)JsonPath.read(credExRecord, "$.credential_proposal_dict")).jsonString();
+        String connectionId = JsonPath.read(credExRecord, "$.connection_id");
+        String credExId = JsonPath.read(credExRecord, "$.credential_exchange_id");
         try {
             String requestedCredDefId = JsonPath.read(credentialProposal, "$.cred_def_id");
             if (requestedCredDefId.equals(credDefId)){
-                String connectionId = JsonPath.read(credExRecord, "$.connection_id");
-                String credExId = JsonPath.read(credExRecord, "$.credential_exchange_id");
                 connIdToCredExId.put(connectionId, credExId);
                 return true;
             }
             log.warn("This issuer can issue credDefId:" + credDefId);
-            log.warn("But, requested credDefId is " + requestedCredDefId + " -> Ignore");
+            log.warn("But, requested credDefId is " + requestedCredDefId + " -> problemReport");
+            String body = JsonPath.parse("{" +
+                    "  description: '본 기관은 요청한 증명서 (credDefId:" + requestedCredDefId + ") 를 발급하지 않습니다'" +
+                    "}").jsonString();
+            String response = client.requestPOST(agentApiUrl + "/issue-credential/records/" + credExId + "/problem-report", accessToken, body);
+            log.info("response: " + response);
         } catch (PathNotFoundException e) {
-            log.warn("Requested credDefId does not exist -> Ignore");
+            log.warn("Requested credDefId does not exist -> problemReport");
+            String body = JsonPath.parse("{" +
+                    "  description: '증명서 (credDefId) 가 지정되지 않았습니다'" +
+                    "}").jsonString();
+            String response = client.requestPOST(agentApiUrl + "/issue-credential/records/" + credExId + "/problem-report", accessToken, body);
+            log.info("response: " + response);
         }
         return false;
     }
