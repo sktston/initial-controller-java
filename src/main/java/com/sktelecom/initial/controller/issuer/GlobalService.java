@@ -210,7 +210,7 @@ public class GlobalService {
         } catch (PathNotFoundException e) {
             log.warn("Requested credDefId does not exist -> Ignore");
         }
-        return false;
+        return true;
     }
 
     public void sendAgreement(String connectionId) {
