@@ -71,9 +71,9 @@ public class GlobalService {
                 if (state.equals("proposal_received")) {
                     log.info("- Case (topic:" + topic + ", state:" + state + ") -> isValidCredentialProposal && sendAgreement");
                     String credentialProposal = JsonPath.parse((LinkedHashMap)JsonPath.read(body, "$.credential_proposal_dict")).jsonString();
-                    if(isValidCredentialProposal(credentialProposal)) {
+                    //if(isValidCredentialProposal(credentialProposal)) {
                         sendAgreement(JsonPath.read(body, "$.connection_id"));
-                    }
+                    //}
                 }
                 // 4. holder 가 증명서를 정상 저장하였음 -> 완료 (revocation 은 아래 코드 참조)
                 else if (state.equals("credential_acked")) {
@@ -90,6 +90,7 @@ public class GlobalService {
                 String type = getTypeFromBasicMessage(content);
                 // 2. holder 가 개인정보이용 동의를 보냄 -> 모바일 가입증명 검증 요청
                 if (type != null && type.equals("initial_agreement_decision")) {
+                //if (type != null && type.equals("initial_agreement")) {
                     if (isAgreementAgreed(content)) {
                         log.info("- Case (topic:" + topic + ", state:" + state + ", type:" + type + ") -> AgreementAgreed & sendPresentationRequest");
                         sendPresentationRequest(JsonPath.read(body, "$.connection_id"));
@@ -230,7 +231,7 @@ public class GlobalService {
             log.warn("Invalid content format  -> Ignore");
         }
 
-        return false;
+        return true;
     }
 
     public void sendPresentationRequest(String connectionId) {
@@ -269,11 +270,15 @@ public class GlobalService {
         // TODO: need to implement business logic to query information for holder
         // we assume that the value is obtained by querying DB (e.g., attrs.mobileNum and selectedItemId)
         LinkedHashMap<String, String> value = new LinkedHashMap<>();
-        value.put("name", "김증명");
-        value.put("date", "20180228");
-        value.put("degree", "컴퓨터공학");
-        value.put("age", "25");
-        value.put("photo", "JpegImageBase64EncodedBinary");
+        value.put("korean_name", "김증명");
+        value.put("english_name", "Kim Initial");
+        value.put("registration_number", "123456789");
+        value.put("exp_date", "20180228");
+        value.put("date_of_birth", "20000228");
+        value.put("date_of_test", "20180228");
+        value.put("score_of_listening", "445");
+        value.put("score_of_reading", "445");
+        value.put("score_of_total", "990");
 
         // value insertion
         String body = JsonPath.parse("{" +
@@ -281,11 +286,15 @@ public class GlobalService {
                 "  cred_def_id: '" + credDefId + "'," +
                 "  credential_proposal: {" +
                 "    attributes: [" +
-                "      { name: 'name', value: '" + value.get("name")  + "' }," +
-                "      { name: 'date', value: " + value.get("date") + "' }," +
-                "      { name: 'degree', value: '" + value.get("degree") + "' }," +
-                "      { name: 'age', value: '" +  value.get("age")  + "' }," +
-                "      { name: 'photo', value: '" + value.get("photo") + "' }" +
+                "      { name: 'date_of_birth', value: '" + value.get("date_of_birth")  + "' }," +
+                "      { name: 'date_of_test', value: " + value.get("date_of_test") + "' }," +
+                "      { name: 'english_name', value: '" + value.get("english_name") + "' }," +
+                "      { name: 'exp_date', value: '" +  value.get("exp_date")  + "' }," +
+                "      { name: 'korean_name', value: '" + value.get("korean_name") + "' }" +
+                "      { name: 'registration_number', value: '" + value.get("registration_number") + "' }" +
+                "      { name: 'score_of_listening', value: '" + value.get("score_of_listening") + "' }" +
+                "      { name: 'score_of_reading', value: '" + value.get("score_of_reading") + "' }" +
+                "      { name: 'score_of_total', value: '" + value.get("score_of_total") + "' }" +
                 "    ]" +
                 "  }" +
                 "}").jsonString();
@@ -304,7 +313,7 @@ public class GlobalService {
         String initialWebView = JsonPath.parse("{" +
                 "  type : 'initial_web_view',"+
                 "  content: {" +
-                "    web_view_url : 'https://issuer.url/web-view/" + presExId + "'," +
+                "    web_view_url : 'https://ssi.ybmnet.co.kr/web-view/TOEIC-certificate.php?their_did=UtArAzrfSaTF77mNJVcCrA'," +
                 "  }"+
                 "}").jsonString();
         String body = JsonPath.parse("{ content: '" + initialWebView  + "' }").jsonString();
