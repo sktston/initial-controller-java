@@ -281,6 +281,7 @@ public class GlobalService {
         value.put("score_of_total", "990");
 
         // value insertion
+        /*
         String body = JsonPath.parse("{" +
                 "  counter_proposal: {" +
                 "    credential_proposal: {" +
@@ -301,6 +302,28 @@ public class GlobalService {
         String credExId = connIdToCredExId.get(connectionId);
         String response = client.requestPOST(agentApiUrl + "/issue-credential/records/" + credExId + "/send-offer", accessToken, body);
         log.info("response: " + response);
+
+         */
+        String body = JsonPath.parse("{" +
+                "  connection_id: '" + connectionId + "'," +
+                "  cred_def_id: '" + credDefId + "'," +
+                "  credential_proposal: {" +
+                "    attributes: [" +
+                "      { name: 'date_of_birth', value: '" + value.get("date_of_birth")  + "' }," +
+                "      { name: 'date_of_test', value: " + value.get("date_of_test") + "' }," +
+                "      { name: 'english_name', value: '" + value.get("english_name") + "' }," +
+                "      { name: 'exp_date', value: '" +  value.get("exp_date")  + "' }," +
+                "      { name: 'korean_name', value: '" + value.get("korean_name") + "' }" +
+                "      { name: 'registration_number', value: '" + value.get("registration_number") + "' }" +
+                "      { name: 'score_of_listening', value: '" + value.get("score_of_listening") + "' }" +
+                "      { name: 'score_of_reading', value: '" + value.get("score_of_reading") + "' }" +
+                "      { name: 'score_of_total', value: '" + value.get("score_of_total") + "' }" +
+                "    ]" +
+                "  }" +
+                "}").jsonString();
+        String response = client.requestPOST(agentApiUrl + "/issue-credential/send", accessToken, body);
+        log.info("response: " + response);
+
     }
 
     public void sendWebView(String connectionId, LinkedHashMap<String, String> attrs, String presExRecord) {
