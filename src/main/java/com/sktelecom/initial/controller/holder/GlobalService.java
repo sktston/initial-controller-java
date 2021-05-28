@@ -26,7 +26,7 @@ public class GlobalService {
     // sample mobile credential definition identifier
     final String sampleMobileCredDefId = "4UvAbFrGzyzH6zhvfDSvxf:3:CL:1618987943:707ca438-2198-465c-8e8d-1b8ab8cef021";
     // sample mobile credential issuer controller url
-    final String sampleMobileIssuerControllerUrl = "http://221.168.33.78:8044";
+    final String sampleMobileIssuerInvitationUrl = "http://221.168.33.78:8044/invitation-url";
 
     @Value("${agentApiUrl}")
     private String agentApiUrl; // agent service api url
@@ -34,8 +34,8 @@ public class GlobalService {
     @Value("${accessToken}")
     private String accessToken; // controller access token
 
-    @Value("${issuerControllerUrl}")
-    private String issuerControllerUrl; // issuer controller url to receive invitation-url
+    @Value("${issuerInvitationUrl}")
+    private String issuerInvitationUrl; // issuer controller invitation url to receive invitation-url
 
     @Value("${issuerCredDefId}")
     private String issuerCredDefId; // credential definition identifier to receive
@@ -56,7 +56,7 @@ public class GlobalService {
         log.info("- organization imageUrl: " + orgImageUrl);
         log.info("- public did: " + publicDid);
         log.info("- controller access token: " + accessToken);
-        log.info("- issuer controller url to receive invitation-irl: " + issuerControllerUrl);
+        log.info("- issuer controller invitation url: " + issuerInvitationUrl);
         log.info("- credential definition id to receive from issuer: " + issuerCredDefId);
         log.info("------------------------------");
 
@@ -69,7 +69,7 @@ public class GlobalService {
         }
         else {
             log.info("Receive sample mobile credential");
-            receiveInvitationUrl(sampleMobileIssuerControllerUrl);
+            receiveInvitationUrl(sampleMobileIssuerInvitationUrl);
         }
     }
 
@@ -212,13 +212,13 @@ public class GlobalService {
     public void startDemo() {
         phase = "started";
         log.info("Receive invitation from issuer controller");
-        receiveInvitationUrl(issuerControllerUrl);
+        receiveInvitationUrl(issuerInvitationUrl);
     }
 
-    public void receiveInvitationUrl(String controllerUrl) {
-        String invitationUrl = client.requestGET(controllerUrl + "/invitation-url", "");
+    public void receiveInvitationUrl(String controllerInvitationUrl) {
+        String invitationUrl = client.requestGET(controllerInvitationUrl, "");
         if (invitationUrl == null) {
-            log.warn("Invalid invitationUrl");
+            log.warn("Invalid invitation-url");
             return;
         }
         log.info("invitation-url: " + invitationUrl);
@@ -305,11 +305,20 @@ public class GlobalService {
             log.info("webViewContent: " + webViewContent);
             String webViewUrl = JsonPath.read(webViewContent, "$.web_view_url");
 
-            // we assume that we show web view to user and user select & submit a item -> POST /web-view/{presExId}
-            String[] token = webViewUrl.split("web-view/");
-            String presExId = token[1];
-            String body = JsonPath.parse("{ selected_item_id: 'a-single-selected-item-id' }").jsonString();
-            String response = client.requestPOST(issuerControllerUrl + "/web-view/" + presExId, "", body);
+            // CODE HERE : Show web view to user and user select & submit a item
+
+            // For automation, we submit a item directly
+            String[] token = webViewUrl.split("/web-view/form.html");
+            String issuerUrl = token[0];
+            String[] token2 = webViewUrl.split("connectionId=");
+            String connectionId = token2[1];
+
+            String body = JsonPath.parse("{" +
+                    "  connectionId: '" + connectionId + "'," +
+                    "  selectedItemId: 'item1Id'" +
+                    "}").jsonString();
+
+            String response = client.requestPOST(issuerUrl + "/web-view/submit", "", body);
             log.info("response: " + response);
         } catch (PathNotFoundException e) {
             log.warn("Invalid content format  -> Ignore");
