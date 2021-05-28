@@ -69,13 +69,12 @@ public class GlobalService {
         log.info("handleEvent >>> topic:" + topic + ", state:" + state + ", body:" + body);
 
         switch(topic) {
-            case "issue_credential":
-                // 1. holder 가 credential 을 요청함 -> 개인정보이용 동의 요청
-                if (state.equals("proposal_received")) {
-                    log.info("- Case (topic:" + topic + ", state:" + state + ") -> checkCredentialProposal && sendAgreement");
-                    if(checkCredentialProposal(body)) {
-                        sendAgreement(JsonPath.read(body, "$.connection_id"));
-                    }
+            case "connections":
+                // 1. connection 완료 -> 개인정보이용 동의 요청
+                if (state.equals("active")) {
+                    log.info("- Case (topic:" + topic + ", state:" + state + ") -> sendAgreement");
+                    String connectionId = JsonPath.read(body, "$.connection_id");
+                    sendAgreement(JsonPath.read(body, "$.connection_id"));
                 }
                 // 4. holder 가 증명서를 정상 저장하였음 -> 완료 (revocation 은 아래 코드 참조)
                 else if (state.equals("credential_acked")) {
@@ -97,7 +96,7 @@ public class GlobalService {
                 if (type != null && type.equals("initial_agreement_decision")) {
                     if (isAgreementAgreed(content)) {
                         log.info("- Case (topic:" + topic + ", state:" + state + ", type:" + type + ") -> AgreementAgreed & sendPresentationRequest");
-                        sendPresentationRequest(JsonPath.read(body, "$.connection_id"));
+                        sendProofRequest(JsonPath.read(body, "$.connection_id"));
                     }
                 }
                 else
@@ -110,24 +109,13 @@ public class GlobalService {
                     LinkedHashMap<String, String> attrs = getPresentationResult(body);
                     for(String key : attrs.keySet())
                         log.info("Requested Attribute - " + key + ": " + attrs.get(key));
-
-                    if (enableWebView) {
-                        // 3-1. 검증 값 정보로 발행할 증명서가 한정되지 않는 경우 추가 정보 요구
-                        log.info("Web View enabled -> sendWebView");
-                        sendWebView(JsonPath.read(body, "$.connection_id"), attrs, body);
-                    }
-                    else {
-                        // 3-2. 검증 값 정보 만으로 발행할 증명서가 한정되는 경우 증명서 바로 발행
-                        log.info("Web View is not used -> sendCredentialOffer");
-                        sendCredentialOffer(JsonPath.read(body, "$.connection_id"), attrs, null);
-                    }
                 }
                 break;
             case "problem_report":
                 log.warn("- Case (topic:" + topic + ") -> Print body");
                 log.warn("  - body:" + prettyJson(body));
                 break;
-            case "connections":
+            case "issue_credential":
             case "revocation_registry":
             case "issuer_cred_rev":
                 break;
@@ -242,6 +230,51 @@ public class GlobalService {
         }
 
         return false;
+    }
+
+
+    public void sendProofRequest(String connectionId) {
+        long curUnixTime = System.currentTimeMillis() / 1000L;
+        String body = JsonPath.parse("{" +
+                "  connection_id: '" + connectionId + "'," +
+                "  proof_request: {" +
+                "    name: 'proof_name'," +
+                "    version: '1.0'," +
+                "    requested_attributes: {" +
+                "      name: {" +
+                "        name: 'name'," +
+                "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
+                "        restrictions: [ {cred_def_id: '" + credDefId + "'} ]" +
+                "      }," +
+                "      date: {" +
+                "        name: 'date'," +
+                "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
+                "        restrictions: [ {cred_def_id: '" + credDefId + "'} ]" +
+                "      }," +
+                "      degree: {" +
+                "        name: 'degree'," +
+                "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
+                "        restrictions: [ {cred_def_id: '" + credDefId + "'} ]" +
+                "      }," +
+                "      photo: {" +
+                "        name: 'photo'," +
+                "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
+                "        restrictions: [ {cred_def_id: '" + credDefId + "'} ]" +
+                "      }" +
+                "    }," +
+                "    requested_predicates: {" +
+                "      age: {" +
+                "        name: 'age'," +
+                "        p_type: '>='," +
+                "        p_value: 20," +
+                "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
+                "        restrictions: [ {cred_def_id: '" + credDefId + "'} ]" +
+                "      }" +
+                "    }" +
+                "  }" +
+                "}").jsonString();
+        String response = client.requestPOST(agentApiUrl + "/present-proof/send-request", accessToken, body);
+        log.info("response: " + response);
     }
 
     public void sendPresentationRequest(String connectionId) {
