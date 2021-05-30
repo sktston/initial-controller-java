@@ -143,6 +143,7 @@ public class GlobalService {
         orgImageUrl = JsonPath.read(invitation, "$.imageUrl");
         log.info("- SUCCESS");
 
+        /*
         if (!credDefId.equals("")) {
             log.info("TEST - Check if credential definition is valid");
             String response = client.requestGET(agentApiUrl + "/credential-definitions/" + credDefId, accessToken);
@@ -165,6 +166,7 @@ public class GlobalService {
                 log.info("- YES : This controller can issue with " + credDefId);
         }
 
+
         if (!verifTplId.equals("")) {
             log.info("TEST - Check if verification template is valid");
             String response = client.requestGET(agentApiUrl + "/verification-templates/" + verifTplId, accessToken);
@@ -176,6 +178,8 @@ public class GlobalService {
             }
             log.info("- SUCCESS : " + verifTplId + " exists");
         }
+
+         */
     }
 
     public String createInvitationUrl() {
