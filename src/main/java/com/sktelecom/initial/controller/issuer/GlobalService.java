@@ -29,6 +29,12 @@ public class GlobalService {
     @Value("${credDefId}")
     private String credDefId; // credential definition identifier
 
+    @Value("${mobile_credDefId}")
+    private String mobile_credDefId; // credential definition identifier
+
+    @Value("${UniCertificateOfGraduationKor_credDefId}")
+    private String UniCertificateOfGraduationKor_credDefId; // credential definition identifier
+
     @Value("${verifTplId}")
     private String verifTplId; // verification template identifier
 
@@ -238,38 +244,36 @@ public class GlobalService {
         String body = JsonPath.parse("{" +
                 "  connection_id: '" + connectionId + "'," +
                 "  proof_request: {" +
-                "    name: 'proof_name'," +
+                "    name: '대학제증명 검증'," +
                 "    version: '1.0'," +
                 "    requested_attributes: {" +
-                "      name: {" +
-                "        name: 'name'," +
+                "      person_name: {" +
+                "        name: 'person_name'," +
                 "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
-                "        restrictions: [ {cred_def_id: '" + credDefId + "'} ]" +
+                "        restrictions: [ {cred_def_id: '" + mobile_credDefId + "'} ]" +
                 "      }," +
-                "      date: {" +
-                "        name: 'date'," +
+                "      mobile_num: {" +
+                "        name: 'mobile_num'," +
                 "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
-                "        restrictions: [ {cred_def_id: '" + credDefId + "'} ]" +
+                "        restrictions: [ {cred_def_id: '" + mobile_credDefId + "'} ]" +
                 "      }," +
-                "      degree: {" +
-                "        name: 'degree'," +
+                "      uni_name: {" +
+                "        name: 'uni_name'," +
                 "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
-                "        restrictions: [ {cred_def_id: '" + credDefId + "'} ]" +
+                "        restrictions: [ {cred_def_id: '" + UniCertificateOfGraduationKor_credDefId + "'} ]" +
                 "      }," +
-                "      photo: {" +
-                "        name: 'photo'," +
+                "      minor: {" +
+                "        name: 'minor'," +
                 "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
-                "        restrictions: [ {cred_def_id: '" + credDefId + "'} ]" +
+                "        restrictions: [ {cred_def_id: '" + UniCertificateOfGraduationKor_credDefId + "'} ]" +
+                "      }" +
+                "      department: {" +
+                "        name: 'department'," +
+                "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
+                "        restrictions: [ {cred_def_id: '" + UniCertificateOfGraduationKor_credDefId + "'} ]" +
                 "      }" +
                 "    }," +
                 "    requested_predicates: {" +
-                "      age: {" +
-                "        name: 'age'," +
-                "        p_type: '>='," +
-                "        p_value: 20," +
-                "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
-                "        restrictions: [ {cred_def_id: '" + credDefId + "'} ]" +
-                "      }" +
                 "    }" +
                 "  }" +
                 "}").jsonString();
