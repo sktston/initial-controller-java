@@ -32,6 +32,12 @@ public class GlobalService {
     @Value("${mobile_credDefId}")
     private String mobile_credDefId; // credential definition identifier
 
+    @Value("${toeic_credDefId}")
+    private String toeic_credDefId; // credential definition identifier
+
+    @Value("${psnm_credDefId}")
+    private String psnm_credDefId; // credential definition identifier
+
     @Value("${verifTplId}")
     private String verifTplId; // verification template identifier
 
@@ -266,7 +272,17 @@ public class GlobalService {
                 "        name: 'mobile_num'," +
                 "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
                 "        restrictions: [ {cred_def_id: '" + mobile_credDefId + "'} ]" +
-                "      }" +
+                "      }," +
+                "      score_of_total: {" +
+                "        name: 'score_of_total'," +
+                "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
+                "        restrictions: [ {cred_def_id: '" + toeic_credDefId + "'} ]" +
+                "      }," +
+                "      employee_no: {" +
+                "        name: 'employee_no'," +
+                "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
+                "        restrictions: [ {cred_def_id: '" + psnm_credDefId + "'} ]" +
+                "      }," +
                 "    }," +
                 "    requested_predicates: {" +
                 "    }" +
@@ -287,10 +303,13 @@ public class GlobalService {
                 "    name: '모바일가입증명 검증'," +
                 "    version: '1.0'," +
                 "    requested_attributes: {" +
-                "      모바일가입증명 : {" +
-                "        names: [" +
-                "           'person_name','mobile_num'"+
-                "           ]," +
+                "      person_name: {" +
+                "        name: 'person_name'," +
+                "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
+                "        restrictions: [ {cred_def_id: '" + mobile_credDefId + "'} ]" +
+                "      }," +
+                "      mobile_num: {" +
+                "        name: 'mobile_num'," +
                 "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
                 "        restrictions: [ {cred_def_id: '" + mobile_credDefId + "'} ]" +
                 "      }" +
@@ -303,8 +322,6 @@ public class GlobalService {
         String response = client.requestPOST(agentApiUrl + "/present-proof/send-request", accessToken, body);
         log.info("response: " + response);
     }
-
-
  */
     public void sendPresentationRequest(String connectionId) {
         String body = JsonPath.parse("{" +
