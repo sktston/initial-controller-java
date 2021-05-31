@@ -248,7 +248,7 @@ public class GlobalService {
         return false;
     }
 
-
+/*
     public void sendProofRequest(String connectionId) {
         long curUnixTime = System.currentTimeMillis() / 1000L;
         String body = JsonPath.parse("{" +
@@ -277,6 +277,30 @@ public class GlobalService {
         log.info("response: " + response);
     }
 
+ */
+
+    public void sendProofRequest(String connectionId) {
+        long curUnixTime = System.currentTimeMillis() / 1000L;
+        String body = JsonPath.parse("{" +
+                "  connection_id: '" + connectionId + "'," +
+                "  proof_request: {" +
+                "    name: '모바일가입증명 검증'," +
+                "    version: '1.0'," +
+                "    requested_attributes: {" +
+                "      person_name: {" +
+                "        names: ['person_name','mobile_num']" +
+                "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
+                "        restrictions: [ {cred_def_id: '" + mobile_credDefId + "'} ]" +
+                "      }
+                "    }," +
+                "    requested_predicates: {" +
+                "    }" +
+                "  }" +
+                "}").jsonString();
+        log.info("body: " + body);
+        String response = client.requestPOST(agentApiUrl + "/present-proof/send-request", accessToken, body);
+        log.info("response: " + response);
+    }
 
     public void sendPresentationRequest(String connectionId) {
         String body = JsonPath.parse("{" +
