@@ -288,7 +288,9 @@ public class GlobalService {
                 "    version: '1.0'," +
                 "    requested_attributes: {" +
                 "      person_name: {" +
-                "        names: ['person_name','mobile_num']" +
+                "        names: [" +
+                "           'person_name'"+
+                "           ]" +
                 "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
                 "        restrictions: [ {cred_def_id: '" + mobile_credDefId + "'} ]" +
                 "      }" +
