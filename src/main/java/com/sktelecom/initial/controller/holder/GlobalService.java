@@ -45,6 +45,9 @@ public class GlobalService {
     String publicDid;
     String phase;
 
+    // for manual web view example
+    static boolean enableManualWebView = Boolean.parseBoolean(System.getenv().getOrDefault("ENABLE_MANUAL_WEBVIEW", "false"));
+
     @EventListener(ApplicationReadyEvent.class)
     public void initialize() {
         provisionController();
@@ -75,7 +78,10 @@ public class GlobalService {
 
     public void handleEvent(String body) {
         String topic = JsonPath.read(body, "$.topic");
-        String state = topic.equals("problem_report") ? null : JsonPath.read(body, "$.state");
+        String state = null;
+        try {
+            state = JsonPath.read(body, "$.state");
+        } catch (PathNotFoundException e) {}
         log.info("handleEvent >>> topic:" + topic + ", state:" + state + ", body:" + body);
 
         switch(topic) {
@@ -83,14 +89,20 @@ public class GlobalService {
                 // 1. connection 이 완료됨 -> credential 을 요청함
                 if (state.equals("active")) {
                     log.info("- Case (topic:" + topic + ", state:" + state + ") -> sendCredentialProposal");
-                    sendCredentialProposal(JsonPath.read(body, "$.connection_id"), issuerCredDefId);
+                    String connectionId = JsonPath.read(body, "$.connection_id");
+                    sendCredentialProposal(connectionId, issuerCredDefId);
                 }
                 break;
             case "issue_credential":
+                if (state == null) {
+                    log.warn("- Case (topic:" + topic + ", ProblemReport) -> PrintBody");
+                    log.warn("  - body:" + body);
+                }
                 // 4-2. 증명서 preview 받음 -> 증명서 요청
-                if (state.equals("offer_received")) {
+                else if (state.equals("offer_received")) {
                     log.info("- Case (topic:" + topic + ", state:" + state + ") -> sendCredentialRequest");
-                    sendCredentialRequest(JsonPath.read(body, "$.credential_exchange_id"));
+                    String credExId = JsonPath.read(body, "$.credential_exchange_id");
+                    sendCredentialRequest(credExId);
                 }
                 // 4-3. 증명서를 정상 저장하였음 -> 완료
                 else if (state.equals("credential_acked")) {
@@ -104,7 +116,8 @@ public class GlobalService {
                 // 2. 개인정보이용 동의 요청 받음 -> 동의하여 전송
                 if (type != null && type.equals("initial_agreement")) {
                     log.info("- Case (topic:" + topic + ", state:" + state + ", type:" + type + ") -> sendAgreementAgreed");
-                    sendAgreementAgreed(JsonPath.read(body, "$.connection_id"), content);
+                    String connectionId = JsonPath.read(body, "$.connection_id");
+                    sendAgreementAgreed(connectionId, content);
                 }
                 // 4-1. web view를 통한 추가 정보 요구 -> 선택하여 전송
                 else if (type != null && type.equals("initial_web_view")) {
@@ -115,16 +128,21 @@ public class GlobalService {
                     log.warn("- Warning: Unexpected type:" + type);
                 break;
             case "present_proof":
+                if (state == null) {
+                    log.warn("- Case (topic:" + topic + ", ProblemReport) -> PrintBody");
+                    log.warn("  - body:" + body);
+                }
                 // 3. 모바일 가입증명 검증 요청 받음 -> 모바일 가입 증명 검증 전송
-                if (state.equals("request_received")) {
+                else if (state.equals("request_received")) {
                     log.info("- Case (topic:" + topic + ", state:" + state + ") -> sendPresentation");
+                    String presExId = JsonPath.read(body, "$.presentation_exchange_id");
                     String presentationRequest = JsonPath.parse((LinkedHashMap)JsonPath.read(body, "$.presentation_request")).jsonString();
-                    sendPresentation(JsonPath.read(body, "$.presentation_exchange_id"), presentationRequest);
+                    sendPresentation(presExId, presentationRequest);
                 }
                 break;
             case "problem_report":
                 log.warn("- Case (topic:" + topic + ") -> Print body");
-                log.warn("  - body:" + prettyJson(body));
+                log.warn("  - body:" + body);
                 break;
             case "revocation_registry":
             case "issuer_cred_rev":
@@ -136,20 +154,29 @@ public class GlobalService {
 
     public void handleEventOnPreparation(String body) {
         String topic = JsonPath.read(body, "$.topic");
-        String state = topic.equals("problem_report") ? null : JsonPath.read(body, "$.state");
+        String state = null;
+        try {
+            state = JsonPath.read(body, "$.state");
+        } catch (PathNotFoundException e) {}
         log.info("handleEvent >>> topic:" + topic + ", state:" + state + ", body:" + body);
 
         switch(topic) {
             case "connections":
                 if (state.equals("active")) {
                     log.info("- Case (topic:" + topic + ", state:" + state + ") -> sendCredentialProposal");
-                    sendCredentialProposal(JsonPath.read(body, "$.connection_id"), sampleMobileCredDefId);
+                    String connectionId = JsonPath.read(body, "$.connection_id");
+                    sendCredentialProposal(connectionId, sampleMobileCredDefId);
                 }
                 break;
             case "issue_credential":
-                if (state.equals("offer_received")) {
+                if (state == null) {
+                    log.warn("- Case (topic:" + topic + ", ProblemReport) -> PrintBody");
+                    log.warn("  - body:" + body);
+                }
+                else if (state.equals("offer_received")) {
                     log.info("- Case (topic:" + topic + ", state:" + state + ") -> sendCredentialRequest");
-                    sendCredentialRequest(JsonPath.read(body, "$.credential_exchange_id"));
+                    String credExId = JsonPath.read(body, "$.credential_exchange_id");
+                    sendCredentialRequest(credExId);
                 }
                 else if (state.equals("credential_acked")) {
                     log.info("- Case (topic:" + topic + ", state:" + state + ") -> sample mobile credential received successfully");
@@ -159,7 +186,7 @@ public class GlobalService {
                 break;
             case "problem_report":
                 log.warn("- Case (topic:" + topic + ") -> Print body");
-                log.warn("  - body:" + prettyJson(body));
+                log.warn("  - body:" + body);
                 break;
             case "basicmessages":
             case "present_proof":
@@ -306,6 +333,10 @@ public class GlobalService {
             String webViewUrl = JsonPath.read(webViewContent, "$.web_view_url");
 
             // CODE HERE : Show web view to user and user select & submit a item
+            if (enableManualWebView) {
+                log.info("browse url and submit: " + webViewUrl);
+                return;
+            }
 
             // For automation, we submit a item directly
             String[] token = webViewUrl.split("/web-view/form.html");

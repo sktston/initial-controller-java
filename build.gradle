@@ -71,6 +71,13 @@ task holder(type:JavaExec) {
 	main = 'com.sktelecom.initial.controller.holder.Application'
 	args(['--spring.config.location=classpath:/application-holder.properties'])
 }
+task holder_manual_webview(type:JavaExec) {
+	group 'application'
+	classpath sourceSets.main.runtimeClasspath
+	main = 'com.sktelecom.initial.controller.holder.Application'
+	args(['--spring.config.location=classpath:/application-holder.properties'])
+	environment("ENABLE_MANUAL_WEBVIEW", "true")
+}
 task holder_prod(type:JavaExec) {
 	group 'application'
 	classpath sourceSets.main.runtimeClasspath
