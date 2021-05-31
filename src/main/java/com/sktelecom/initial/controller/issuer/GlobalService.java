@@ -29,6 +29,9 @@ public class GlobalService {
     @Value("${credDefId}")
     private String credDefId; // credential definition identifier
 
+    @Value("${mobile_credDefId}")
+    private String mobile_credDefId; // credential definition identifier
+
     @Value("${verifTplId}")
     private String verifTplId; // verification template identifier
 
@@ -257,12 +260,12 @@ public class GlobalService {
                 "      person_name: {" +
                 "        name: 'person_name'," +
                 "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
-                "        restrictions: [ {cred_def_id: '" + credDefId + "'} ]" +
+                "        restrictions: [ {cred_def_id: '" + mobile_credDefId + "'} ]" +
                 "      }," +
                 "      mobile_num: {" +
                 "        name: 'mobile_num'," +
                 "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
-                "        restrictions: [ {cred_def_id: '" + credDefId + "'} ]" +
+                "        restrictions: [ {cred_def_id: '" + mobile_credDefId + "'} ]" +
                 "      }" +
                 "    }," +
                 "    requested_predicates: {" +
