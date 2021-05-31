@@ -64,18 +64,27 @@ public class GlobalService {
     }
 
     public void handleEvent(String body) {
-        //log.info("handleEvent >>> body:" + body);
         String topic = JsonPath.read(body, "$.topic");
-        String state = topic.equals("problem_report") ? null : JsonPath.read(body, "$.state");
+        String state = null;
+        try {
+            state = JsonPath.read(body, "$.state");
+        } catch (PathNotFoundException e) {}
         log.info("handleEvent >>> topic:" + topic + ", state:" + state + ", body:" + body);
 
         switch(topic) {
             case "issue_credential":
+                if (state == null) {
+                    log.warn("- Case (topic:" + topic + ", ProblemReport) -> PrintBody");
+                    log.warn("  - body:" + body);
+                }
                 // 1. holder 가 credential 을 요청함 -> 개인정보이용 동의 요청
-                if (state.equals("proposal_received")) {
+                else if (state.equals("proposal_received")) {
                     log.info("- Case (topic:" + topic + ", state:" + state + ") -> checkCredentialProposal && sendAgreement");
-                    if(checkCredentialProposal(body)) {
-                        sendAgreement(JsonPath.read(body, "$.connection_id"));
+                    String connectionId = JsonPath.read(body, "$.connection_id");
+                    String credExId = JsonPath.read(body, "$.credential_exchange_id");
+                    String credentialProposal = JsonPath.parse((LinkedHashMap)JsonPath.read(body, "$.credential_proposal_dict")).jsonString();
+                    if(checkCredentialProposal(connectionId, credExId, credentialProposal)) {
+                        sendAgreement(connectionId);
                     }
                 }
                 // 4. holder 가 증명서를 정상 저장하였음 -> 완료 (revocation 은 아래 코드 참조)
@@ -105,8 +114,12 @@ public class GlobalService {
                     log.warn("- Warning: Unexpected type:" + type);
                 break;
             case "present_proof":
+                if (state == null) {
+                    log.warn("- Case (topic:" + topic + ", ProblemReport) -> PrintBody");
+                    log.warn("  - body:" + body);
+                }
                 // 3. holder 가 보낸 모바일 가입증명 검증 완료
-                if (state.equals("verified")) {
+                else if (state.equals("verified")) {
                     log.info("- Case (topic:" + topic + ", state:" + state + ") -> getPresentationResult");
                     LinkedHashMap<String, String> attrs = getPresentationResult(body);
                     for(String key : attrs.keySet())
@@ -196,10 +209,15 @@ public class GlobalService {
         }
     }
 
-    public boolean checkCredentialProposal(String credExRecord) {
-        String credentialProposal = JsonPath.parse((LinkedHashMap)JsonPath.read(credExRecord, "$.credential_proposal_dict")).jsonString();
-        String connectionId = JsonPath.read(credExRecord, "$.connection_id");
-        String credExId = JsonPath.read(credExRecord, "$.credential_exchange_id");
+    public void sendCredProblemReport(String credExId, String description) {
+        String body = JsonPath.parse("{" +
+                "  description: '" + description + "'" +
+                "}").jsonString();
+        String response = client.requestPOST(agentApiUrl + "/issue-credential/records/" + credExId + "/problem-report", accessToken, body);
+        log.info("response: " + response);
+    }
+
+    public boolean checkCredentialProposal(String connectionId, String credExId, String credentialProposal) {
         try {
             String requestedCredDefId = JsonPath.read(credentialProposal, "$.cred_def_id");
             if (requestedCredDefId.equals(credDefId)){
@@ -208,18 +226,10 @@ public class GlobalService {
             }
             log.warn("This issuer can issue credDefId:" + credDefId);
             log.warn("But, requested credDefId is " + requestedCredDefId + " -> problemReport");
-            String body = JsonPath.parse("{" +
-                    "  description: '본 기관은 요청한 증명서 (credDefId:" + requestedCredDefId + ") 를 발급하지 않습니다'" +
-                    "}").jsonString();
-            String response = client.requestPOST(agentApiUrl + "/issue-credential/records/" + credExId + "/problem-report", accessToken, body);
-            log.info("response: " + response);
+            sendCredProblemReport(credExId, "본 기관은 요청한 증명서 (credDefId:" + requestedCredDefId + ") 를 발급하지 않습니다");
         } catch (PathNotFoundException e) {
             log.warn("Requested credDefId does not exist -> problemReport");
-            String body = JsonPath.parse("{" +
-                    "  description: '증명서 (credDefId) 가 지정되지 않았습니다'" +
-                    "}").jsonString();
-            String response = client.requestPOST(agentApiUrl + "/issue-credential/records/" + credExId + "/problem-report", accessToken, body);
-            log.info("response: " + response);
+            sendCredProblemReport(credExId, "증명서 (credDefId) 가 지정되지 않았습니다");
         }
         return false;
     }

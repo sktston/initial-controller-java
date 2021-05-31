@@ -75,7 +75,10 @@ public class GlobalService {
 
     public void handleEvent(String body) {
         String topic = JsonPath.read(body, "$.topic");
-        String state = topic.equals("problem_report") ? null : JsonPath.read(body, "$.state");
+        String state = null;
+        try {
+            state = JsonPath.read(body, "$.state");
+        } catch (PathNotFoundException e) {}
         log.info("handleEvent >>> topic:" + topic + ", state:" + state + ", body:" + body);
 
         switch(topic) {
@@ -87,8 +90,12 @@ public class GlobalService {
                 }
                 break;
             case "issue_credential":
+                if (state == null) {
+                    log.warn("- Case (topic:" + topic + ", ProblemReport) -> PrintBody");
+                    log.warn("  - body:" + body);
+                }
                 // 4-2. 증명서 preview 받음 -> 증명서 요청
-                if (state.equals("offer_received")) {
+                else if (state.equals("offer_received")) {
                     log.info("- Case (topic:" + topic + ", state:" + state + ") -> sendCredentialRequest");
                     sendCredentialRequest(JsonPath.read(body, "$.credential_exchange_id"));
                 }
@@ -115,8 +122,12 @@ public class GlobalService {
                     log.warn("- Warning: Unexpected type:" + type);
                 break;
             case "present_proof":
+                if (state == null) {
+                    log.warn("- Case (topic:" + topic + ", ProblemReport) -> PrintBody");
+                    log.warn("  - body:" + body);
+                }
                 // 3. 모바일 가입증명 검증 요청 받음 -> 모바일 가입 증명 검증 전송
-                if (state.equals("request_received")) {
+                else if (state.equals("request_received")) {
                     log.info("- Case (topic:" + topic + ", state:" + state + ") -> sendPresentation");
                     String presentationRequest = JsonPath.parse((LinkedHashMap)JsonPath.read(body, "$.presentation_request")).jsonString();
                     sendPresentation(JsonPath.read(body, "$.presentation_exchange_id"), presentationRequest);
@@ -136,7 +147,10 @@ public class GlobalService {
 
     public void handleEventOnPreparation(String body) {
         String topic = JsonPath.read(body, "$.topic");
-        String state = topic.equals("problem_report") ? null : JsonPath.read(body, "$.state");
+        String state = null;
+        try {
+            state = JsonPath.read(body, "$.state");
+        } catch (PathNotFoundException e) {}
         log.info("handleEvent >>> topic:" + topic + ", state:" + state + ", body:" + body);
 
         switch(topic) {
@@ -147,7 +161,11 @@ public class GlobalService {
                 }
                 break;
             case "issue_credential":
-                if (state.equals("offer_received")) {
+                if (state == null) {
+                    log.warn("- Case (topic:" + topic + ", ProblemReport) -> PrintBody");
+                    log.warn("  - body:" + body);
+                }
+                else if (state.equals("offer_received")) {
                     log.info("- Case (topic:" + topic + ", state:" + state + ") -> sendCredentialRequest");
                     sendCredentialRequest(JsonPath.read(body, "$.credential_exchange_id"));
                 }
