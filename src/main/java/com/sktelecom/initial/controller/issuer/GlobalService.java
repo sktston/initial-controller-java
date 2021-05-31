@@ -306,14 +306,14 @@ public class GlobalService {
                 "    version: '1.0'," +
                 "    requested_attributes: {" +
                 "      person_name: {" +
-                "        name: 'score_of_reading'," +
+                "        name: 'person_name'," +
                 "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
-                "        restrictions: [ {cred_def_id: '" + toeic_credDefId + "'} ]" +
+                "        restrictions: [ {cred_def_id: '" + mobile_credDefId + "'} ]" +
                 "      }," +
                 "      mobile_num: {" +
-                "        name: 'score_of_listening'," +
+                "        name: 'mobile_num'," +
                 "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
-                "        restrictions: [ {cred_def_id: '" + toeic_credDefId + "'} ]" +
+                "        restrictions: [ {cred_def_id: '" + mobile_credDefId + "'} ]" +
                 "      }" +
                 "    }," +
                 "    requested_predicates: {" +
