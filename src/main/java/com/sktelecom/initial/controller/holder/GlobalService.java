@@ -45,6 +45,9 @@ public class GlobalService {
     String publicDid;
     String phase;
 
+    // for manual web view example
+    static boolean enableManualWebView = Boolean.parseBoolean(System.getenv().getOrDefault("ENABLE_MANUAL_WEBVIEW", "false"));
+
     @EventListener(ApplicationReadyEvent.class)
     public void initialize() {
         provisionController();
@@ -330,6 +333,10 @@ public class GlobalService {
             String webViewUrl = JsonPath.read(webViewContent, "$.web_view_url");
 
             // CODE HERE : Show web view to user and user select & submit a item
+            if (enableManualWebView) {
+                log.info("browse url and submit: " + webViewUrl);
+                return;
+            }
 
             // For automation, we submit a item directly
             String[] token = webViewUrl.split("/web-view/form.html");
