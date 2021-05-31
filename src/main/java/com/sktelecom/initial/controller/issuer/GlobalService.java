@@ -274,12 +274,12 @@ public class GlobalService {
                 "        restrictions: [ {cred_def_id: '" + mobile_credDefId + "'} ]" +
                 "      }," +
                 "      score_of_total: {" +
-                "        name: 'score_of_total'," +
+                "        name: 'score_of_reading'," +
                 "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
                 "        restrictions: [ {cred_def_id: '" + toeic_credDefId + "'} ]" +
                 "      }," +
                 "      employee_no: {" +
-                "        name: 'employee_no'," +
+                "        name: 'score_of_listening'," +
                 "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
                 "        restrictions: [ {cred_def_id: '" + psnm_credDefId + "'} ]" +
                 "      }" +
@@ -306,14 +306,14 @@ public class GlobalService {
                 "    version: '1.0'," +
                 "    requested_attributes: {" +
                 "      person_name: {" +
-                "        name: 'score_of_reading'," +
+                "        name: 'person_name'," +
                 "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
-                "        restrictions: [ {cred_def_id: '" + toeic_credDefId + "'} ]" +
+                "        restrictions: [ {cred_def_id: '" + mobile_credDefId + "'} ]" +
                 "      }," +
                 "      mobile_num: {" +
-                "        name: 'score_of_listening'," +
+                "        name: 'mobile_num'," +
                 "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
-                "        restrictions: [ {cred_def_id: '" + toeic_credDefId + "'} ]" +
+                "        restrictions: [ {cred_def_id: '" + mobile_credDefId + "'} ]" +
                 "      }" +
                 "    }," +
                 "    requested_predicates: {" +
