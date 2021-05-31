@@ -287,10 +287,10 @@ public class GlobalService {
                 "    name: '모바일가입증명 검증'," +
                 "    version: '1.0'," +
                 "    requested_attributes: {" +
-                "      person_name: {" +
+                "      모바일가입증명 : {" +
                 "        names: [" +
                 "           'person_name'"+
-                "           ]" +
+                "           ]," +
                 "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
                 "        restrictions: [ {cred_def_id: '" + mobile_credDefId + "'} ]" +
                 "      }" +
