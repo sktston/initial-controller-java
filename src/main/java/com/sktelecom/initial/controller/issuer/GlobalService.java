@@ -276,6 +276,101 @@ public class GlobalService {
                 "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
                 "        restrictions: [ {cred_def_id: '" + UniCertificateOfGraduationKor_credDefId + "'} ]" +
                 "      }" +
+                "      college: {" +
+                "        name: 'college'," +
+                "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
+                "        restrictions: [ {cred_def_id: '" + UniCertificateOfGraduationKor_credDefId + "'} ]" +
+                "      }" +
+                "      date_of_admission: {" +
+                "        name: 'date_of_admission'," +
+                "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
+                "        restrictions: [ {cred_def_id: '" + UniCertificateOfGraduationKor_credDefId + "'} ]" +
+                "      }" +
+                "      date_of_birth: {" +
+                "        name: 'date_of_birth'," +
+                "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
+                "        restrictions: [ {cred_def_id: '" + UniCertificateOfGraduationKor_credDefId + "'} ]" +
+                "      }" +
+                "      date_of_graduation: {" +
+                "        name: 'date_of_graduation'," +
+                "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
+                "        restrictions: [ {cred_def_id: '" + UniCertificateOfGraduationKor_credDefId + "'} ]" +
+                "      }" +
+                "      date_of_issue: {" +
+                "        name: 'date_of_issue'," +
+                "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
+                "        restrictions: [ {cred_def_id: '" + UniCertificateOfGraduationKor_credDefId + "'} ]" +
+                "      }" +
+                "      degree_name: {" +
+                "        name: 'degree_name'," +
+                "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
+                "        restrictions: [ {cred_def_id: '" + UniCertificateOfGraduationKor_credDefId + "'} ]" +
+                "      }" +
+                "      degree_number: {" +
+                "        name: 'degree_number'," +
+                "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
+                "        restrictions: [ {cred_def_id: '" + UniCertificateOfGraduationKor_credDefId + "'} ]" +
+                "      }" +
+                "      double_major: {" +
+                "        name: 'double_major'," +
+                "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
+                "        restrictions: [ {cred_def_id: '" + UniCertificateOfGraduationKor_credDefId + "'} ]" +
+                "      }" +
+                "      exp_date: {" +
+                "        name: 'exp_date'," +
+                "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
+                "        restrictions: [ {cred_def_id: '" + UniCertificateOfGraduationKor_credDefId + "'} ]" +
+                "      }" +
+                "      identification_number: {" +
+                "        name: 'identification_number'," +
+                "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
+                "        restrictions: [ {cred_def_id: '" + UniCertificateOfGraduationKor_credDefId + "'} ]" +
+                "      }" +
+                "      issued_key: {" +
+                "        name: 'issued_key'," +
+                "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
+                "        restrictions: [ {cred_def_id: '" + UniCertificateOfGraduationKor_credDefId + "'} ]" +
+                "      }" +
+                "      issue_number: {" +
+                "        name: 'issue_number'," +
+                "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
+                "        restrictions: [ {cred_def_id: '" + UniCertificateOfGraduationKor_credDefId + "'} ]" +
+                "      }" +
+                "      major: {" +
+                "        name: 'major'," +
+                "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
+                "        restrictions: [ {cred_def_id: '" + UniCertificateOfGraduationKor_credDefId + "'} ]" +
+                "      }" +
+                "      name: {" +
+                "        name: 'name'," +
+                "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
+                "        restrictions: [ {cred_def_id: '" + UniCertificateOfGraduationKor_credDefId + "'} ]" +
+                "      }" +
+                "      pdf_down: {" +
+                "        name: 'pdf_down'," +
+                "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
+                "        restrictions: [ {cred_def_id: '" + UniCertificateOfGraduationKor_credDefId + "'} ]" +
+                "      }" +
+                "      pdf_preview: {" +
+                "        name: 'pdf_preview'," +
+                "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
+                "        restrictions: [ {cred_def_id: '" + UniCertificateOfGraduationKor_credDefId + "'} ]" +
+                "      }" +
+                "      student_id: {" +
+                "        name: 'student_id'," +
+                "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
+                "        restrictions: [ {cred_def_id: '" + UniCertificateOfGraduationKor_credDefId + "'} ]" +
+                "      }" +
+                "      submission: {" +
+                "        name: 'submission'," +
+                "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
+                "        restrictions: [ {cred_def_id: '" + UniCertificateOfGraduationKor_credDefId + "'} ]" +
+                "      }" +
+                "      use: {" +
+                "        name: 'use'," +
+                "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
+                "        restrictions: [ {cred_def_id: '" + UniCertificateOfGraduationKor_credDefId + "'} ]" +
+                "      }" +
                 "    }," +
                 "    requested_predicates: {" +
                 "    }" +
