@@ -282,7 +282,7 @@ public class GlobalService {
                 "        name: 'employee_no'," +
                 "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
                 "        restrictions: [ {cred_def_id: '" + psnm_credDefId + "'} ]" +
-                "      }," +
+                "      }" +
                 "    }," +
                 "    requested_predicates: {" +
                 "    }" +
