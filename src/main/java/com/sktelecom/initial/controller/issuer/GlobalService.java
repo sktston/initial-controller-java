@@ -273,11 +273,6 @@ public class GlobalService {
                 "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
                 "        restrictions: [ {cred_def_id: '" + mobile_credDefId + "'} ]" +
                 "      }," +
-                "      score_of_total: {" +
-                "        name: 'score_of_total'," +
-                "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
-                "        restrictions: [ {cred_def_id: '" + toeic_credDefId + "'} ]" +
-                "      }," +
                 "      employee_no: {" +
                 "        name: 'employee_no'," +
                 "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
