@@ -291,7 +291,7 @@ public class GlobalService {
                 "        names: ['person_name','mobile_num']" +
                 "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
                 "        restrictions: [ {cred_def_id: '" + mobile_credDefId + "'} ]" +
-                "      },"
+                "      }"
                 "    }," +
                 "    requested_predicates: {" +
                 "    }" +
