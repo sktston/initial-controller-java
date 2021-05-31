@@ -107,7 +107,8 @@ public class GlobalService {
                 if (type != null && type.equals("initial_agreement_decision")) {
                     if (isAgreementAgreed(content)) {
                         log.info("- Case (topic:" + topic + ", state:" + state + ", type:" + type + ") -> AgreementAgreed & sendPresentationRequest");
-                        sendPresentationRequest(JsonPath.read(body, "$.connection_id"));
+                        String connectionId = JsonPath.read(body, "$.connection_id");
+                        sendPresentationRequest(connectionId);
                     }
                 }
                 else
@@ -128,18 +129,20 @@ public class GlobalService {
                     if (enableWebView) {
                         // 3-1. 검증 값 정보로 발행할 증명서가 한정되지 않는 경우 추가 정보 요구
                         log.info("Web View enabled -> sendWebView");
-                        sendWebView(JsonPath.read(body, "$.connection_id"), attrs, body);
+                        String connectionId = JsonPath.read(body, "$.connection_id");
+                        sendWebView(connectionId, attrs, body);
                     }
                     else {
                         // 3-2. 검증 값 정보 만으로 발행할 증명서가 한정되는 경우 증명서 바로 발행
                         log.info("Web View is not used -> sendCredentialOffer");
-                        sendCredentialOffer(JsonPath.read(body, "$.connection_id"), attrs, null);
+                        String connectionId = JsonPath.read(body, "$.connection_id");
+                        sendCredentialOffer(connectionId, attrs, null);
                     }
                 }
                 break;
             case "problem_report":
                 log.warn("- Case (topic:" + topic + ") -> Print body");
-                log.warn("  - body:" + prettyJson(body));
+                log.warn("  - body:" + body);
                 break;
             case "connections":
             case "revocation_registry":
