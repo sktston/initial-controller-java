@@ -269,6 +269,7 @@ public class GlobalService {
                 "    }" +
                 "  }" +
                 "}").jsonString();
+        log.info("body: " + body);
         String response = client.requestPOST(agentApiUrl + "/present-proof/send-request", accessToken, body);
         log.info("response: " + response);
     }
