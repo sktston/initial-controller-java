@@ -257,12 +257,12 @@ public class GlobalService {
                 "      person_name: {" +
                 "        name: 'person_name'," +
                 "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
-                "        restrictions: [ {cred_def_id: '" + mobile_credDefId + "'} ]" +
+                "        restrictions: [ {cred_def_id: '" + credDefId + "'} ]" +
                 "      }," +
                 "      mobile_num: {" +
                 "        name: 'mobile_num'," +
                 "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
-                "        restrictions: [ {cred_def_id: '" + mobile_credDefId + "'} ]" +
+                "        restrictions: [ {cred_def_id: '" + credDefId + "'} ]" +
                 "      }" +
                 "    }," +
                 "    requested_predicates: {" +
