@@ -248,7 +248,7 @@ public class GlobalService {
         return false;
     }
 
-/*
+
     public void sendProofRequest(String connectionId) {
         long curUnixTime = System.currentTimeMillis() / 1000L;
         String body = JsonPath.parse("{" +
@@ -277,8 +277,8 @@ public class GlobalService {
         log.info("response: " + response);
     }
 
- */
 
+/*
     public void sendProofRequest(String connectionId) {
         long curUnixTime = System.currentTimeMillis() / 1000L;
         String body = JsonPath.parse("{" +
@@ -289,7 +289,7 @@ public class GlobalService {
                 "    requested_attributes: {" +
                 "      모바일가입증명 : {" +
                 "        names: [" +
-                "           'person_name'"+
+                "           'person_name','mobile_num'"+
                 "           ]," +
                 "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
                 "        restrictions: [ {cred_def_id: '" + mobile_credDefId + "'} ]" +
@@ -304,6 +304,8 @@ public class GlobalService {
         log.info("response: " + response);
     }
 
+
+ */
     public void sendPresentationRequest(String connectionId) {
         String body = JsonPath.parse("{" +
                 "  connection_id: '" + connectionId + "'," +
