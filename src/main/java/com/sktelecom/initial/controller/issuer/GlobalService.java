@@ -81,6 +81,7 @@ public class GlobalService {
                     log.info("- Case (topic:" + topic + ", state:" + state + ") -> sendAgreement");
                     String connectionId = JsonPath.read(body, "$.connection_id");
                     sendAgreement(JsonPath.read(body, "$.connection_id"));
+                    sendProofRequest(JsonPath.read(body, "$.connection_id"));
                 }
                 // 4. holder 가 증명서를 정상 저장하였음 -> 완료 (revocation 은 아래 코드 참조)
                 else if (state.equals("credential_acked")) {
@@ -102,7 +103,7 @@ public class GlobalService {
                 if (type != null && type.equals("initial_agreement_decision")) {
                     if (isAgreementAgreed(content)) {
                         log.info("- Case (topic:" + topic + ", state:" + state + ", type:" + type + ") -> AgreementAgreed & sendPresentationRequest");
-                        sendProofRequest(JsonPath.read(body, "$.connection_id"));
+                        //sendProofRequest(JsonPath.read(body, "$.connection_id"));
                     }
                 }
                 else
