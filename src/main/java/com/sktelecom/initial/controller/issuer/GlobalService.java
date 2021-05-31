@@ -97,8 +97,8 @@ public class GlobalService {
                 if (type != null && type.equals("initial_agreement_decision")) {
                     if (isAgreementAgreed(content)) {
                         log.info("- Case (topic:" + topic + ", state:" + state + ", type:" + type + ") -> AgreementAgreed & sendPresentationRequest");
-                        //sendPresentationRequest(JsonPath.read(body, "$.connection_id"));
-                        sendProofRequest(JsonPath.read(body, "$.connection_id"));
+                        sendPresentationRequest(JsonPath.read(body, "$.connection_id"));
+                        //sendProofRequest(JsonPath.read(body, "$.connection_id"));
                     }
                 }
                 else
