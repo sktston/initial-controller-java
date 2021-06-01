@@ -74,8 +74,9 @@ public class GlobalService {
         switch(topic) {
             case "issue_credential":
                 if (state == null) {
-                    log.warn("- Case (topic:" + topic + ", ProblemReport) -> PrintBody");
-                    log.warn("  - body:" + body);
+                    log.warn("- Case (topic:" + topic + ", ProblemReport) -> Print Error Message");
+                    String errorMsg = JsonPath.read(body, "$.error_msg");
+                    log.warn("  - error_msg: " + errorMsg);
                 }
                 // 1. holder 가 credential 을 요청함 -> 개인정보이용 동의 요청
                 else if (state.equals("proposal_received")) {
@@ -116,8 +117,9 @@ public class GlobalService {
                 break;
             case "present_proof":
                 if (state == null) {
-                    log.warn("- Case (topic:" + topic + ", ProblemReport) -> PrintBody");
-                    log.warn("  - body:" + body);
+                    log.warn("- Case (topic:" + topic + ", ProblemReport) -> Print Error Message");
+                    String errorMsg = JsonPath.read(body, "$.error_msg");
+                    log.warn("  - error_msg: " + errorMsg);
                 }
                 // 3. holder 가 보낸 모바일 가입증명 검증 완료
                 else if (state.equals("verified")) {

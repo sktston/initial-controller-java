@@ -95,8 +95,9 @@ public class GlobalService {
                 break;
             case "issue_credential":
                 if (state == null) {
-                    log.warn("- Case (topic:" + topic + ", ProblemReport) -> PrintBody");
-                    log.warn("  - body:" + body);
+                    log.warn("- Case (topic:" + topic + ", ProblemReport) -> Print Error Message");
+                    String errorMsg = JsonPath.read(body, "$.error_msg");
+                    log.warn("  - error_msg: " + errorMsg);
                 }
                 // 4-2. 증명서 preview 받음 -> 증명서 요청
                 else if (state.equals("offer_received")) {
@@ -129,8 +130,9 @@ public class GlobalService {
                 break;
             case "present_proof":
                 if (state == null) {
-                    log.warn("- Case (topic:" + topic + ", ProblemReport) -> PrintBody");
-                    log.warn("  - body:" + body);
+                    log.warn("- Case (topic:" + topic + ", ProblemReport) -> Print Error Message");
+                    String errorMsg = JsonPath.read(body, "$.error_msg");
+                    log.warn("  - error_msg: " + errorMsg);
                 }
                 // 3. 모바일 가입증명 검증 요청 받음 -> 모바일 가입 증명 검증 전송
                 else if (state.equals("request_received")) {
