@@ -354,7 +354,7 @@ public class GlobalService {
         value.put("korean_name", "김증명");
         value.put("english_name", "Kim Initial");
         value.put("registration_number", "123456789");
-        value.put("exp_date", "2022-02-28");
+        value.put("exp_date", "2022.02.28");
         value.put("date_of_birth", "20000228");
         value.put("date_of_test", "2022-02-28");
         value.put("score_of_listening", "445");
