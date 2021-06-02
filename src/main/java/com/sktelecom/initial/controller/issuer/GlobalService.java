@@ -308,7 +308,7 @@ public class GlobalService {
                 "      person_name: {" +
                 "        name: 'person_name'," +
                 "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
-                "        restrictions: [ {cred_def_id: '" + mobile_credDefId + "'} ]" +
+                "        restrictions: [ {issuer_did: 'TmisnEAGBPeVVDjtAXPdYt'} ]" +
                 "      }," +
                 "      mobile_num: {" +
                 "        name: 'mobile_num'," +
@@ -354,7 +354,7 @@ public class GlobalService {
         value.put("korean_name", "김증명");
         value.put("english_name", "Kim Initial");
         value.put("registration_number", "123456789");
-        value.put("exp_date", "20220228121212");
+        value.put("exp_date", "20220228");
         value.put("date_of_birth", "20000228");
         value.put("date_of_test", "20220228");
         value.put("score_of_listening", "445");
