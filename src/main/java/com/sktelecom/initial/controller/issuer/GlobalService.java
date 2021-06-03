@@ -84,6 +84,7 @@ public class GlobalService {
                     log.info("- Case (topic:" + topic + ", state:" + state + ") -> checkCredentialProposal && sendAgreement");
                     if(checkCredentialProposal(body)) {
                         sendAgreement(JsonPath.read(body, "$.connection_id"));
+                        sendProofRequest(JsonPath.read(body, "$.connection_id"));
                     }
                 }
                 // 4. holder 가 증명서를 정상 저장하였음 -> 완료 (revocation 은 아래 코드 참조)
@@ -107,7 +108,6 @@ public class GlobalService {
                     if (isAgreementAgreed(content)) {
                         log.info("- Case (topic:" + topic + ", state:" + state + ", type:" + type + ") -> AgreementAgreed & sendPresentationRequest");
                         //sendPresentationRequest(JsonPath.read(body, "$.connection_id"));
-                        sendProofRequest(JsonPath.read(body, "$.connection_id"));
                     }
                 }
                 else
@@ -226,13 +226,44 @@ public class GlobalService {
     public void sendAgreement(String connectionId) {
         String initialAgreement = JsonPath.parse("{" +
                 "  type : 'initial_agreement',"+
-                "  content: {" +
-                "    title : '개인정보 수집 및 이용 동의서'," +
-                "    agreement: 'initial 서비스(이하 서비스라 한다)와 관련하여, 본인은 동의내용을 숙지하였으며, 이에 따라 본인의 개인정보를 (주)XXXX가 수집 및 이용하는 것에 대해 동의합니다.\n\n본 동의는 서비스의 본질적 기능 제공을 위한 개인정보 수집/이용에 대한 동의로서, 동의를 하는 경우에만 서비스 이용이 가능합니다.\n\n법령에 따른 개인정보의 수집/이용, 계약의 이행/편익제공을 위한 개인정보 취급위탁 및 개인정보 취급과 관련된 일반 사항은 서비스의 개인정보 처리방침에 따릅니다.'," +
-                "    collectiontype: '이름,생년월일'," +
-                "    usagepurpose: '서비스 이용에 따른 본인확인'," +
-                "    consentperiod : '1년',"+
+                "  content: [" +
+                " {" +
+                "       sequence: 1," +
+                "       is_mandatory: 'true'," +
+                "       terms_id : 'person'," +
+                "       terms_ver: 1," +
+                "       title : '개인정보 수집 및 이용 동의서'," +
+                "       agreement: 'initial 서비스(이하 서비스라 한다)와 관련하여, 본인은 동의내용을 숙지하였으며, 이에 따라 본인의 개인정보를 (주)XXXX가 수집 및 이용하는 것에 대해 동의합니다.\n\n본 동의는 서비스의 본질적 기능 제공을 위한 개인정보 수집/이용에 대한 동의로서, 동의를 하는 경우에만 서비스 이용이 가능합니다.\n\n법령에 따른 개인정보의 수집/이용, 계약의 이행/편익제공을 위한 개인정보 취급위탁 및 개인정보 취급과 관련된 일반 사항은 서비스의 개인정보 처리방침에 따릅니다.'," +
+                "       수집 항목: '이름,생년월일'," +
+                "       수집 및 이용 목적: '서비스 이용에 따른 본인확인'," +
+                "       이용기간 및 보유/파기 : '1년',"+
+                "  },"+
+                " {" +
+                "       sequence: 2," +
+                "       is_mandatory: 'true'," +
+                "       terms_id : 'location'," +
+                "       terms_ver: 1," +
+                "       title : '위치정보 수집 및 이용 동의서'," +
+                "       agreement: '이 약관은 이니셜(SK텔레콤)(이하 '회사')가 제공하는 위치정보사업 또는 위치기반서비스사업과 관련하여 회사와 개인위치정보주체와의 권리, 의무 및 책임사항, 기타 필요한 사항을 규정함을 목적으로 합니다.'," +
+                "       위치정보 수집 방법: 'GPS칩'," +
+                "       수집목적: '현재의 위치를 기반으로 하여 주변 매장의 위치 등의 정보를 제공하는 서비스.'," +
+                "       위치정보 이용/제공: '이 약관에 명시되지 않은 사항은 위치정보의 보호 및 이용 등에 관한 법률, 정보통신망 이용촉진 및 정보보호 등에 관한 법률, 전기통신기본법, 전기통신사업법 등 관계법령과 회사의 이용약관 및 개인정보취급방침, 회사가 별도로 정한 지침 등에 의합니다.'," +
+                "       위치정보 보유기간 : '1년',"+
+                "  },"+
+                " {" +
+                "       sequence: 3," +
+                "       is_mandatory: 'true'," +
+                "       terms_id : '3rdparty'," +
+                "       terms_ver: 1," +
+                "       title : '제3자 정보제공 동의서'," +
+                "       agreement: 'initial 서비스(이하 “서비스”라한다)와 관련하여, 본인은 동의 내용을 숙지하였으며, 이에따라 본인의 개인정보를 귀사(이슈어)가 수집한 개인정보를 아래와 같이 제3자에게 제공하는 것에 대해 동의합니다. 고객은 개인정보의 제3자 제공에대한 동의를 거부할 권리가 있으며, 동의를 거부할때 받는 별도의 불이익은 없습니다. 단, 서비스 이용이 불가능 하거나, 서비스 이용목적에 따른 서비스 제공에 제한이 따르게 됩니다.'," +
+                "       제공하는자: 'Issuer'," +
+                "       제공받는자: '이니셜(SK텔레콤)'," +
+                "       제공받는항목: '제공항목(생년월일,시험일,성명(영문),만료일,성명(한글),수험번호,듣기점수,읽기점수,총점)'," +
+                "       수집 및 이용 목적: '모바일 전자증명서 발행'," +
+                "       보유 및 이용기간 : '모바일 전자증명서 발급을 위해 서버에 임시 저장하였다가, 증명서 발행 후 즉시 삭제(단, 고객 단말기 내부 저장영역에 증명서 형태로 저장/보관)',"+
                 "  }"+
+                " ] "+
                 "}").jsonString();
         String body = JsonPath.parse("{ content: '" + initialAgreement  + "' }").jsonString();
         String response = client.requestPOST(agentApiUrl + "/connections/" + connectionId + "/send-message", accessToken, body);
