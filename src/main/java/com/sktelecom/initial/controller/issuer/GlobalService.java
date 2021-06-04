@@ -225,7 +225,7 @@ public class GlobalService {
 
     public void sendAgreement(String connectionId) {
 
-        String initialAgreement = "{\n" +
+        String initialAgreement = JsonPath.parse("{\n" +
                 "\"type\": \"initial_agreement\",\n" +
                 "\"content\": [{\n" +
                 "\"sequence\": 1,\n" +
@@ -304,7 +304,7 @@ public class GlobalService {
                 "}\n" +
                 "]\n" +
                 "\n" +
-                "}".trim();
+                "}").jsonString();
 
 
         String body = JsonPath.parse("{ content: '" + initialAgreement  + "' }").jsonString();
