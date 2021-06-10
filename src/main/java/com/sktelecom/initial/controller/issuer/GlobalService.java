@@ -426,7 +426,7 @@ public class GlobalService {
                 "    }" +
                 "  }" +
                 "}").jsonString();
-        log.info("body: " + body);
+        //log.info("body: " + body);
         String response = client.requestPOST(agentApiUrl + "/present-proof/send-request", accessToken, body);
         log.info("response: " + response);
     }
@@ -458,7 +458,8 @@ public class GlobalService {
         // TODO: need to implement business logic to query information for holder
         // we assume that the value is obtained by querying DB (e.g., attrs.mobileNum and selectedItemId)
         LinkedHashMap<String, String> value = new LinkedHashMap<>();
-        value.put("korean_name", "김증명");
+        //value.put("korean_name", "김증명");
+        value.put("korean_name", attrs.get("person_name"));
         value.put("english_name", "Kim Initial");
         value.put("registration_number", "123456789");
         value.put("exp_date", "20220228");

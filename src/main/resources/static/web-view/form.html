@@ -43,6 +43,17 @@
     }
 </script>
 
+<script>
+    var userAgent = navigator.userAgent.toLowerCase();
+        if (userAgent.search("android") > -1) {
+            Android.failVC ();
+        }
+        else {
+            webkit.messageHandlers.callbackHandler.postMessage("failVC");
+        }
+</script>
+
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, width=device-width" />
@@ -80,6 +91,9 @@
                        name="selectedItemId" value="item2Id">
                 <label for="itemChoice2">2020.03.05 토익성적 증명서</label>
             </p>
+        </div>
+        <div>
+            <input type="button" onclick="ajax_send()" value="발급요청">
         </div>
         <div>
             <input type="button" onclick="ajax_send()" value="발급요청">
