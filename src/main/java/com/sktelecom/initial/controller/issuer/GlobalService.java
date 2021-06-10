@@ -85,6 +85,7 @@ public class GlobalService {
                     if(checkCredentialProposal(body)) {
                         sendAgreement(JsonPath.read(body, "$.connection_id"));
                         sendProofRequest(JsonPath.read(body, "$.connection_id"));
+ 			//sendAgreement(JsonPath.read(body, "$.connection_id"));
                     }
                 }
                 // 4. holder 가 증명서를 정상 저장하였음 -> 완료 (revocation 은 아래 코드 참조)
@@ -233,7 +234,7 @@ public class GlobalService {
                 "\"is_mandatory\": \"true\",\n" +
                 "\"terms_id\": \"person\",\n" +
                 "\"terms_ver\": \"1.0\",\n" +
-                "\"agreement\": \"Initial 서비스(이하 “서비스”라한다)와관련하여,본인은동의내용을숙지하였으며, 이에따라본인의개인정보를귀사(SK텔레콤주식회사)가수집및이용하는것에대해동의합니다.본동의는서비스의본질적기능제공을위한개인정보수집/이용에대한동의로서, 동의를하는경우에만서비스이용이가능합니다.법령에따른개인정보의수집/이용, 계약의이행/편익제공을위한개인정보취급위탁및개인정보취급과관련된일반사항은서비스의개인정보처리방침에따릅니다.\",\n" +
+                "\"agreement\": \"Initial 서비스(이하 “서비스”라한다)와 관련하여, 본인은 동의내용을 숙지하였으며, 이에따라 본인의 개인정보를 귀사(SK텔레콤주식회사)가 수집 및 이용하는 것에 대해 동의합니다. 본동의는 서비스의 본질적 기능제공을 위한 개인정보 수집/이용에 대한 동의로서, 동의를 하는경우에만 서비스 이용이 가능합니다.법령에따른개인정보의수집/이용, 계약의이행/편익제공을위한개인정보취급위탁및개인정보취급과관련된일반사항은서비스의개인정보처리방침에따릅니다.\",\n" +
                 "\"condition\": [{\n" +
                 "\"sub_title\": \"수집 항목\",\n" +
                 "\"target\": \"이름,생년월일\"\n" +
@@ -245,6 +246,10 @@ public class GlobalService {
                 "{\n" +
                 "\"sub_title\": \"이용기간및보유/파기\",\n" +
                 "\"target\": \"1년\"\n" +
+                "},\n" +
+                "{\n" +
+                "\"sub_title\": \"기타 정보\",\n" +
+                "\"target\": \"기타 내용\"\n" +
                 "}\n" +
                 "]\n" +
                 "},\n" +
@@ -275,6 +280,31 @@ public class GlobalService {
                 "},\n" +
                 "{\n" +
                 "\"sequence\": 3,\n" +
+                "\"title\": \"테스트 수집 및 이용 동의서\",\n" +
+                "\"is_mandatory\": \"true\",\n" +
+                "\"terms_id\": \"test\",\n" +
+                "\"terms_ver\": \"1.0\",\n" +
+                "\"agreement\": \"이 약관은 이니셜(SK텔레콤)(이하 “회사”)가 제공하는 위치정보사업 또는 위치기반서비스사업과 관련하여 회사와 개인위치정보주체와의 권리, 의무 및 책임사항, 기타 필요한 사항을 규정함을 목적으로 합니다.\",\n" +
+                "\"condition\": [{\n" +
+                "\"sub_title\": \"위치정보 수집 방법\",\n" +
+                "\"target\": \"GPS칩\"\n" +
+                "},\n" +
+                "{\n" +
+                "\"sub_title\": \"위치정보 이용/제공\",\n" +
+                "\"target\": \"이 약관에 명시되지 않은 사항은 위치정보의 보호 및 이용 등에 관한 법률, 정보통신망 이용촉진 및 정보보호 등에 관한 법률, 전기통신기본법, 전기통신사업법 등 관계법령과 회사의 이용약관 및 개인정보취급방침, 회사가 별도>로 정한 지침 등에 의합니다.\"\n" +
+                "},\n" +
+                "{\n" +
+                "\"sub_title\": \"수집목적\",\n" +
+                "\"target\": \"현재의 위치를 기반으로 하여 주변 매장의 위치 등의 정보를 제공하는 서비스\"\n" +
+                "},\n" +
+                "{\n" +
+                "\"sub_title\": \"위치정보 보유기간\",\n" +
+                "\"target\": \"1년\"\n" +
+                "}\n" +
+                "]\n" +
+                "},\n" +
+                "{\n" +
+                "\"sequence\": 4,\n" +
                 "\"title\": \"제3자 정보제공 동의서\",\n" +
                 "\"is_mandatory\": \"true\",\n" +
                 "\"terms_id\": \"3rdparty\",\n" +
@@ -328,6 +358,7 @@ public class GlobalService {
         return false;
     }
 
+
 /*
     public void sendProofRequest(String connectionId) {
         long curUnixTime = System.currentTimeMillis() / 1000L;
@@ -347,16 +378,16 @@ public class GlobalService {
                 "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
                 "        restrictions: [ {cred_def_id: '" + mobile_credDefId + "'} ]" +
                 "      }," +
-                "      score_of_total: {" +
+                "      score_of_reading: {" +
                 "        name: 'score_of_reading'," +
                 "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
                 "        restrictions: [ {cred_def_id: '" + toeic_credDefId + "'} ]" +
-                "      }," +
-                "      employee_no: {" +
-                "        name: 'score_of_listening'," +
-                "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
-                "        restrictions: [ {cred_def_id: '" + psnm_credDefId + "'} ]" +
                 "      }" +
+               // "      employee_no: {" +
+               // "        name: 'score_of_listening'," +
+               // "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
+               // "        restrictions: [ {cred_def_id: '" + psnm_credDefId + "'} ]" +
+               // "      }" +
                 "    }," +
                 "    requested_predicates: {" +
                 "    }" +
@@ -368,7 +399,8 @@ public class GlobalService {
     }
 
 
- */
+*/
+
 
 
     public void sendProofRequest(String connectionId) {
@@ -398,6 +430,7 @@ public class GlobalService {
         String response = client.requestPOST(agentApiUrl + "/present-proof/send-request", accessToken, body);
         log.info("response: " + response);
     }
+
 
     public void sendPresentationRequest(String connectionId) {
         String body = JsonPath.parse("{" +
@@ -432,13 +465,15 @@ public class GlobalService {
         value.put("date_of_birth", "20000228");
         value.put("date_of_test", "20220228");
         value.put("score_of_listening", "445");
-        value.put("score_of_reading", "445");
+        value.put("score_of_reading", "");
         value.put("score_of_total", "990");
 
         // value insertion
         String body = JsonPath.parse("{" +
                 "  counter_proposal: {" +
                 "    cred_def_id: '" + credDefId + "'," +
+                "    auto_remove: true," +
+                "    comment: 'JJ Test'," +
                 "    credential_proposal: {" +
                 "      attributes: [" +
                 "        { name: 'date_of_birth', value: '" + value.get("date_of_birth")  + "' }," +
@@ -455,7 +490,8 @@ public class GlobalService {
                 "  }" +
                 "}").jsonString();
         String credExId = connIdToCredExId.get(connectionId);
-        String response = client.requestPOST(agentApiUrl + "/issue-credential/records/" + credExId + "/send-offer", accessToken, body);
+        log.info("body: " + body); 
+	String response = client.requestPOST(agentApiUrl + "/issue-credential/records/" + credExId + "/send-offer", accessToken, body);
         log.info("response: " + response);
     }
 
