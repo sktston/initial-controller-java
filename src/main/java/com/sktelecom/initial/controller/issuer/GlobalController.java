@@ -31,7 +31,8 @@ public class GlobalController {
     @GetMapping(value = "/invitation-qr", produces = MediaType.IMAGE_PNG_VALUE)
     public byte[] getInvitationUrlQRCode() {
         String invitationUrl = globalService.createInvitationUrl();
-        return generateQRCode(invitationUrl, 300, 300);
+        String deeplinkUrl = "initial://reqService?process=I&ynCloud=Y&invitation=" + invitationUrl;
+        return generateQRCode(deeplinkUrl, 300, 300);
     }
 
     @PostMapping(value = "/webhooks")
