@@ -49,6 +49,7 @@ public class GlobalService {
     String publicDid;
 
     LinkedHashMap<String, String> connIdToCredExId = new LinkedHashMap<>(); // cache to keep credential issuing flow
+    LinkedHashMap<String, String> attrs = new LinkedHashMap<>(); // cache to keep credential issuing flow
 
     // for revocation example
     static boolean enableRevoke = Boolean.parseBoolean(System.getenv().getOrDefault("ENABLE_REVOKE", "false"));
@@ -118,7 +119,7 @@ public class GlobalService {
                 // 3. holder 가 보낸 모바일 가입증명 검증 완료
                 if (state.equals("verified")) {
                     log.info("- Case (topic:" + topic + ", state:" + state + ") -> getPresentationResult");
-                    LinkedHashMap<String, String> attrs = getPresentationResult(body);
+                    attrs = getPresentationResult(body);
                     for(String key : attrs.keySet())
                         log.info("Requested Attribute - " + key + ": " + attrs.get(key));
 
