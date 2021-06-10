@@ -464,7 +464,7 @@ public class GlobalService {
         //log.info(attrs.get("person_name"));
         value.put("english_name", "Kim Initial");
         value.put("registration_number", "123456789");
-        value.put("exp_date", "20220228");
+        value.put("exp_date", getRandomInt(2021, 2022) + "0228");
         value.put("date_of_birth", "20000228");
         value.put("date_of_test", "20220228");
         value.put("score_of_listening", "445");
