@@ -461,7 +461,7 @@ public class GlobalService {
         LinkedHashMap<String, String> value = new LinkedHashMap<>();
         value.put("korean_name", "김증명");
         //value.put("korean_name", attrs.get("person_name"));
-        log.info(attrs.get("person_name"));
+        //log.info(attrs.get("person_name"));
         value.put("english_name", "Kim Initial");
         value.put("registration_number", "123456789");
         value.put("exp_date", "20220228");
