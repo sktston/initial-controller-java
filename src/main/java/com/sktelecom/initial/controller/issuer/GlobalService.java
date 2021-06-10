@@ -513,7 +513,7 @@ public class GlobalService {
         log.info("response: " + response);
     }
 
-    public void handleWebView(String body) {
+    public void handleWebView(String body, LinkedHashMap<String, String> attrs) {
         log.info("handleWebView >>> body:" + body);
 
         String connectionId = JsonPath.read(body, "$.connectionId");
@@ -521,7 +521,7 @@ public class GlobalService {
 
         // 3-1-1. 추가 정보 기반으로 증명서 발행
         log.info("sendCredentialOffer with connectionId:" + connectionId + ", selectedItemId:" + selectedItemId);
-        sendCredentialOffer(connectionId, null, selectedItemId);
+        sendCredentialOffer(connectionId, attrs, selectedItemId);
     }
 
     public void revokeCredential(String credExId) {
