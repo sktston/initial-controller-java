@@ -43,16 +43,6 @@
     }
 </script>
 
-<script>
-    var userAgent = navigator.userAgent.toLowerCase();
-        if (userAgent.search("android") > -1) {
-            Android.failVC ();
-        }
-        else {
-            webkit.messageHandlers.callbackHandler.postMessage("failVC");
-        }
-</script>
-
 
 <head>
     <meta charset="UTF-8">
