@@ -417,6 +417,11 @@ public class GlobalService {
                 "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
                 "        restrictions: [ {cred_def_id: '" + mobile_credDefId + "'} ]" +
                 "      }," +
+                "      date_of_birth: {" +
+                "        name: 'date_of_birth'," +
+                "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
+                "        restrictions: [ {cred_def_id: '" + mobile_credDefId + "'} ]" +
+                "      }," +
                 "      mobile_num: {" +
                 "        name: 'mobile_num'," +
                 "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
@@ -465,8 +470,8 @@ public class GlobalService {
         value.put("english_name", "Kim Initial");
         value.put("registration_number", attrs.get("mobile_num"));
         value.put("exp_date", getRandomInt(2021, 2024) + "0228");
-        value.put("date_of_birth", "20000228");
-        value.put("date_of_test", "20220228");
+        value.put("date_of_birth", attrs.get("date_of_birth"));
+        value.put("date_of_test", "20200228");
         value.put("score_of_listening", getRandomInt(100, 444) + "");
         value.put("score_of_reading", "");
         value.put("score_of_total", "990");
