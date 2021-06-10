@@ -415,7 +415,7 @@ public class GlobalService {
                 "      person_name: {" +
                 "        name: 'person_name'," +
                 "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
-                "        restrictions: [ {issuer_did: 'TmisnEAGBPeVVDjtAXPdYt'} ]" +
+                "        restrictions: [ {cred_def_id: '" + mobile_credDefId + "'} ]" +
                 "      }," +
                 "      mobile_num: {" +
                 "        name: 'mobile_num'," +
@@ -459,8 +459,8 @@ public class GlobalService {
         // TODO: need to implement business logic to query information for holder
         // we assume that the value is obtained by querying DB (e.g., attrs.mobileNum and selectedItemId)
         LinkedHashMap<String, String> value = new LinkedHashMap<>();
-        value.put("korean_name", "김증명");
-        //value.put("korean_name", attrs.get("person_name"));
+        //value.put("korean_name", "김증명");
+        value.put("korean_name", attrs.get("person_name"));
         //log.info(attrs.get("person_name"));
         value.put("english_name", "Kim Initial");
         value.put("registration_number", "123456789");
@@ -522,7 +522,7 @@ public class GlobalService {
 
         // 3-1-1. 추가 정보 기반으로 증명서 발행
         log.info("sendCredentialOffer with connectionId:" + connectionId + ", selectedItemId:" + selectedItemId);
-        sendCredentialOffer(connectionId, null, selectedItemId);
+        sendCredentialOffer(connectionId, attrs , selectedItemId);
     }
 
     public void revokeCredential(String credExId) {
