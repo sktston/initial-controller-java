@@ -519,11 +519,9 @@ public class GlobalService {
         String connectionId = JsonPath.read(body, "$.connectionId");
         String selectedItemId = JsonPath.read(body, "$.selectedItemId");
 
-        LinkedHashMap<String, String> attrs = getPresentationResult(body);
-
         // 3-1-1. 추가 정보 기반으로 증명서 발행
         log.info("sendCredentialOffer with connectionId:" + connectionId + ", selectedItemId:" + selectedItemId);
-        sendCredentialOffer(connectionId, attrs, selectedItemId);
+        sendCredentialOffer(connectionId, null, selectedItemId);
     }
 
     public void revokeCredential(String credExId) {
