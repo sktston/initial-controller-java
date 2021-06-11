@@ -3,6 +3,7 @@ package com.sktelecom.initial.controller.issuer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +18,9 @@ import static com.sktelecom.initial.controller.utils.Common.*;
 @Slf4j
 @RestController
 public class GlobalController {
+
+    @Value("${x-api-key}")
+    private String xApiKey; // controller access token
 
     @Autowired
     GlobalService globalService;
@@ -43,16 +47,17 @@ public class GlobalController {
     public ResponseEntity webhooksTopicHandler(@RequestBody String body, HttpServletRequest request) {
         //http header x-api-key 정보 확인
         String httpAddr = request.getRemoteAddr();
-        String xapikey = request.getHeader("x-api-key");
+        String apiKey = request.getHeader("x-api-key");
         //log.info("http header:   " + httpAddr + "   xapikey :" + xapikey);
 
         globalService.handleEvent(body);
-        if(xapikey.equals("1q2w3e4r")){
-            log.info("http header:   " + httpAddr + "   xapikey :" + xapikey);
+
+        if(apiKey.equals(xApiKey)){
+            log.info("http header:   " + httpAddr + "   xapikey :" + apiKey);
             return ResponseEntity.ok().build();
         }
         else {
-            log.info("http header:   " + httpAddr + "   xapikey :" + xapikey);
+            log.info("http header:   " + httpAddr + "   xapikey :" + apiKey);
             return ResponseEntity.badRequest().build();
         }
     }
