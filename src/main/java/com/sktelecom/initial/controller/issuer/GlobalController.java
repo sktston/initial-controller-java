@@ -49,8 +49,11 @@ public class GlobalController {
         globalService.handleEvent(body);
         if(xapikey.equals("1q2w3e4r")){
             log.info("http header:   " + httpAddr + "   xapikey :" + xapikey);
+            return ResponseEntity.ok().build();
         }
-        return ResponseEntity.ok().build();
+        else {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @PostMapping(value = "/web-view/submit")
