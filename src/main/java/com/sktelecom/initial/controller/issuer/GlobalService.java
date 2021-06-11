@@ -131,7 +131,7 @@ public class GlobalService {
                     else {
                         // 3-2. 검증 값 정보 만으로 발행할 증명서가 한정되는 경우 증명서 바로 발행
                         log.info("Web View is not used -> sendCredentialOffer");
-                        sendCredentialOffer(JsonPath.read(body, "$.connection_id"), attrs, null);
+                        sendCredentialOffer(JsonPath.read(body, "$.connection_id"), attrs, null, null);
                     }
                 }
                 break;
@@ -460,14 +460,14 @@ public class GlobalService {
         return attrs;
     }
 
-    public void sendCredentialOffer(String connectionId, LinkedHashMap<String, String> attrs, String selectedItemId) {
+    public void sendCredentialOffer(String connectionId, LinkedHashMap<String, String> attrs, String selectedItemId, String eng_name) {
         // TODO: need to implement business logic to query information for holder
         // we assume that the value is obtained by querying DB (e.g., attrs.mobileNum and selectedItemId)
         LinkedHashMap<String, String> value = new LinkedHashMap<>();
         //value.put("korean_name", "김증명");
         value.put("korean_name", attrs.get("person_name"));
         //log.info(attrs.get("person_name"));
-        value.put("english_name", "Kim Initial");
+        value.put("english_name", eng_name);
         value.put("registration_number", attrs.get("mobile_num"));
         value.put("exp_date", getRandomInt(2021, 2024) + "0228");
         value.put("date_of_birth", attrs.get("date_of_birth"));
@@ -524,10 +524,12 @@ public class GlobalService {
 
         String connectionId = JsonPath.read(body, "$.connectionId");
         String selectedItemId = JsonPath.read(body, "$.selectedItemId");
+        String eng_name = JsonPath.read(body, "$.eng_name");
+
 
         // 3-1-1. 추가 정보 기반으로 증명서 발행
-        log.info("sendCredentialOffer with connectionId:" + connectionId + ", selectedItemId:" + selectedItemId);
-        sendCredentialOffer(connectionId, attrs , selectedItemId);
+        log.info("sendCredentialOffer with connectionId:" + connectionId + ", selectedItemId:" + selectedItemId, ", eng_name : " + eng_name);
+        sendCredentialOffer(connectionId, attrs , selectedItemId, eng_name);
     }
 
     public void revokeCredential(String credExId) {
