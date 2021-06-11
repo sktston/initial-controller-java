@@ -36,7 +36,8 @@ public class GlobalController {
     }
 
     @PostMapping(value = "/webhooks")
-    public ResponseEntity webhooksTopicHandler(@RequestBody String body) {
+    public ResponseEntity webhooksTopicHandler(@RequestBody String body, @RequestHeader("host") String hostheader) {
+        log.info("hostheader:  " + hostheader);
         globalService.handleEvent(body);
         return ResponseEntity.ok().build();
     }
