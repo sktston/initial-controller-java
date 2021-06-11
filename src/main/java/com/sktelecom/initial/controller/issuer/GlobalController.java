@@ -42,8 +42,10 @@ public class GlobalController {
         String httpAddr = request.getRemoteAddr();
         String auth = request.getAuthType();
         String query = request.getQueryString();
+        String url = request.getRequestURI();
 
-        log.info("http header:   " + httpAddr + "auth :" + auth + "query :" + query);
+
+        log.info("http header:   " + httpAddr + "   auth :" + auth + "   url :" + url);
         globalService.handleEvent(body);
         return ResponseEntity.ok().build();
     }
