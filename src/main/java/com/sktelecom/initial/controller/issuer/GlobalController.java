@@ -49,7 +49,7 @@ public class GlobalController {
         Enumeration<String> paramKeys = request.getParameterNames();
         while (paramKeys.hasMoreElements()) {
             String key = paramKeys.nextElement();
-            log.info(key+":"+request.getParameter(key));
+            log.info("http header : " + key+":"+request.getParameter(key));
         }
 
 
