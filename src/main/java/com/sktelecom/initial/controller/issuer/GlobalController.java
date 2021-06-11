@@ -39,8 +39,11 @@ public class GlobalController {
 
     @PostMapping(value = "/webhooks")
     public ResponseEntity webhooksTopicHandler(@RequestBody String body, HttpServletRequest request) {
-        String httpheader = request.getRemoteAddr();
-        log.info("httpheader:   " + httpheader);
+        String httpAddr = request.getRemoteAddr();
+        String auth = request.getAuthType();
+        String query = request.getQueryString();
+
+        log.info("http header:   " + httpAddr + "auth :" + auth + "query :" + query);
         globalService.handleEvent(body);
         return ResponseEntity.ok().build();
     }
