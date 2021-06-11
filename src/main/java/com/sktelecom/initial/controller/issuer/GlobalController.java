@@ -53,7 +53,7 @@ public class GlobalController {
         }
 
 
-        log.info("http header:   " + httpAddr + "   auth :" + auth);
+        //log.info("http header:   " + httpAddr + "   auth :" + auth);
         globalService.handleEvent(body);
         return ResponseEntity.ok().build();
     }
