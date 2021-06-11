@@ -48,18 +48,13 @@ public class GlobalController {
         //http header x-api-key 정보 확인
         String httpAddr = request.getRemoteAddr();
         String apiKey = request.getHeader("x-api-key");
-        //log.info("http header:   " + httpAddr + "   xapikey :" + xapikey);
-
         globalService.handleEvent(body);
-
-        if(apiKey.equals(xApiKey)){
-            log.info("http header:   " + httpAddr + "   xapikey :" + apiKey);
-            return ResponseEntity.ok().build();
-        }
-        else {
+        // api key check
+        if(!apiKey.equals(xApiKey)){
             log.info("http header:   " + httpAddr + "   xapikey :" + apiKey);
             return ResponseEntity.badRequest().build();
         }
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping(value = "/web-view/submit")
