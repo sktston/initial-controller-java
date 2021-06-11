@@ -53,6 +53,7 @@ public class GlobalController {
     @PostMapping(value = "/web-view/submit")
     public ResponseEntity webViewHandler(@RequestBody String body) {
         globalService.handleWebView(body);
+        log.info("web_view response : " + body);
         return ResponseEntity.ok().build();
     }
 
