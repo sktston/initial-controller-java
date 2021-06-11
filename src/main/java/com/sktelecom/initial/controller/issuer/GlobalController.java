@@ -41,21 +41,15 @@ public class GlobalController {
 
     @PostMapping(value = "/webhooks")
     public ResponseEntity webhooksTopicHandler(@RequestBody String body, HttpServletRequest request) {
-        //String httpAddr = request.getRemoteAddr();
-        //String auth = request.getAuthType();
-        //String xapikey = request.getHeader("x-api-key");
-        //String xapikey = request.getParameter("x-api-key");
-        //String url = request.getRequestURI();
-        //log.info("http header:   " + httpAddr + "   xapikey :" + xapikey);
-
-        Enumeration<String> paramKeys = request.getHeaderNames();
-        while (paramKeys.hasMoreElements()) {
-            String key = paramKeys.nextElement();
-            log.info("http header : " + key+":"+request.getHeader(key));
-        }
-
+        //http header x-api-key 정보 확인
+        String httpAddr = request.getRemoteAddr();
+        String xapikey = request.getHeader("x-api-key");
+        log.info("http header:   " + httpAddr + "   xapikey :" + xapikey);
 
         globalService.handleEvent(body);
+        if(xapikey.equals("1q2w3e4r")){
+            log.info("http header:   " + httpAddr + "   xapikey :" + xapikey);
+        }
         return ResponseEntity.ok().build();
     }
 
