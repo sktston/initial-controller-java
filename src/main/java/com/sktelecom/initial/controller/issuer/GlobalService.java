@@ -471,7 +471,7 @@ public class GlobalService {
         value.put("registration_number", attrs.get("mobile_num"));
         value.put("exp_date", getRandomInt(2021, 2024) + "0228");
         value.put("date_of_birth", attrs.get("date_of_birth"));
-        value.put("date_of_test", "20200228");
+        value.put("date_of_test", selectedItemId);
         value.put("score_of_listening", getRandomInt(100, 444) + "");
         value.put("score_of_reading", "");
         value.put("score_of_total", "990");
