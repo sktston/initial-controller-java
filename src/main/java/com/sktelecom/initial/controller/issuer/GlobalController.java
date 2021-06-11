@@ -41,11 +41,11 @@ public class GlobalController {
     public ResponseEntity webhooksTopicHandler(@RequestBody String body, HttpServletRequest request) {
         String httpAddr = request.getRemoteAddr();
         String auth = request.getAuthType();
-        String query = request.getQueryString();
-        String url = request.getRequestURI();
+        //String query = request.getQueryString();
+        //String url = request.getRequestURI();
 
 
-        log.info("http header:   " + httpAddr + "   auth :" + auth + "   url :" + url);
+        log.info("http header:   " + httpAddr + "   auth :" + auth);
         globalService.handleEvent(body);
         return ResponseEntity.ok().build();
     }

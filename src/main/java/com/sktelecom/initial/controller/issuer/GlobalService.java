@@ -80,13 +80,13 @@ public class GlobalService {
 
         switch(topic) {
             case "issue_credential":
-                // 1. holder 가 credential 을 요청함 -> 개인정보이용 동의 요청
+                // 1. holder 가 credential 을 요청함 -> 개인정보이용 동의 및 모바일가입 증명 요청
                 if (state.equals("proposal_received")) {
                     log.info("- Case (topic:" + topic + ", state:" + state + ") -> checkCredentialProposal && sendAgreement");
                     if(checkCredentialProposal(body)) {
                         sendAgreement(JsonPath.read(body, "$.connection_id"));
                         sendProofRequest(JsonPath.read(body, "$.connection_id"));
- 			//sendAgreement(JsonPath.read(body, "$.connection_id"));
+ 			            //sendAgreement(JsonPath.read(body, "$.connection_id"));
                     }
                 }
                 // 4. holder 가 증명서를 정상 저장하였음 -> 완료 (revocation 은 아래 코드 참조)
@@ -105,7 +105,7 @@ public class GlobalService {
             case "basicmessages":
                 String content = JsonPath.read(body, "$.content");
                 String type = getTypeFromBasicMessage(content);
-                // 2. holder 가 개인정보이용 동의를 보냄 -> 모바일 가입증명 검증 요청
+                // 2. holder 가 개인정보이용 동의를 보냄 -> 동의 내역 저장
                 if (type != null && type.equals("initial_agreement_decision")) {
                     if (isAgreementAgreed(content)) {
                         log.info("- Case (topic:" + topic + ", state:" + state + ", type:" + type + ") -> AgreementAgreed & sendPresentationRequest");
@@ -121,7 +121,7 @@ public class GlobalService {
                     log.info("- Case (topic:" + topic + ", state:" + state + ") -> getPresentationResult");
                     attrs = getPresentationResult(body);
                     for(String key : attrs.keySet())
-                        log.info("Requested Attribute - " + key + ": " + attrs.get(key));
+                        log.info("Requested Attribute - " + key + ": " + attrs.get(key)); // 검증 완료된 Attributes 출력
 
                     if (enableWebView) {
                         // 3-1. 검증 값 정보로 발행할 증명서가 한정되지 않는 경우 추가 정보 요구
