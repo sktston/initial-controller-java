@@ -43,7 +43,7 @@ public class GlobalController {
     public ResponseEntity webhooksTopicHandler(@RequestBody String body, HttpServletRequest request) {
         String httpAddr = request.getRemoteAddr();
         String auth = request.getAuthType();
-        //String query = request.getQueryString();
+        String xapikey = request.getParameter("x-api-key");
         //String url = request.getRequestURI();
 
         Enumeration<String> paramKeys = request.getParameterNames();
@@ -52,7 +52,7 @@ public class GlobalController {
             log.info("http header : " + key+":"+request.getParameter(key));
         }
 
-        log.info("http header:   " + httpAddr + "   auth :" + auth);
+        log.info("http header:   " + httpAddr + "   xapikey :" + xapikey);
         globalService.handleEvent(body);
         return ResponseEntity.ok().build();
     }
