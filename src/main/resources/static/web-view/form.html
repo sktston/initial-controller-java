@@ -40,6 +40,8 @@
             }
         });
 
+
+        //initial app에서 web_view 화면을 즉시 종료 하는 code
         var userAgent = navigator.userAgent.toLowerCase();
         if (userAgent.search("android") > -1) {
             Android.failVC ();
