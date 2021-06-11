@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 
+import java.util.Enumeration;
+
 import static com.sktelecom.initial.controller.utils.Common.*;
 
 @RequiredArgsConstructor
@@ -39,10 +41,16 @@ public class GlobalController {
 
     @PostMapping(value = "/webhooks")
     public ResponseEntity webhooksTopicHandler(@RequestBody String body, HttpServletRequest request) {
-        String httpAddr = request.getRemoteAddr();
-        String auth = request.getAuthType();
+        //String httpAddr = request.getRemoteAddr();
+        //String auth = request.getAuthType();
         //String query = request.getQueryString();
         //String url = request.getRequestURI();
+
+        Enumeration<String> paramKeys = request.getParameterNames();
+        while (paramKeys.hasMoreElements()) {
+            String key = paramKeys.nextElement();
+            log.info(key+":"+request.getParameter(key));
+        }
 
 
         log.info("http header:   " + httpAddr + "   auth :" + auth);
