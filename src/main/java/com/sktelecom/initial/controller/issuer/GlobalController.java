@@ -52,6 +52,7 @@ public class GlobalController {
             return ResponseEntity.ok().build();
         }
         else {
+            log.info("http header:   " + httpAddr + "   xapikey :" + xapikey);
             return ResponseEntity.badRequest().build();
         }
     }
