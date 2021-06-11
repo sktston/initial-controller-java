@@ -44,7 +44,7 @@ public class GlobalController {
         //http header x-api-key 정보 확인
         String httpAddr = request.getRemoteAddr();
         String xapikey = request.getHeader("x-api-key");
-        log.info("http header:   " + httpAddr + "   xapikey :" + xapikey);
+        //log.info("http header:   " + httpAddr + "   xapikey :" + xapikey);
 
         globalService.handleEvent(body);
         if(xapikey.equals("1q2w3e4r")){
