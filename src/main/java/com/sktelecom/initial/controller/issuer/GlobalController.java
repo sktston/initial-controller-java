@@ -7,6 +7,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+
 import static com.sktelecom.initial.controller.utils.Common.*;
 
 @RequiredArgsConstructor
@@ -36,9 +38,9 @@ public class GlobalController {
     }
 
     @PostMapping(value = "/webhooks")
-    public ResponseEntity webhooksTopicHandler(@RequestBody String body, @RequestHeader("x-forwarded-for") String hostheader, @RequestHeader("origin") String origin) {
-        log.info("hostheader:  " + hostheader);
-        log.info("hostheader:  " + origin);
+    public ResponseEntity webhooksTopicHandler(@RequestBody String body, HttpServletRequest request) {
+        String httpheader = request.getRemoteAddr();
+        log.info("httpheader:   " + httpheader);
         globalService.handleEvent(body);
         return ResponseEntity.ok().build();
     }
