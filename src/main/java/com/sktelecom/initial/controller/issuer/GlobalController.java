@@ -41,8 +41,8 @@ public class GlobalController {
 
     @PostMapping(value = "/webhooks")
     public ResponseEntity webhooksTopicHandler(@RequestBody String body, HttpServletRequest request) {
-        //String httpAddr = request.getRemoteAddr();
-        //String auth = request.getAuthType();
+        String httpAddr = request.getRemoteAddr();
+        String auth = request.getAuthType();
         //String query = request.getQueryString();
         //String url = request.getRequestURI();
 
@@ -52,8 +52,7 @@ public class GlobalController {
             log.info("http header : " + key+":"+request.getParameter(key));
         }
 
-
-        //log.info("http header:   " + httpAddr + "   auth :" + auth);
+        log.info("http header:   " + httpAddr + "   auth :" + auth);
         globalService.handleEvent(body);
         return ResponseEntity.ok().build();
     }
