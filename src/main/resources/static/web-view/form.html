@@ -40,16 +40,6 @@
             }
         });
 
-
-        //initial app에서 web_view 화면을 즉시 종료 하는 code
-        //var userAgent = navigator.userAgent.toLowerCase();
-        //if (userAgent.search("android") > -1) {
-        //    Android.failVC ();
-        //}
-        //else {
-        //    webkit.messageHandlers.callbackHandler.postMessage("failVC");
-        //}
-
         return false;
     }
 </script>
@@ -114,6 +104,7 @@
         <div>
             <input type="button" onclick="ajax_send()" value="발급요청">
         </div>
+        <p></p>
         <div>
             <input type="button" onclick="cancle()" value="취소">
         </div>
