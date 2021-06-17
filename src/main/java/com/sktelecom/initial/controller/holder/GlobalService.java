@@ -99,13 +99,13 @@ public class GlobalService {
                     String errorMsg = JsonPath.read(body, "$.error_msg");
                     log.warn("  - error_msg: " + errorMsg);
                 }
-                // 4-2. 증명서 preview 받음 -> 증명서 요청
+                // 3-2. 증명서 preview 받음 -> 증명서 요청
                 else if (state.equals("offer_received")) {
                     log.info("- Case (topic:" + topic + ", state:" + state + ") -> sendCredentialRequest");
                     String credExId = JsonPath.read(body, "$.credential_exchange_id");
                     sendCredentialRequest(credExId);
                 }
-                // 4-3. 증명서를 정상 저장하였음 -> 완료
+                // 3-3. 증명서를 정상 저장하였음 -> 완료
                 else if (state.equals("credential_acked")) {
                     log.info("- Case (topic:" + topic + ", state:" + state + ") -> credential received successfully");
                     delayedExit();
@@ -114,14 +114,8 @@ public class GlobalService {
             case "basicmessages":
                 String content = JsonPath.read(body, "$.content");
                 String type = getTypeFromBasicMessage(content);
-                // 2. 개인정보이용 동의 요청 받음 -> 동의하여 전송
-                if (type != null && type.equals("initial_agreement")) {
-                    log.info("- Case (topic:" + topic + ", state:" + state + ", type:" + type + ") -> sendAgreementAgreed");
-                    String connectionId = JsonPath.read(body, "$.connection_id");
-                    sendAgreementAgreed(connectionId, content);
-                }
-                // 4-1. web view를 통한 추가 정보 요구 -> 선택하여 전송
-                else if (type != null && type.equals("initial_web_view")) {
+                // 3-1. web view를 통한 추가 정보 요구 -> 선택하여 전송
+                if (type != null && type.equals("initial_web_view")) {
                     log.info("- Case (topic:" + topic + ", state:" + state + ", type:" + type + ") -> showWebViewAndSelect");
                     showWebViewAndSelect(content);
                 }
@@ -134,9 +128,14 @@ public class GlobalService {
                     String errorMsg = JsonPath.read(body, "$.error_msg");
                     log.warn("  - error_msg: " + errorMsg);
                 }
-                // 3. 모바일 가입증명 검증 요청 받음 -> 모바일 가입 증명 검증 전송
+                // 2. 모바일 가입증명 검증 요청 받음 -> 개인정보이용 동의 전송 & 모바일 가입 증명 검증 전송
                 else if (state.equals("request_received")) {
-                    log.info("- Case (topic:" + topic + ", state:" + state + ") -> sendPresentation");
+                    log.info("- Case (topic:" + topic + ", state:" + state + ") -> sendAgreementAgreed & sendPresentation");
+                    String connectionId = JsonPath.read(body, "$.connection_id");
+                    String comment = JsonPath.read(body, "$.presentation_request_dict.comment");
+                    String agreement = JsonPath.parse((LinkedHashMap)JsonPath.read(comment, "$.agreement")).jsonString();
+                    sendAgreementAgreed(connectionId, agreement);
+
                     String presExId = JsonPath.read(body, "$.presentation_exchange_id");
                     String presentationRequest = JsonPath.parse((LinkedHashMap)JsonPath.read(body, "$.presentation_request")).jsonString();
                     sendPresentation(presExId, presentationRequest);
@@ -266,10 +265,17 @@ public class GlobalService {
         log.info("response: " + response);
     }
 
-    public void sendAgreementAgreed(String connectionId, String content) {
+    public void sendAgreementAgreed(String connectionId, String agreement) {
+        String type = getTypeFromBasicMessage(agreement);
+        if (type == null || !type.equals("initial_agreement")) {
+            log.warn("Invalid agreement type  -> Ignore");
+            return;
+        }
+
         try {
-            String agreementContent = JsonPath.parse((LinkedHashMap)JsonPath.read(content, "$.content")).jsonString();
-            log.info("agreementContent: " + agreementContent);
+            ArrayList<Object> contents = JsonPath.read(agreement, "$.content");
+            for (Object element : contents)
+                log.info("agreementContent:" + JsonPath.parse(element).jsonString());
         } catch (PathNotFoundException e) {
             log.warn("Invalid content format  -> Ignore");
             return;
