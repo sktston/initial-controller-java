@@ -84,9 +84,8 @@ public class GlobalService {
                 if (state.equals("proposal_received")) {
                     log.info("- Case (topic:" + topic + ", state:" + state + ") -> checkCredentialProposal && sendAgreement");
                     if(checkCredentialProposal(body)) {
-                        sendAgreement(JsonPath.read(body, "$.connection_id"));
+                        //sendAgreement(JsonPath.read(body, "$.connection_id"));
                         sendProofRequest(JsonPath.read(body, "$.connection_id"));
- 			            //sendAgreement(JsonPath.read(body, "$.connection_id"));
                     }
                 }
                 // 4. holder 가 증명서를 정상 저장하였음 -> 완료 (revocation 은 아래 코드 참조)
