@@ -77,7 +77,7 @@ public class GlobalService {
         String topic = JsonPath.read(body, "$.topic");
         String state = topic.equals("problem_report") ? null : JsonPath.read(body, "$.state");
         log.info("handleEvent >>> topic:" + topic + ", state:" + state + ", body:" + body);
-
+/*
         switch(topic) {
             case "issue_credential":
                 // 1. holder 가 credential 을 요청함 -> 개인정보이용 동의 및 모바일가입 증명 요청
@@ -85,7 +85,8 @@ public class GlobalService {
                     log.info("- Case (topic:" + topic + ", state:" + state + ") -> checkCredentialProposal && sendAgreement");
                     if(checkCredentialProposal(body)) {
                         //sendAgreement(JsonPath.read(body, "$.connection_id"));
-                        sendProofRequest(JsonPath.read(body, "$.connection_id"));
+                        //sendProofRequest(JsonPath.read(body, "$.connection_id"));
+                        sendPresentationRequest(connectionId);
                     }
                 }
                 // 4. holder 가 증명서를 정상 저장하였음 -> 완료 (revocation 은 아래 코드 참조)
@@ -147,6 +148,92 @@ public class GlobalService {
         }
     }
 
+
+ */
+        switch(topic) {
+        case "issue_credential":
+            if (state == null) {
+                log.warn("- Case (topic:" + topic + ", ProblemReport) -> Print Error Message");
+                String errorMsg = JsonPath.read(body, "$.error_msg");
+                log.warn("  - error_msg: " + errorMsg);
+            }
+            // 1. holder 가 credential 을 요청함 -> 모바일 가입증명 검증 요청
+            else if (state.equals("proposal_received")) {
+                log.info("- Case (topic:" + topic + ", state:" + state + ") -> checkCredentialProposal && sendPresentationRequest");
+                String connectionId = JsonPath.read(body, "$.connection_id");
+                String credExId = JsonPath.read(body, "$.credential_exchange_id");
+                String credentialProposal = JsonPath.parse((LinkedHashMap)JsonPath.read(body, "$.credential_proposal_dict")).jsonString();
+                if(checkCredentialProposal(connectionId, credExId, credentialProposal)) {
+                    sendPresentationRequest(connectionId);
+                }
+            }
+            // 4. holder 가 증명서를 정상 저장하였음 -> 완료 (revocation 은 아래 코드 참조)
+            else if (state.equals("credential_acked")) {
+                log.info("- Case (topic:" + topic + ", state:" + state + ") -> credential issued successfully");
+
+                // TODO: should store credential_exchange_id to revoke this credential
+                // connIdToCredExId is simple example for this
+                if (enableRevoke) {
+                    String connectionId = JsonPath.read(body, "$.connection_id");
+                    String credExId = connIdToCredExId.get(connectionId);
+                    revokeCredential(credExId);
+                }
+            }
+            break;
+        case "basicmessages":
+            String content = JsonPath.read(body, "$.content");
+            String type = getTypeFromBasicMessage(content);
+            // 2. holder 가 개인정보이용 동의를 보냄 -> 동의 내용 저장
+            if (type != null && type.equals("initial_agreement_decision")) {
+                if (isAgreementAgreed(content)) {
+                    log.info("- Case (topic:" + topic + ", state:" + state + ", type:" + type + ") -> AgreementAgreed");
+                    // TODO: store agreement decision
+                }
+            }
+            else
+                log.warn("- Warning: Unexpected type:" + type);
+            break;
+        case "present_proof":
+            if (state == null) {
+                log.warn("- Case (topic:" + topic + ", ProblemReport) -> Print Error Message");
+                String errorMsg = JsonPath.read(body, "$.error_msg");
+                log.warn("  - error_msg: " + errorMsg);
+            }
+            // 3. holder 가 보낸 모바일 가입증명 검증 완료
+            else if (state.equals("verified")) {
+                log.info("- Case (topic:" + topic + ", state:" + state + ") -> getPresentationResult");
+                LinkedHashMap<String, String> attrs = getPresentationResult(body);
+                for(String key : attrs.keySet())
+                    log.info("Requested Attribute - " + key + ": " + attrs.get(key));
+
+                if (enableWebView) {
+                    // 3-1. 검증 값 정보로 발행할 증명서가 한정되지 않는 경우 추가 정보 요구
+                    log.info("Web View enabled -> sendWebView");
+                    String connectionId = JsonPath.read(body, "$.connection_id");
+                    sendWebView(connectionId, attrs, body);
+                }
+                else {
+                    // 3-2. 검증 값 정보 만으로 발행할 증명서가 한정되는 경우 증명서 바로 발행
+                    log.info("Web View is not used -> sendCredentialOffer");
+                    String connectionId = JsonPath.read(body, "$.connection_id");
+                    //sendCredentialOffer(connectionId, attrs, null);
+                    sendCredentialOffer(JsonPath.read(body, "$.connection_id"), attrs, null, null);
+
+                }
+            }
+            break;
+        case "problem_report":
+            log.warn("- Case (topic:" + topic + ") -> Print body");
+            log.warn("  - body:" + body);
+            break;
+        case "connections":
+        case "revocation_registry":
+        case "issuer_cred_rev":
+            break;
+        default:
+            log.warn("- Warning Unexpected topic:" + topic);
+    }
+}
     void provisionController() {
         log.info("TEST - Create invitation-url");
         String invitationUrl = createInvitationUrl();
@@ -206,22 +293,30 @@ public class GlobalService {
         }
     }
 
-    public boolean checkCredentialProposal(String credExRecord) {
-        String credentialProposal = JsonPath.parse((LinkedHashMap)JsonPath.read(credExRecord, "$.credential_proposal_dict")).jsonString();
+
+    public void sendCredProblemReport(String credExId, String description) {
+        String body = JsonPath.parse("{" +
+                "  description: '" + description + "'" +
+                "}").jsonString();
+        String response = client.requestPOST(agentApiUrl + "/issue-credential/records/" + credExId + "/problem-report", accessToken, body);
+        log.info("response: " + response);
+    }
+
+    public boolean checkCredentialProposal(String connectionId, String credExId, String credentialProposal) {
         try {
             String requestedCredDefId = JsonPath.read(credentialProposal, "$.cred_def_id");
             if (requestedCredDefId.equals(credDefId)){
-                String connectionId = JsonPath.read(credExRecord, "$.connection_id");
-                String credExId = JsonPath.read(credExRecord, "$.credential_exchange_id");
                 connIdToCredExId.put(connectionId, credExId);
                 return true;
             }
             log.warn("This issuer can issue credDefId:" + credDefId);
-            log.warn("But, requested credDefId is " + requestedCredDefId + " -> Ignore");
+            log.warn("But, requested credDefId is " + requestedCredDefId + " -> problemReport");
+            sendCredProblemReport(credExId, "본 기관은 요청한 증명서 (credDefId:" + requestedCredDefId + ") 를 발급하지 않습니다");
         } catch (PathNotFoundException e) {
-            log.warn("Requested credDefId does not exist -> Ignore");
+            log.warn("Requested credDefId does not exist -> problemReport");
+            sendCredProblemReport(credExId, "증명서 (credDefId) 가 지정되지 않았습니다");
         }
-        return true;
+        return false;
     }
 
     public void sendAgreement(String connectionId) {
@@ -550,9 +645,95 @@ public class GlobalService {
 
 
     public void sendPresentationRequest(String connectionId) {
+        // sample agreement
+        String agreement = JsonPath.parse("{" +
+                "  type: 'initial_agreement',"+
+                "  content: [" +
+                "    {" +
+                "      sequence: 1," +
+                "      title: '개인정보 수집 및 이용 동의서'," +
+                "      is_mandatory: 'true'," +
+                "      terms_id: 'person'," +
+                "      terms_ver: '1.0'," +
+                "      agreement: 'initial서비스(이하“서비스”라 한다)와 관련하여, 본인은 동의 내용을 숙지하였으며, 이에 따라 본인의 개인정보를 귀사(SK텔레콤주식회사)가 수집 및 이용하는 것에 대해 동의 합니다. 본 동의는 서비스의 본질적 기능 제공을 위한 개인정보 수집/이용에 대한 동의로서, 동의를 하는 경우에만 서비스 이용이 가능합니다. 법령에 따른 개인정보의 수집/이용, 계약의 이행/편익 제공을 위한 개인정보 취급 위탁 및 개인정보 취급과 관련된 일반 사항은 서비스의 개인정보 처리 방침에 따릅니다.'," +
+                "      condition: [" +
+                "        {" +
+                "          sub_title: '수집 항목'," +
+                "          target: '이름,생년월일'" +
+                "        }," +
+                "        {" +
+                "          sub_title: '수집 및 이용목적'," +
+                "          target: '서비스 이용에 따른 본인확인'" +
+                "        }," +
+                "        {" +
+                "          sub_title: '이용기간 및 보유/파기'," +
+                "          target: '1년'" +
+                "        }" +
+                "      ]" +
+                "    }," +
+                "    {" +
+                "      sequence: 2," +
+                "      title: '위치정보 수집 및 이용 동의서'," +
+                "      is_mandatory: 'true'," +
+                "      terms_id: 'location'," +
+                "      terms_ver: '1.0'," +
+                "      agreement: '이 약관은 이니셜(SK텔레콤)(이하“회사”)가 제공하는 위치 정보사업 또는 위치기반 서비스 사업과 관련하여 회사와 개인 위치 정보주체와의 권리, 의무 및 책임사항, 기타 필요한 사항을 규정함을 목적으로 합니다.'," +
+                "      condition: [" +
+                "        {" +
+                "          sub_title: '위치정보 수집 방법'," +
+                "          target: 'GPS칩'" +
+                "        }," +
+                "        {" +
+                "          sub_title: '위치정보 이용/제공'," +
+                "          target: '이 약관에 명시되지 않은 사항은 위치정보의 보호 및 이용 등에 관한 법률, 정보통신망 이용촉진 및 정보보호 등에 관한 법률, 전기통신기본법, 전기통신사업법 등 관계법령과 회사의 이용약관 및 개인정보취급방침, 회사가 별도로 정한 지침 등에 의합니다.'" +
+                "        }," +
+                "        {" +
+                "          sub_title: '수집목적'," +
+                "          target: '현재의 위치를 기반으로 하여 주변 매장의 위치 등의 정보를 제공하는 서비스'" +
+                "        }," +
+                "        {" +
+                "          sub_title: '위치정보 보유기간'," +
+                "          target: '1년'" +
+                "        }" +
+                "      ]" +
+                "    }," +
+                "    {" +
+                "      sequence: 3," +
+                "      title: '제3자 정보제공 동의서'," +
+                "      is_mandatory: 'true'," +
+                "      terms_id: '3rdparty'," +
+                "      terms_ver: '1.0'," +
+                "      agreement: 'initial서비스(이하“서비스”라 한다)와 관련하여, 본인은 동의 내용을 숙지하였으며, 이에 따라 본인의 개인정보를 귀사(이슈어)가 수집한 개인정보를 아래와 같이 제3자에게 제공하는 것에 대해 동의 합니다. 고객은 개인정보의 제3자 제공에 대한 동의를 거부할 권리가 있으며, 동의를 거부할 시 받는 별도의 불이익은 없습니다. 단, 서비스 이용이 불가능하거나, 서비스 이용 목적에 따른 서비스 제공에 제한이 따르게 됩니다.'," +
+                "      condition: [" +
+                "        {" +
+                "          sub_title: '제공하는 자'," +
+                "          target: '발급기관'" +
+                "        }," +
+                "        {" +
+                "          sub_title: '제공받는 자'," +
+                "          target: '이니셜(SK텔레콤)'" +
+                "        }," +
+                "        {" +
+                "          sub_title: '제공받는 항목'," +
+                "          target: '생년월일,시험일,성명(영문),만료일,성명(한글),수험번호,듣기점수,읽기점수,총점'" +
+                "        }," +
+                "        {" +
+                "          sub_title: '수집 및 이용목적'," +
+                "          target: '모바일 전자증명서 발급'" +
+                "        }," +
+                "        {" +
+                "          sub_title: '보유 및 이용기간'," +
+                "          target: '모바일 전자증명서 발급을 위해 서버에 임시 저장하였다가, 증명서 발행 후 즉시 삭제(단, 고객 단말기 내부 저장영역에 증명서 형태로 저장/보관)'" +
+                "        }" +
+                "      ]" +
+                "    }" +
+                "  ]"+
+                "}").jsonString();
+
         String body = JsonPath.parse("{" +
                 "  connection_id: '" + connectionId + "'," +
-                "  verification_template_id: '" + verifTplId + "'" +
+                "  verification_template_id: '" + verifTplId + "'," +
+                "  agreement: " + agreement +
                 "}").jsonString();
         String response = client.requestPOST(agentApiUrl + "/present-proof/send-verification-request", accessToken, body);
         log.info("response: " + response);
