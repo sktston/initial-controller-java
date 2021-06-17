@@ -164,6 +164,7 @@ public class GlobalService {
                 String credExId = JsonPath.read(body, "$.credential_exchange_id");
                 String credentialProposal = JsonPath.parse((LinkedHashMap)JsonPath.read(body, "$.credential_proposal_dict")).jsonString();
                 if(checkCredentialProposal(connectionId, credExId, credentialProposal)) {
+                    sendAgreement(JsonPath.read(body, "$.connection_id"));
                     sendPresentationRequest(connectionId);
                 }
             }
