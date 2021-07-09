@@ -124,8 +124,6 @@ public class GlobalService {
                 else if (state.equals("verified")) {
                     log.info("- Case (topic:" + topic + ", state:" + state + ") -> getPresentationResult");
                     LinkedHashMap<String, String> attrs = getPresentationResult(body);
-                    for(String key : attrs.keySet())
-                        log.info("Requested Attribute - " + key + ": " + attrs.get(key));
 
                     if (enableWebView) {
                         // 3-1. 검증 값 정보로 발행할 증명서가 한정되지 않는 경우 추가 정보 요구
@@ -352,12 +350,22 @@ public class GlobalService {
         String verified = JsonPath.read(presExRecord, "$.verified");
         if (!verified.equals("true")) {
             log.info("proof is not verified");
+            log.info("Possible Reason: Revoked or Signature mismatch or Predicates unsatisfied");
             return null;
         }
+        String requestedProof = JsonPath.read(presExRecord, "$.presentation.requested_proof");
+
+        LinkedHashMap<String, Object> revealedAttrs = JsonPath.read(requestedProof, "$.revealed_attrs");
         LinkedHashMap<String, String> attrs = new LinkedHashMap<>();
-        LinkedHashMap<String, Object> revealedAttrs = JsonPath.read(presExRecord, "$.presentation.requested_proof.revealed_attrs");
         for(String key : revealedAttrs.keySet())
             attrs.put(key, JsonPath.read(revealedAttrs.get(key), "$.raw"));
+        for(String key : attrs.keySet())
+            log.info("Requested Attribute - " + key + ": " + attrs.get(key));
+
+        LinkedHashMap<String, Object> predicates = JsonPath.read(requestedProof, "$.predicates");
+        for(String key : predicates.keySet())
+            log.info("Requested Predicates - " + key + " is satisfied");
+
         return attrs;
     }
 
