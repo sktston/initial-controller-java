@@ -353,7 +353,7 @@ public class GlobalService {
             log.info("Possible Reason: Revoked or Signature mismatch or Predicates unsatisfied");
             return null;
         }
-        String requestedProof = JsonPath.read(presExRecord, "$.presentation.requested_proof");
+        String requestedProof = JsonPath.parse((LinkedHashMap)JsonPath.read(presExRecord, "$.presentation.requested_proof")).jsonString();
 
         LinkedHashMap<String, Object> revealedAttrs = JsonPath.read(requestedProof, "$.revealed_attrs");
         LinkedHashMap<String, String> attrs = new LinkedHashMap<>();
