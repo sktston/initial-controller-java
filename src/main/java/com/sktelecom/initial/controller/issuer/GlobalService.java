@@ -40,6 +40,7 @@ public class GlobalService {
     String publicDid;
 
     LinkedHashMap<String, String> connIdToCredExId = new LinkedHashMap<>(); // cache to keep credential issuing flow
+    LinkedHashMap<String, String> attrs = new LinkedHashMap<>(); // cache to keep credential issuing flow
 
     // for revocation example
     static boolean enableRevoke = Boolean.parseBoolean(System.getenv().getOrDefault("ENABLE_REVOKE", "false"));
@@ -436,7 +437,7 @@ public class GlobalService {
 
         // 3-1-1. 추가 정보 기반으로 증명서 발행
         log.info("sendCredentialOffer with connectionId:" + connectionId + ", selectedItemId:" + selectedItemId);
-        sendCredentialOffer(connectionId, null, selectedItemId, eng_name);
+        sendCredentialOffer(connectionId, attrs, selectedItemId, eng_name);
     }
 
     public void revokeCredential(String credExId) {
