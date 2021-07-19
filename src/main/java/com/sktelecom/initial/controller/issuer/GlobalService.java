@@ -373,8 +373,8 @@ public class GlobalService {
         // TODO: need to implement business logic to query information for holder
         // we assume that the value is obtained by querying DB (e.g., attrs.mobileNum and selectedItemId)
         LinkedHashMap<String, String> value = new LinkedHashMap<>();
+        log.info("###### "+attrs.get("person_name"));
         value.put("korean_name", attrs.get("person_name"));
-        //log.info(attrs.get("person_name"));
         //value.put("english_name", eng_name);
         value.put("english_name", attrs.get("person_name"));
         value.put("registration_number", attrs.get("mobile_num"));
