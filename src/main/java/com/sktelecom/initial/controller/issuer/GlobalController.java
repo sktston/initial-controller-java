@@ -4,16 +4,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import static com.sktelecom.initial.controller.utils.Common.*;
-
 import javax.servlet.http.HttpServletRequest;
 
 import java.util.Enumeration;
+
+import static com.sktelecom.initial.controller.utils.Common.*;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -50,7 +49,7 @@ public class GlobalController {
 
         // api key check
         if(!apiKey.equals(xApiKey)){
-            log.info("http header:   " + httpAddr + "   xapikey :" + apiKey + ", Unauthorized API-KEY");
+            //log.info("http header:   " + httpAddr + "   xapikey :" + apiKey + ", Unauthorized API-KEY");
             return ResponseEntity.badRequest().build();
         }
         globalService.handleEvent(body);
