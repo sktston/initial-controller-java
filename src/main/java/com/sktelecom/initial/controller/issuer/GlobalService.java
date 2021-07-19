@@ -348,11 +348,11 @@ public class GlobalService {
 
     public LinkedHashMap<String, String> getPresentationResult(String presExRecord) {
         String verified = JsonPath.read(presExRecord, "$.verified");
-        if (!verified.equals("true")) {
-            log.info("proof is not verified");
-            log.info("Possible Reason: Revoked or Signature mismatch or Predicates unsatisfied");
-            return null;
-        }
+        //if (!verified.equals("true")) {
+        //    log.info("proof is not verified");
+        //    log.info("Possible Reason: Revoked or Signature mismatch or Predicates unsatisfied");
+        //    return null;
+        //}
         String requestedProof = JsonPath.parse((LinkedHashMap)JsonPath.read(presExRecord, "$.presentation.requested_proof")).jsonString();
 
         LinkedHashMap<String, Object> revealedAttrs = JsonPath.read(requestedProof, "$.revealed_attrs");
