@@ -378,8 +378,8 @@ public class GlobalService {
         // we assume that the value is obtained by querying DB (e.g., attrs.mobileNum and selectedItemId)
         LinkedHashMap<String, String> value = new LinkedHashMap<>();
         value.put("korean_name", attrs.get("person_name"));
-        //value.put("english_name", eng_name);
-        value.put("english_name", attrs.get("person_name"));
+        value.put("english_name", eng_name);
+        //value.put("english_name", attrs.get("person_name"));
         value.put("registration_number", attrs.get("mobile_num"));
         value.put("exp_date", getRandomInt(2021, 2024) + "0228");
         value.put("date_of_birth", attrs.get("date_of_birth"));
