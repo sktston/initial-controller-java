@@ -369,7 +369,7 @@ public class GlobalService {
         return attrs;
     }
 
-    public void sendCredentialOffer(String connectionId, LinkedHashMap<String, String> attrs, String selectedItemId) {
+    public void sendCredentialOffer(String connectionId, LinkedHashMap<String, String> attrs, String selectedItemId, String eng_name) {
         // TODO: need to implement business logic to query information for holder
         // we assume that the value is obtained by querying DB (e.g., attrs.mobileNum and selectedItemId)
         LinkedHashMap<String, String> value = new LinkedHashMap<>();
@@ -432,10 +432,11 @@ public class GlobalService {
 
         String connectionId = JsonPath.read(body, "$.connectionId");
         String selectedItemId = JsonPath.read(body, "$.selectedItemId");
+        String eng_name = JsonPath.read(body, "$.eng_name");
 
         // 3-1-1. 추가 정보 기반으로 증명서 발행
         log.info("sendCredentialOffer with connectionId:" + connectionId + ", selectedItemId:" + selectedItemId);
-        sendCredentialOffer(connectionId, null, selectedItemId);
+        sendCredentialOffer(connectionId, null, selectedItemId, eng_name);
     }
 
     public void revokeCredential(String credExId) {
