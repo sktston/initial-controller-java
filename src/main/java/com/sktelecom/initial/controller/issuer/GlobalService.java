@@ -40,8 +40,6 @@ public class GlobalService {
     String publicDid;
 
     LinkedHashMap<String, String> connIdToCredExId = new LinkedHashMap<>(); // cache to keep credential issuing flow
-    LinkedHashMap<String, String> attrs = new LinkedHashMap<>(); // cache to keep credential issuing flow
-
 
     // for revocation example
     static boolean enableRevoke = Boolean.parseBoolean(System.getenv().getOrDefault("ENABLE_REVOKE", "false"));
@@ -137,7 +135,7 @@ public class GlobalService {
                         // 3-2. 검증 값 정보 만으로 발행할 증명서가 한정되는 경우 증명서 바로 발행
                         log.info("Web View is not used -> sendCredentialOffer");
                         String connectionId = JsonPath.read(body, "$.connection_id");
-                        sendCredentialOffer(JsonPath.read(body, "$.connection_id"), attrs, null, null);
+                        sendCredentialOffer(connectionId, attrs, null);
                     }
                 }
                 break;
@@ -350,11 +348,11 @@ public class GlobalService {
 
     public LinkedHashMap<String, String> getPresentationResult(String presExRecord) {
         String verified = JsonPath.read(presExRecord, "$.verified");
-        //if (!verified.equals("true")) {
-        //    log.info("proof is not verified");
-        //    log.info("Possible Reason: Revoked or Signature mismatch or Predicates unsatisfied");
-        //    return null;
-        //}
+        if (!verified.equals("true")) {
+            log.info("proof is not verified");
+            log.info("Possible Reason: Revoked or Signature mismatch or Predicates unsatisfied");
+            return null;
+        }
         String requestedProof = JsonPath.parse((LinkedHashMap)JsonPath.read(presExRecord, "$.presentation.requested_proof")).jsonString();
 
         LinkedHashMap<String, Object> revealedAttrs = JsonPath.read(requestedProof, "$.revealed_attrs");
@@ -371,12 +369,14 @@ public class GlobalService {
         return attrs;
     }
 
-    public void sendCredentialOffer(String connectionId, LinkedHashMap<String, String> attrs, String selectedItemId, String eng_name) {
+    public void sendCredentialOffer(String connectionId, LinkedHashMap<String, String> attrs, String selectedItemId) {
         // TODO: need to implement business logic to query information for holder
         // we assume that the value is obtained by querying DB (e.g., attrs.mobileNum and selectedItemId)
         LinkedHashMap<String, String> value = new LinkedHashMap<>();
         value.put("korean_name", attrs.get("person_name"));
-        value.put("english_name", eng_name);
+        //log.info(attrs.get("person_name"));
+        //value.put("english_name", eng_name);
+        value.put("english_name", attrs.get("person_name"));
         value.put("registration_number", attrs.get("mobile_num"));
         value.put("exp_date", getRandomInt(2021, 2024) + "0228");
         value.put("date_of_birth", attrs.get("date_of_birth"));
@@ -389,6 +389,8 @@ public class GlobalService {
         String body = JsonPath.parse("{" +
                 "  counter_proposal: {" +
                 "    cred_def_id: '" + credDefId + "'," +
+                "    auto_remove: true," +
+                "    comment: 'JJ Test'," +
                 "    credential_proposal: {" +
                 "      attributes: [" +
                 "        { name: 'date_of_birth', value: '" + value.get("date_of_birth")  + "' }," +
@@ -430,12 +432,10 @@ public class GlobalService {
 
         String connectionId = JsonPath.read(body, "$.connectionId");
         String selectedItemId = JsonPath.read(body, "$.selectedItemId");
-        String eng_name = JsonPath.read(body, "$.eng_name");
-
 
         // 3-1-1. 추가 정보 기반으로 증명서 발행
-        log.info("sendCredentialOffer with connectionId:" + connectionId + ", selectedItemId:" + selectedItemId, ", eng_name : " + eng_name);
-        sendCredentialOffer(connectionId, attrs , selectedItemId, eng_name);
+        log.info("sendCredentialOffer with connectionId:" + connectionId + ", selectedItemId:" + selectedItemId);
+        sendCredentialOffer(connectionId, null, selectedItemId);
     }
 
     public void revokeCredential(String credExId) {
