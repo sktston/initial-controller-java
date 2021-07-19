@@ -357,7 +357,7 @@ public class GlobalService {
         String requestedProof = JsonPath.parse((LinkedHashMap)JsonPath.read(presExRecord, "$.presentation.requested_proof")).jsonString();
 
         LinkedHashMap<String, Object> revealedAttrs = JsonPath.read(requestedProof, "$.revealed_attrs");
-        LinkedHashMap<String, String> attrs = new LinkedHashMap<>();
+        //LinkedHashMap<String, String> attrs = new LinkedHashMap<>();
         for(String key : revealedAttrs.keySet())
             attrs.put(key, JsonPath.read(revealedAttrs.get(key), "$.raw"));
         for(String key : attrs.keySet())
@@ -374,7 +374,7 @@ public class GlobalService {
         // TODO: need to implement business logic to query information for holder
         // we assume that the value is obtained by querying DB (e.g., attrs.mobileNum and selectedItemId)
         LinkedHashMap<String, String> value = new LinkedHashMap<>();
-        log.info("###### "+attrs.get("person_name"));
+        log.info("###### attrs.get(\"person_name\")"+attrs.get("person_name"));
         value.put("korean_name", attrs.get("person_name"));
         //value.put("english_name", eng_name);
         value.put("english_name", attrs.get("person_name"));
