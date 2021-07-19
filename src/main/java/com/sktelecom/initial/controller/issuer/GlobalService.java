@@ -361,11 +361,11 @@ public class GlobalService {
         for(String key : revealedAttrs.keySet())
             attrs.put(key, JsonPath.read(revealedAttrs.get(key), "$.raw"));
         for(String key : attrs.keySet())
-            log.info("Requested Attribute - " + key + ": " + attrs.get(key));
+            log.info("###### Requested Attribute - " + key + ": " + attrs.get(key));
 
         LinkedHashMap<String, Object> predicates = JsonPath.read(requestedProof, "$.predicates");
         for(String key : predicates.keySet())
-            log.info("Requested Predicates - " + key + " is satisfied");
+            log.info("###### Requested Predicates - " + key + " is satisfied");
 
         return attrs;
     }
@@ -436,7 +436,7 @@ public class GlobalService {
         String eng_name = JsonPath.read(body, "$.eng_name");
 
         // 3-1-1. 추가 정보 기반으로 증명서 발행
-        log.info("sendCredentialOffer with connectionId:" + connectionId + ", selectedItemId:" + selectedItemId);
+        log.info("###### sendCredentialOffer with connectionId:" + connectionId + ", selectedItemId:" + selectedItemId + ", eng_name:" + eng_name);
         sendCredentialOffer(connectionId, attrs, selectedItemId, eng_name);
     }
 
