@@ -39,9 +39,25 @@
                 alert(status);
             }
         });
+
         return false;
     }
 </script>
+
+<!-- json submit -->
+<script>
+    function cancle(){
+        //initial app에서 web_view 화면을 즉시 종료 하는 code
+        var userAgent = navigator.userAgent.toLowerCase();
+        if (userAgent.search("android") > -1) {
+            Android.failVC ();
+        }
+        else {
+            webkit.messageHandlers.callbackHandler.postMessage("failVC");
+        }
+    }
+</script>
+
 
 <head>
     <meta charset="UTF-8">
@@ -57,29 +73,42 @@
 
 <body>
 <center>
-<form id="dataForm">
-    <input type="hidden" name="connectionId" id="connectionId" value="connectionIdValue" />
-    <script>
+    <form id="dataForm">
+        <input type="hidden" name="connectionId" id="connectionId" value="connectionIdValue" />
+        <script>
         var connectionIdValue = request.getParameter('connectionId');
         document.getElementById("connectionId").value = connectionIdValue
-    </script>
-    <p>발급 받기 원하는 학위 증명서를 선택해 주세요</p>
-    <div>
+        </script>
+        <p>Web View 테스트 화면 입니다. VC를 발급 받기 위해서는 영어 이름을 입력하고 아래 버튼을 클릭하세요. 화면은 자동 종료 됩니다.</p>
+        <div>
+            <p>
+                <input type="radio" id="itemChoice1"
+                       name="selectedItemId" value="20190105" checked>
+                <label for="itemChoice1">2019.01.05 토익성적 증명서</label>
+            </p>
+            <p>
+                <input type="radio" id="itemChoice2"
+                       name="selectedItemId" value="20200305">
+                <label for="itemChoice2">2020.03.05 토익성적 증명서</label>
+            </p>
+            <p>
+                <input type="radio" id="itemChoice3"
+                       name="selectedItemId" value="20210405">
+                <label for="itemChoice3">2021.04.05 토익성적 증명서</label>
+            </p>
+        </div>
         <p>
-            <input type="radio" id="itemChoice1"
-                   name="selectedItemId" value="item1Id" checked>
-            <label for="itemChoice1">컴퓨터공학</label>
+            English name :
+            <input type="text" id="eng_name" name="eng_name"> <br>
         </p>
-        <p>
-            <input type="radio" id="itemChoice2"
-                   name="selectedItemId" value="item2Id">
-            <label for="itemChoice2">산업공학</label>
-        </p>
-    </div>
-    <div>
-        <input type="button" onclick="ajax_send()" value="발급요청">
-    </div>
-</form>
+        <div>
+            <input type="button" onclick="ajax_send()" value="발급요청">
+        </div>
+        <p></p>
+        <div>
+            <input type="button" onclick="cancle()" value="취소">
+        </div>
+    </form>
 </center>
 </body>
 
