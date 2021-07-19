@@ -38,7 +38,8 @@ public class GlobalController {
     @GetMapping(value = "/invitation-qr", produces = MediaType.IMAGE_PNG_VALUE)
     public byte[] getInvitationUrlQRCode() {
         String invitationUrl = globalService.createInvitationUrl();
-        return generateQRCode(invitationUrl, 300, 300);
+        String deeplinkUrl = "initial://reqService?process=I&ynCloud=Y&invitation=" + invitationUrl;
+        return generateQRCode(deeplinkUrl, 300, 300);
     }
 
     @PostMapping(value = "/webhooks")
@@ -59,6 +60,7 @@ public class GlobalController {
     @PostMapping(value = "/web-view/submit")
     public ResponseEntity webViewHandler(@RequestBody String body) {
         globalService.handleWebView(body);
+        //log.info("web_view response : " + body);
         return ResponseEntity.ok().build();
     }
 
