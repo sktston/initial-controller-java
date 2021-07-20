@@ -453,6 +453,8 @@ public class GlobalService {
                 "  }"+
                 "}").jsonString();
         String body = JsonPath.parse("{ content: '" + initialWebView  + "' }").jsonString();
+        log.info("body: " + body);
+
         String response = client.requestPOST(agentApiUrl + "/connections/" + connectionId + "/send-message", accessToken, body);
         log.info("response: " + response);
     }
