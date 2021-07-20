@@ -7,11 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import javax.servlet.http.HttpServletRequest;
-
-import java.util.Enumeration;
-
 import static com.sktelecom.initial.controller.utils.Common.*;
 
 @RequiredArgsConstructor
@@ -45,12 +41,12 @@ public class GlobalController {
     @PostMapping(value = "/webhooks")
     public ResponseEntity webhooksTopicHandler(@RequestBody String body, HttpServletRequest request) {
         //http header x-api-key 정보 확인
-        String httpAddr = request.getRemoteAddr();
+        String httpAddr = request.getRemoteAddr(); // Webhook Inbound IP Address
         String apiKey = request.getHeader("x-api-key");
 
-        // api key check
+        // API Key Check
         if(!apiKey.equals(xApiKey)){
-            //log.info("http header:   " + httpAddr + "   xapikey :" + apiKey + ", Unauthorized API-KEY");
+            log.info("Inbound IP Address :   " + httpAddr + "   x-api-key :" + apiKey + ", Unauthorized API-KEY");
             return ResponseEntity.badRequest().build();
         }
         globalService.handleEvent(body);

@@ -444,7 +444,7 @@ public class GlobalService {
                 "    credential_proposal: {" +
                 "      attributes: [" +
                 "        { name: 'date_of_birth', value: '" + value.get("date_of_birth")  + "' }," +
-                "        { name: 'date_of_test', value: " + value.get("date_of_test") + "' }," +
+                "        { name: 'date_of_test', value: '" + value.get("date_of_test") + "' }," +
                 "        { name: 'english_name', value: '" + value.get("english_name") + "' }," +
                 "        { name: 'exp_date', value: '" +  value.get("exp_date")  + "' }," +
                 "        { name: 'korean_name', value: '" + value.get("korean_name") + "' }" +
