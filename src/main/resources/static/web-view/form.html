@@ -27,7 +27,7 @@
 
 <!-- json submit -->
 <script>
-    function ajax_send(frm){
+    $('#myModal').on('shown.bs.modal', function ajax_send(frm){
         var formData = $('#dataForm').serializeObject();
         $.ajax({
             url : '/web-view/submit',
@@ -42,7 +42,7 @@
         });
 
         return false;
-    }
+    })
 </script>
 
 <!-- cancel button -->
@@ -290,7 +290,7 @@ h1 small{
             <input type="text" id="eng_name" name="eng_name"> <br>
         </p>
         <div>
-            <button type="button" id="just_load_please">발급요청</button>
+            <button type="button" onclick="ajax_send()" value="발급요청">발급요청</button>
         </div>
         <p></p>
         <div>
