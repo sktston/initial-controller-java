@@ -350,8 +350,8 @@ public class GlobalService {
                 "}").jsonString();
 
         String body = JsonPath.parse("{" +
-                "\"connection_id\": \"+ connectionId + \"," +
-                "\"verification_template_id\": \" + verifTplId + \"," +
+                "\"connection_id\":" + connectionId  +
+                "\"verification_template_id\": " + verifTplId +
                 "\"agreement\": " + agreement +
                 "}").jsonString();
         log.info("response: " + body);
