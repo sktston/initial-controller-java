@@ -388,9 +388,10 @@ public class GlobalService {
         //LinkedHashMap<String, String> attrs = new LinkedHashMap<>();
         for(String key : revealedAttrs.keySet()) {
             attrs.put(key, JsonPath.read(revealedAttrs.get(key), "$.raw"));
+            log.info("###### Requested Attribute1 - " + key + ": " + attrs.get(key));
         }
         for(String key : attrs.keySet())
-            log.info("###### Requested Attribute - " + key + ": " + attrs.get(key));
+            log.info("###### Requested Attribute1 - " + key + ": " + attrs.get(key));
 
 
 
