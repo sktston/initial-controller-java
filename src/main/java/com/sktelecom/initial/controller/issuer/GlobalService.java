@@ -447,12 +447,12 @@ public class GlobalService {
         // This web view page will submit connectionId and selectedItemId to POST /web-view/submit
 
         String initialWebView = JsonPath.parse("{" +
-                "  type : 'initial_web_view',"+
-                "  content: {" +
-                "    web_view_url : '" + webViewUrl + "?connectionId=" + connectionId + "'," +
+                "  \"type\" : \"initial_web_view\","+
+                "  \"content\": {" +
+                "    \"web_view_url\" : '" + webViewUrl + "?connectionId=" + connectionId + "'," +
                 "  }"+
                 "}").jsonString();
-        String body = JsonPath.parse("{ content: '" + initialWebView  + "' }").jsonString();
+        String body = JsonPath.parse("{ \"content\": " + initialWebView  + " }").jsonString();
         log.info("body: " + body);
 
         String response = client.requestPOST(agentApiUrl + "/connections/" + connectionId + "/send-message", accessToken, body);
