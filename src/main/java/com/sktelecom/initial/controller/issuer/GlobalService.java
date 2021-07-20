@@ -392,7 +392,7 @@ public class GlobalService {
             log.info("###### Requested Attribute1 - " + key + ": " + attrs.get(key));
         }
         for(String key : revealedAttrs.keySet()) {
-            attrs.put(JsonPath.read(revealedAttrs.get(key), "$.name"), JsonPath.read(revealedAttrs.get(key), "$.raw"));
+            attrs.put(JsonPath.read(requestedAttrs.get(key), "$.name"), JsonPath.read(revealedAttrs.get(key), "$.raw"));
             log.info("###### Requested Attribute2 - " + key + ": " + attrs.get(key));
         }
 
