@@ -400,10 +400,19 @@ public class GlobalService {
          */
 
         LinkedHashMap<String, Object> revealedAttrs = JsonPath.read(requestedProof, "$.revealed_attrs");
+        LinkedHashMap<String, Object> requestedAttrs = JsonPath.read(requested_attributes, "$.requested_attributes");
+        LinkedHashMap<String, String> attrs_name = new LinkedHashMap<>();
+        LinkedHashMap<String, String> attrs_value = new LinkedHashMap<>();
+        for(String key : requestedAttrs.keySet())
+            attrs_name.put(key, JsonPath.read(requestedAttrs.get(key), "$.name"));
         for(String key : revealedAttrs.keySet())
-            attrs.put(key, JsonPath.read(revealedAttrs.get(key), "$.raw"));
-        for(String key : attrs.keySet())
-            log.info("Requested Attribute - " + key + ": " + attrs.get(key));
+            attrs_value.put(key, JsonPath.read(revealedAttrs.get(key), "$.raw"));
+        //for(String key : attrs.keySet())
+        //    log.info("Revealed Attribute - " + key + ": " + attrs.get(key));
+        for(String key : requestedAttrs.keySet())
+            attrs.put(attrs_name.get(key), attrs_value.get(key));
+
+        log.info("###### Revealed Attribute - " + attrs);
 
         LinkedHashMap<String, Object> predicates = JsonPath.read(requestedProof, "$.predicates");
         for(String key : predicates.keySet())
