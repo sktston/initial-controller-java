@@ -3,161 +3,161 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-serialize-object/2.5.0/jquery.serialize-object.min.js"></script>
 <style>
-body {font-family: Arial, Helvetica, sans-serif;}
-* {box-sizing: border-box;}
+    body {font-family: Arial, Helvetica, sans-serif;}
+    * {box-sizing: border-box;}
 
-/* Set a style for all buttons */
-button {
-  background-color: #04AA6D;
-  color: white;
-  padding: 14px 20px;
-  margin: 8px 0;
-  border: none;
-  cursor: pointer;
-  width: 100%;
-  opacity: 0.9;
-}
+    /* Set a style for all buttons */
+    button {
+      background-color: #04AA6D;
+      color: white;
+      padding: 14px 20px;
+      margin: 8px 0;
+      border: none;
+      cursor: pointer;
+      width: 100%;
+      opacity: 0.9;
+    }
 
-button:hover {
-  opacity:1;
-}
+    button:hover {
+      opacity:1;
+    }
 
-/* Float cancel and delete buttons and add an equal width */
-.cancelbtn, .deletebtn {
-  float: left;
-  width: 50%;
-}
+    /* Float cancel and delete buttons and add an equal width */
+    .cancelbtn, .deletebtn {
+      float: left;
+      width: 50%;
+    }
 
-/* Add a color to the cancel button */
-.cancelbtn {
-  background-color: #ccc;
-  color: black;
-}
+    /* Add a color to the cancel button */
+    .cancelbtn {
+      background-color: #ccc;
+      color: black;
+    }
 
-/* Add a color to the delete button */
-.deletebtn {
-  background-color: #f44336;
-}
+    /* Add a color to the delete button */
+    .deletebtn {
+      background-color: #f44336;
+    }
 
-/* Add padding and center-align text to the container */
-.container {
-  padding: 16px;
-  text-align: center;
-}
+    /* Add padding and center-align text to the container */
+    .container {
+      padding: 16px;
+      text-align: center;
+    }
 
-/* The Modal (background) */
-.modal {
-  display: none; /* Hidden by default */
-  position: fixed; /* Stay in place */
-  z-index: 1; /* Sit on top */
-  left: 0;
-  top: 0;
-  width: 100%; /* Full width */
-  height: 100%; /* Full height */
-  overflow: auto; /* Enable scroll if needed */
-  background-color: #474e5d;
-  padding-top: 50px;
-}
+    /* The Modal (background) */
+    .modal {
+      display: none; /* Hidden by default */
+      position: fixed; /* Stay in place */
+      z-index: 1; /* Sit on top */
+      left: 0;
+      top: 0;
+      width: 100%; /* Full width */
+      height: 100%; /* Full height */
+      overflow: auto; /* Enable scroll if needed */
+      background-color: #474e5d;
+      padding-top: 50px;
+    }
 
-/* Modal Content/Box */
-.modal-content {
-  background-color: #fefefe;
-  margin: 5% auto 15% auto; /* 5% from the top, 15% from the bottom and centered */
-  border: 1px solid #888;
-  width: 80%; /* Could be more or less, depending on screen size */
-}
+    /* Modal Content/Box */
+    .modal-content {
+      background-color: #fefefe;
+      margin: 5% auto 15% auto; /* 5% from the top, 15% from the bottom and centered */
+      border: 1px solid #888;
+      width: 80%; /* Could be more or less, depending on screen size */
+    }
 
-/* Style the horizontal ruler */
-hr {
-  border: 1px solid #f1f1f1;
-  margin-bottom: 25px;
-}
+    /* Style the horizontal ruler */
+    hr {
+      border: 1px solid #f1f1f1;
+      margin-bottom: 25px;
+    }
 
-/* The Modal Close Button (x) */
-.close {
-  position: absolute;
-  right: 35px;
-  top: 15px;
-  font-size: 40px;
-  font-weight: bold;
-  color: #f1f1f1;
-}
+    /* The Modal Close Button (x) */
+    .close {
+      position: absolute;
+      right: 35px;
+      top: 15px;
+      font-size: 40px;
+      font-weight: bold;
+      color: #f1f1f1;
+    }
 
-.close:hover,
-.close:focus {
-  color: #f44336;
-  cursor: pointer;
-}
+    .close:hover,
+    .close:focus {
+      color: #f44336;
+      cursor: pointer;
+    }
 
-/* Clear floats */
-.clearfix::after {
-  content: "";
-  clear: both;
-  display: table;
-}
+    /* Clear floats */
+    .clearfix::after {
+      content: "";
+      clear: both;
+      display: table;
+    }
 
-/* Change styles for cancel button and delete button on extra small screens */
-@media screen and (max-width: 300px) {
-  .cancelbtn, .deletebtn {
-     width: 100%;
-  }
-}
-</style>
+    /* Change styles for cancel button and delete button on extra small screens */
+    @media screen and (max-width: 300px) {
+      .cancelbtn, .deletebtn {
+        width: 100%;
+      }
+    }
+  </style>
 
 <!-- get parameters -->
 <script type="text/javascript">
     var Request = function() {
-        this.getParameter = function(name) {
-            var rtnval = '';
-            var nowAddress = unescape(location.href);
-            var parameters = (nowAddress.slice(nowAddress.indexOf('?') + 1,
-                    nowAddress.length)).split('&');
-            for (var i = 0; i < parameters.length; i++) {
-                var varName = parameters[i].split('=')[0];
-                if (varName.toUpperCase() == name.toUpperCase()) {
-                    rtnval = parameters[i].split('=')[1];
-                    break;
-                }
-            }
-            return rtnval;
+      this.getParameter = function(name) {
+        var rtnval = '';
+        var nowAddress = unescape(location.href);
+        var parameters = (nowAddress.slice(nowAddress.indexOf('?') + 1,
+                                           nowAddress.length)).split('&');
+        for (var i = 0; i < parameters.length; i++) {
+          var varName = parameters[i].split('=')[0];
+          if (varName.toUpperCase() == name.toUpperCase()) {
+            rtnval = parameters[i].split('=')[1];
+            break;
+          }
         }
+        return rtnval;
+      }
     }
     var request = new Request();
-</script>
+  </script>
 
 <!-- json submit -->
 <script>
     function ajax_send(frm){
-    	var formData = $('#dataForm').serializeObject();
-        $.ajax({
-            url : '/web-view/submit',
-            type : 'POST',
-            contentType : 'application/json',
-            data : JSON.stringify(formData),
-            success : function(data){
-            },
-            error: function(xhr, status, error){
-                alert(status);
-            }
-        });
-        modal.style.display = "block";
-        return false;
+      var formData = $('#dataForm').serializeObject();
+      $.ajax({
+        url : '/web-view/submit',
+        type : 'POST',
+        contentType : 'application/json',
+        data : JSON.stringify(formData),
+        success : function(data){
+        },
+        error: function(xhr, status, error){
+          alert(status);
+        }
+      });
+      modal.style.display = "block";
+      return false;
     }
-</script>
+  </script>
 
 <!-- cancel button -->
 <script>
     function cancel(){
-        //initial app에서 web_view 화면을 즉시 종료 하는 code
-        var userAgent = navigator.userAgent.toLowerCase();
-        if (userAgent.search("android") > -1) {
-            Android.failVC ();
-        }
-        else {
-            webkit.messageHandlers.callbackHandler.postMessage("failVC");
-        }
+      //initial app에서 web_view 화면을 즉시 종료 하는 code
+      var userAgent = navigator.userAgent.toLowerCase();
+      if (userAgent.search("android") > -1) {
+        Android.failVC ();
+      }
+      else {
+        webkit.messageHandlers.callbackHandler.postMessage("failVC");
+      }
     }
-</script>
+  </script>
 
 
 
@@ -172,30 +172,40 @@ hr {
     <form id="dataForm">
         <input type="hidden" name="connectionId" id="connectionId" value="connectionIdValue" />
         <script>
-        var connectionIdValue = request.getParameter('connectionId');
-        document.getElementById("connectionId").value = connectionIdValue
+          var connectionIdValue = request.getParameter('connectionId');
+          document.getElementById("connectionId").value = connectionIdValue
         </script>
-        <p>Web View 테스트 화면 입니다. VC를 발급 받기 위해서는 영어 이름을 입력하고 아래 버튼을 클릭하세요. 화면은 자동 종료 됩니다.</p>
+
+        <div class="card" style="width: 18rem;">
+            <img src="https://play-lh.googleusercontent.com/XpMUfVBitD2tSCYEvKcp8NEtOfBjU9Pp9FFjnLWQRcPLFdGnETxe7_6aIS7E_3shR2A" class="card-img-top" alt="...">
+            <div class="card-body">
+                <h5 class="card-title">Web View 테스트</h5>
+                <p class="card-text">VC를 발급 받기 위해서는 날짜를 선택하고 영어 이름을 입력하고 아래 버튼을 클릭하세요. 화면은 자동 종료 됩니다. </p>
+                <a href="https://github.com/sktston/initial-controller-java/blob/cloud_demo_v2/src/main/resources/static/web-view/form.html" class="btn btn-primary">Web_view Sample</a>
+            </div>
+        </div>
+        <br><br>
         <div>
             <p>
-                <input type="radio" id="itemChoice1"
+                <input class="form-check-input" type="radio" id="itemChoice1"
                        name="selectedItemId" value="20190105" checked>
-                <label for="itemChoice1">2019.01.05 토익성적 증명서</label>
+                <label class="form-check-label" for="itemChoice1">2019.01.05 토익성적 증명서</label>
             </p>
             <p>
-                <input type="radio" id="itemChoice2"
+                <input class="form-check-input" type="radio" id="itemChoice2"
                        name="selectedItemId" value="20200305">
-                <label for="itemChoice2">2020.03.05 토익성적 증명서</label>
+                <label class="form-check-label"for="itemChoice2">2020.03.05 토익성적 증명서</label>
             </p>
             <p>
-                <input type="radio" id="itemChoice3"
+                <input class="form-check-input" type="radio" id="itemChoice3"
                        name="selectedItemId" value="20210405">
-                <label for="itemChoice3">2021.04.05 토익성적 증명서</label>
+                <label class="form-check-label" for="itemChoice3">2021.04.05 토익성적 증명서</label>
             </p>
         </div>
         <p>
-            English name :
-            <input type="text" id="eng_name" name="eng_name"> <br>
+        <div class="input-group mb-3">
+            <span class="input-group-text" id="basic-addon1">English name :</span><input type="text" class="form-control" id="eng_name" placeholder="English name" aria-label="Username" aria-describedby="basic-addon1" name="eng_name"> <br>
+        </div>
         </p>
         <div>
             <button type="button" onclick="ajax_send()" value="발급요청">발급요청</button>
@@ -216,16 +226,16 @@ hr {
 </div>
 
 <script>
-// Get the modal
-var modal = document.getElementById('id01');
+    // Get the modal
+    var modal = document.getElementById('id01');
 
-// When the user clicks anywhere outside of the modal, close it
-window.onclick = function(event) {
-  if (event.target == modal) {
-    modal.style.display = "none";
-  }
-}
-</script>
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function(event) {
+      if (event.target == modal) {
+        modal.style.display = "none";
+      }
+    }
+  </script>
 
 </body>
 </html>
