@@ -43,14 +43,16 @@ public class GlobalController {
         //http header x-api-key 정보 확인
         String httpAddr = request.getRemoteAddr(); // Webhook Inbound IP Address
         String apiKey = request.getHeader("x-api-key");
-        log.info("### apikey : " + apiKey);
+
         // API Key Check
         if(!apiKey.equals(null)) {
+            log.info("### not null apikey : " + apiKey);
             if (!apiKey.equals(xApiKey)) {
                 log.info("##### Inbound IP Address :   " + httpAddr + "   x-api-key :" + apiKey + ", Unauthorized API-KEY");
                 return ResponseEntity.badRequest().build();
             }
         }
+        log.info("### no apikey : " + apiKey);
         globalService.handleEvent(body);
         return ResponseEntity.ok().build();
     }
