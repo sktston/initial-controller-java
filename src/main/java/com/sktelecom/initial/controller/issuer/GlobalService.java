@@ -449,7 +449,7 @@ public class GlobalService {
         String initialWebView = JsonPath.parse("{" +
                 "  \"type\" : \"initial_web_view\","+
                 "  \"content\": {" +
-                "    \"web_view_url\" : " + webViewUrl + "?connectionId=" + connectionId + "," +
+                "    \"web_view_url\" : \"" + webViewUrl + "?connectionId=" + connectionId + "\"" +
                 "  }"+
                 "}").jsonString();
         String body = JsonPath.parse("{ content: '" + initialWebView  + "' }").jsonString();
