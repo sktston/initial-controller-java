@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-serialize-object/2.5.0/jquery.serialize-object.min.js"></script>
 
 <!-- get parameters -->
 <script type="text/javascript">
@@ -57,45 +56,12 @@
         }
     }
 </script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
-<script>
-// Get the modal
-var modal = document.getElementById("myModal");
 
-// Get the button that opens the modal
-var btn = document.getElementById("myBtn");
-
-// Get the <span> element that closes the modal
-var span = document.getElementsByClassName("close")[0];
-
-// When the user clicks the button, open the modal
-btn.onclick = function() {
-  modal.style.display = "block";
-}
-
-// When the user clicks on <span> (x), close the modal
-span.onclick = function() {
-  modal.style.display = "none";
-}
-
-// When the user clicks anywhere outside of the modal, close it
-window.onclick = function(event) {
-  if (event.target == modal) {
-    modal.style.display = "none";
-  }
-}
-</script>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, width=device-width" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <title>web-view form</title>
-    <style>
-      * {
-        font-size: 16px;
-        font-family: Consolas, sans-serif;
-      }
-    </style>
     <style>
 body {font-family: Arial, Helvetica, sans-serif;}
 
@@ -142,53 +108,82 @@ body {font-family: Arial, Helvetica, sans-serif;}
 
 <body>
 <center>
-    <form id="dataForm">
-        <input type="hidden" name="connectionId" id="connectionId" value="connectionIdValue" />
-        <script>
+
+    <input type="hidden" name="connectionId" id="connectionId" value="connectionIdValue" />
+    <script>
         var connectionIdValue = request.getParameter('connectionId');
         document.getElementById("connectionId").value = connectionIdValue
         </script>
-        <p>Web View 테스트 화면 입니다. VC를 발급 받기 위해서는 영어 이름을 입력하고 아래 버튼을 클릭하세요. 화면은 자동 종료 됩니다.</p>
-        <div>
-            <p>
-                <input type="radio" id="itemChoice1"
-                       name="selectedItemId" value="20190105" checked>
-                <label for="itemChoice1">2019.01.05 토익성적 증명서</label>
-            </p>
-            <p>
-                <input type="radio" id="itemChoice2"
-                       name="selectedItemId" value="20200305">
-                <label for="itemChoice2">2020.03.05 토익성적 증명서</label>
-            </p>
-            <p>
-                <input type="radio" id="itemChoice3"
-                       name="selectedItemId" value="20210405">
-                <label for="itemChoice3">2021.04.05 토익성적 증명서</label>
-            </p>
-        </div>
+    <p>Web View 테스트 화면 입니다. VC를 발급 받기 위해서는 영어 이름을 입력하고 아래 버튼을 클릭하세요. 화면은 자동 종료 됩니다.</p>
+    <div>
         <p>
-            English name :
-            <input type="text" id="eng_name" name="eng_name"> <br>
+            <input type="radio" id="itemChoice1"
+                   name="selectedItemId" value="20190105" checked>
+            <label for="itemChoice1">2019.01.05 토익성적 증명서</label>
         </p>
-        <div>
-            <button type="button" id="myBtn">발급요청</button>
-        </div>
-        <!-- The Modal -->
-        <div id="myModal" class="modal">
+        <p>
+            <input type="radio" id="itemChoice2"
+                   name="selectedItemId" value="20200305">
+            <label for="itemChoice2">2020.03.05 토익성적 증명서</label>
+        </p>
+        <p>
+            <input type="radio" id="itemChoice3"
+                   name="selectedItemId" value="20210405">
+            <label for="itemChoice3">2021.04.05 토익성적 증명서</label>
+        </p>
+    </div>
+    <p>
+        English name :
+        <input type="text" id="eng_name" name="eng_name"> <br>
+    </p>
+    <!-- Trigger/Open The Modal -->
+    <button id="myBtn">Open Modal</button>
 
-            <!-- Modal content -->
-            <div class="modal-content">
-                <div class="spinner-border" role="status">
-                    <span class="sr-only">Loading...</span>
-                </div>
-            </div>
+    <!-- The Modal -->
+    <div id="myModal" onclick="ajax_send()" class="modal">
 
+        <!-- Modal content -->
+        <div class="modal-content">
+            <button class="btn btn-primary" type="button" disabled>
+                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                Loading...
+            </button>
         </div>
-        <p></p>
-        <div>
-            <button type="button" onclick="cancel()" value="취소">취소</button>
-        </div>
-    </form>
+    </div>
+
+    </div>
+    <script>
+// Get the modal
+var modal = document.getElementById("myModal");
+
+// Get the button that opens the modal
+var btn = document.getElementById("myBtn");
+
+// Get the <span> element that closes the modal
+var span = document.getElementsByClassName("close")[0];
+
+// When the user clicks the button, open the modal
+btn.onclick = function() {
+  modal.style.display = "block";
+}
+
+// When the user clicks on <span> (x), close the modal
+span.onclick = function() {
+  modal.style.display = "none";
+}
+
+// When the user clicks anywhere outside of the modal, close it
+window.onclick = function(event) {
+  if (event.target == modal) {
+    modal.style.display = "none";
+  }
+}
+</script>
+    <p></p>
+    <div>
+        <button type="button" onclick="cancel()" value="취소">취소</button>
+    </div>
+
 </center>
 </body>
 
