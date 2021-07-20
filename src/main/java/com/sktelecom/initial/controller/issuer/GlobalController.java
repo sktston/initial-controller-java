@@ -45,9 +45,11 @@ public class GlobalController {
         String apiKey = request.getHeader("x-api-key");
 
         // API Key Check
-        if(!apiKey.equals(xApiKey)){
-            log.info("Inbound IP Address :   " + httpAddr + "   x-api-key :" + apiKey + ", Unauthorized API-KEY");
-            return ResponseEntity.badRequest().build();
+        if(!apiKey.equals(null)) {
+            if (!apiKey.equals(xApiKey)) {
+                log.info("##### Inbound IP Address :   " + httpAddr + "   x-api-key :" + apiKey + ", Unauthorized API-KEY");
+                return ResponseEntity.badRequest().build();
+            }
         }
         globalService.handleEvent(body);
         return ResponseEntity.ok().build();
