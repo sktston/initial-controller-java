@@ -40,20 +40,18 @@ public class GlobalController {
 
     @PostMapping(value = "/webhooks")
     public ResponseEntity webhooksTopicHandler(@RequestBody String body, HttpServletRequest request) {
-        //http header x-api-key 정보 확인
+        //Http header x-api-key 정보 확인
         String httpAddr = request.getRemoteAddr(); // Webhook Inbound IP Address
         String apiKey = request.getHeader("x-api-key");
 
         log.info("### apikey : " + apiKey + "### x-api-key : " + xApiKey);
         // API Key Check
         if(apiKey != null && apiKey.isEmpty()) {
-            log.info("### not null apikey : " + apiKey);
             if (!apiKey.equals(xApiKey)) {
                 log.info("##### Inbound IP Address :   " + httpAddr + "   x-api-key :" + apiKey + ", Unauthorized API-KEY");
                 return ResponseEntity.badRequest().build();
             }
         }
-        log.info("### no apikey : " + apiKey);
         globalService.handleEvent(body);
         return ResponseEntity.ok().build();
     }
