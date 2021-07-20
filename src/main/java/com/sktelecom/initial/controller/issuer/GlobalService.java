@@ -385,13 +385,15 @@ public class GlobalService {
         String requested_attributes = JsonPath.parse((LinkedHashMap)JsonPath.read(presExRecord, "$.presentation_request")).jsonString();
 
         LinkedHashMap<String, Object> revealedAttrs = JsonPath.read(requestedProof, "$.revealed_attrs");
+        LinkedHashMap<String, Object> requestedAttrs = JsonPath.read(requested_attributes, "$.requested_attributes");
         //LinkedHashMap<String, String> attrs = new LinkedHashMap<>();
-        for(String key : revealedAttrs.keySet()) {
-            attrs.put(key, JsonPath.read(revealedAttrs.get(key), "$.raw"));
-            log.info("###### Requested Attribute1 - " + key + ": " + attrs.get(key));
+        for(String name : requestedAttrs.keySet()) {
+            log.info("###### Requested Attribute1 - " + name + ": " + attrs.get(name));
         }
-        for(String key : attrs.keySet())
-            log.info("###### Requested Attribute1 - " + key + ": " + attrs.get(key));
+        for(String key : revealedAttrs.keySet()) {
+            attrs.put(JsonPath.read(revealedAttrs.get(key), "$.name"), JsonPath.read(revealedAttrs.get(key), "$.raw"));
+            log.info("###### Requested Attribute2 - " + key + ": " + attrs.get(key));
+        }
 
 
 
