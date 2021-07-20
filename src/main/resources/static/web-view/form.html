@@ -146,9 +146,9 @@
   </script>
 
 <!-- cancel button -->
+<!-- initial App에서 web_view 화면을 닫고, 첫페이지로 이동하는 취소 버튼 code -->
 <script>
     function cancel(){
-      //initial app에서 web_view 화면을 즉시 종료 하는 code
       var userAgent = navigator.userAgent.toLowerCase();
       if (userAgent.search("android") > -1) {
         Android.failVC ();
@@ -180,7 +180,7 @@
             <img src="https://play-lh.googleusercontent.com/XpMUfVBitD2tSCYEvKcp8NEtOfBjU9Pp9FFjnLWQRcPLFdGnETxe7_6aIS7E_3shR2A" class="card-img-top" alt="...">
             <div class="card-body">
                 <h5 class="card-title">Web View 테스트</h5>
-                <p class="card-text">VC를 발급 받기 위해서는 날짜를 선택하고 영어 이름을 입력하고 아래 버튼을 클릭하세요. 화면은 자동 종료 됩니다. </p>
+                <p class="card-text">VC를 발급 받기 위해서는 날짜를 선택하고 영어 이름을 입력하고 아래 '발급요청' 버튼을 클릭하세요. 화면은 자동 종료 됩니다. </p>
                 <a href="https://github.com/sktston/initial-controller-java/blob/cloud_demo_v2/src/main/resources/static/web-view/form.html" class="btn btn-primary">Web_view Sample</a>
             </div>
         </div>
@@ -217,7 +217,7 @@
     </form>
 </center>
 
-<!--Modal-->
+<!--발급요청 시 로딩 UI를 표시하기 위한 Modal-->
 <div id="id01" class="modal">
     <button class="btn btn-primary" type="button" disabled>
         <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
@@ -230,12 +230,12 @@
     var modal = document.getElementById('id01');
 
     // When the user clicks anywhere outside of the modal, close it
-    window.onclick = function(event) {
-      if (event.target == modal) {
-        modal.style.display = "none";
-      }
-    }
-  </script>
+    //window.onclick = function(event) {
+    //  if (event.target == modal) {
+    //    modal.style.display = "none";
+    //  }
+    //}
+</script>
 
 </body>
 </html>
