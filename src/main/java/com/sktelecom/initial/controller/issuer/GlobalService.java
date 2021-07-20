@@ -412,7 +412,7 @@ public class GlobalService {
         for(String key : requestedAttrs.keySet())
             attrs.put(attrs_name.get(key), attrs_value.get(key));
 
-        log.info("###### Revealed Attribute - " + attrs);
+        log.info("###### Revealed Attribute - " + attrs.get("person_name"));
 
         LinkedHashMap<String, Object> predicates = JsonPath.read(requestedProof, "$.predicates");
         for(String key : predicates.keySet())
