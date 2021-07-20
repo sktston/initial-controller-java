@@ -443,15 +443,15 @@ public class GlobalService {
                 "    \"comment\": \"JJ Test\"," +
                 "    \"credential_proposal\": {" +
                 "      \"attributes\": [" +
-                "        { name: 'date_of_birth', value: '" + value.get("date_of_birth")  + "' }," +
-                "        { name: 'date_of_test', value: '" + value.get("date_of_test") + "' }," +
-                "        { name: 'english_name', value: '" + value.get("english_name") + "' }," +
-                "        { name: 'exp_date', value: '" +  value.get("exp_date")  + "' }," +
-                "        { name: 'korean_name', value: '" + value.get("korean_name") + "' }" +
-                "        { name: 'registration_number', value: '" + value.get("registration_number") + "' }" +
-                "        { name: 'score_of_listening', value: '" + value.get("score_of_listening") + "' }" +
-                "        { name: 'score_of_reading', value: '" + value.get("score_of_reading") + "' }" +
-                "        { name: 'score_of_total', value: '" + value.get("score_of_total") + "' }" +
+                "        { \"name\": \"date_of_birth\", value: '" + value.get("date_of_birth")  + "' }," +
+                "        { \"name\": \"date_of_test\", value: '" + value.get("date_of_test") + "' }," +
+                "        { \"name\": \"english_name\", value: '" + value.get("english_name") + "' }," +
+                "        { \"name\": \"exp_date\", value: '" +  value.get("exp_date")  + "' }," +
+                "        { \"name\": \"korean_name\", value: '" + value.get("korean_name") + "' }" +
+                "        { \"name\": \"registration_number\", value: '" + value.get("registration_number") + "' }" +
+                "        { \"name\": \"score_of_listening\", value: '" + value.get("score_of_listening") + "' }" +
+                "        { \"name\": \"score_of_reading\", value: '" + value.get("score_of_reading") + "' }" +
+                "        { \"name\": \"score_of_total\", value: '" + value.get("score_of_total") + "' }" +
                 "      ]" +
                 "    }" +
                 "  }" +
