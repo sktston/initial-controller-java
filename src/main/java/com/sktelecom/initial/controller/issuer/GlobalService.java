@@ -460,6 +460,7 @@ public class GlobalService {
                 "    web_view_url : '" + webViewUrl + "?connectionId=" + connectionId + "'," +
                 "  }"+
                 "}").jsonString();
+
         String body = JsonPath.parse("{ \"content\": " + initialWebView  + " }").jsonString();
         log.info("body: " + body);
 
