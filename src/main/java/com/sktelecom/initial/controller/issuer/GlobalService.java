@@ -396,21 +396,9 @@ public class GlobalService {
             log.info("###### Requested Attribute2 - " + attrs);
         }
 
-
-
-        //LinkedHashMap<String, Object> reqeustedAttrs = JsonPath.read(requested_attributes, "$.requested_attributes");
-        //for(String key : revealedAttrs.keySet())
-        //    attrs.put(key, JsonPath.read(revealedAttrs.get(key), "$.raw"));
-        //for(String key : attrs.keySet())
-        //    log.info("###### Requested Attribute - " + key + ": " + attrs.get(key));
-
-
         LinkedHashMap<String, Object> predicates = JsonPath.read(requestedProof, "$.predicates");
         for(String key : predicates.keySet())
-            //log.info("###### Requested Predicates - " + key + " is satisfied");
-
-        log.info("###### attrs : "+ attrs);
-
+            log.info("Requested Predicates - " + key + " is satisfied");
 
         return attrs;
     }
