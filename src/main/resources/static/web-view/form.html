@@ -138,7 +138,7 @@ hr {
                 alert(status);
             }
         });
-        modal.style.display = "block";
+        //modal.style.display = "block";
         return false;
     }
 </script>
@@ -196,16 +196,14 @@ hr {
             <input type="text" id="eng_name" name="eng_name"> <br>
         </p>
         <div>
-            <input type="button" onclick="ajax_send()" value="발급요청">
+            <button type="button" onclick="ajax_send()" value="발급요청">발급요청</button>
         </div>
         <p></p>
         <div>
-            <input type="button" onclick="cancel()" value="취소">
+            <button type="button" onclick="cancel()" value="취소">취소</button>
         </div>
     </form>
 </center>
-
-<button onclick="document.getElementById('id01').style.display='block'">Open Modal</button>
 
 <!--Modal-->
 <div id="id01" class="modal">
