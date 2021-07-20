@@ -425,34 +425,33 @@ public class GlobalService {
         // TODO: need to implement business logic to query information for holder
         // we assume that the value is obtained by querying DB (e.g., attrs.mobileNum and selectedItemId)
         LinkedHashMap<String, String> value = new LinkedHashMap<>();
-        value.put("korean_name", attrs.get("person_name"));
-        value.put("english_name", eng_name);
-        //value.put("english_name", attrs.get("person_name"));
-        value.put("registration_number", attrs.get("mobile_num"));
-        value.put("exp_date", getRandomInt(2021, 2024) + "0228");
         value.put("date_of_birth", attrs.get("date_of_birth"));
         value.put("date_of_test", selectedItemId);
+        value.put("english_name", eng_name);
+        value.put("exp_date", getRandomInt(2021, 2024) + "0228");
+        value.put("korean_name", attrs.get("person_name"));
+        value.put("registration_number", attrs.get("mobile_num"));
         value.put("score_of_listening", getRandomInt(100, 444) + "");
         value.put("score_of_reading", "");
         value.put("score_of_total", "990");
 
         // value insertion
         String body = JsonPath.parse("{" +
-                "\"counter_proposal\": {" +
-                "\"cred_def_id\": " + credDefId + "," +
-                "\"auto_remove\":" + true + "," +
-                "\"comment\": \"JJ Test\"," +
-                "\"credential_proposal\": {" +
-                "\"attributes\": [" +
-                "        { \"name\": \"date_of_birth\", \"value\": " + value.get("date_of_birth")  + "}," +
-                "        { \"name\": \"date_of_test\", \"value\": " + value.get("date_of_test") + "}," +
-                "        { \"name\": \"english_name\", \"value\": " + value.get("english_name") + "}," +
-                "        { \"name\": \"exp_date\", \"value\":" +  value.get("exp_date")  + "}," +
-                "        { \"name\": \"korean_name\", \"value\": " + value.get("korean_name") + "}" +
-                "        { \"name\": \"registration_number\", \"value\": " + value.get("registration_number") + "}" +
-                "        { \"name\": \"score_of_listening\", \"value\": " + value.get("score_of_listening") + "}" +
-                "        { \"name\": \"score_of_reading\", \"value\": " + value.get("score_of_reading") + "}" +
-                "        { \"name\": \"score_of_total\", \"value\": " + value.get("score_of_total") + "}" +
+                "  counter_proposal: {" +
+                "    cred_def_id: '" + credDefId + "'," +
+                "    auto_remove: true," +
+                "    comment: 'JJ Test'," +
+                "    credential_proposal: {" +
+                "      attributes: [" +
+                "        { name: 'date_of_birth', value: '" + value.get("date_of_birth")  + "' }," +
+                "        { name: 'date_of_test', value: " + value.get("date_of_test") + "' }," +
+                "        { name: 'english_name', value: '" + value.get("english_name") + "' }," +
+                "        { name: 'exp_date', value: '" +  value.get("exp_date")  + "' }," +
+                "        { name: 'korean_name', value: '" + value.get("korean_name") + "' }" +
+                "        { name: 'registration_number', value: '" + value.get("registration_number") + "' }" +
+                "        { name: 'score_of_listening', value: '" + value.get("score_of_listening") + "' }" +
+                "        { name: 'score_of_reading', value: '" + value.get("score_of_reading") + "' }" +
+                "        { name: 'score_of_total', value: '" + value.get("score_of_total") + "' }" +
                 "      ]" +
                 "    }" +
                 "  }" +
