@@ -437,12 +437,12 @@ public class GlobalService {
 
         // value insertion
         String body = JsonPath.parse("{" +
-                "  counter_proposal: {" +
-                "    cred_def_id: '" + credDefId + "'," +
-                "    auto_remove: true," +
-                "    comment: 'JJ Test'," +
-                "    credential_proposal: {" +
-                "      attributes: [" +
+                "  \"counter_proposal\": {" +
+                "    \"cred_def_id\": " + credDefId + "," +
+                "    \"auto_remove\": true," +
+                "    \"comment\": \"JJ Test\"," +
+                "    \"credential_proposal\": {" +
+                "      \"attributes\": [" +
                 "        { name: 'date_of_birth', value: '" + value.get("date_of_birth")  + "' }," +
                 "        { name: 'date_of_test', value: '" + value.get("date_of_test") + "' }," +
                 "        { name: 'english_name', value: '" + value.get("english_name") + "' }," +
