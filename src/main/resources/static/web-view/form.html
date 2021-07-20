@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="ko">
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-serialize-object/2.5.0/jquery.serialize-object.min.js"></script>
 
@@ -27,7 +26,7 @@
 
 <!-- json submit -->
 <script>
-    $('#myModal').on('shown.bs.modal', function ajax_send(frm){
+    function ajax_send(frm){
         var formData = $('#dataForm').serializeObject();
         $.ajax({
             url : '/web-view/submit',
@@ -42,7 +41,7 @@
         });
 
         return false;
-    })
+    }
 </script>
 
 <!-- cancel button -->
@@ -59,203 +58,16 @@
     }
 </script>
 
-<script>
 
-    $(document).ready(function() {
-  $("#just_load_please").on("click", function(e) {
-    e.preventDefault();
-    $("#loadMe").modal({
-      backdrop: "static", //remove ability to close modal with click
-      keyboard: false, //remove option to close with keyboard
-      show: true //Display loader!
-    });
-    setTimeout(function() {
-      $("#loadMe").modal("hide");
-    }, 3500);
-  });
-  //ajax code here (example for $.post) using test page from https://reqres.in
-  //Adding a delay so we can see the functionality of the loader while request processes
-  $("#load_me_baby").on("click", function(e) {
-    e.preventDefault();
-    $("#loadMe").modal({
-      backdrop: "static", //remove ability to close modal with click
-      keyboard: false, //remove option to close with keyboard
-      show: true //Display loader!
-    });
-    var testUrl = "https://reqres.in/api/users?delay=3";
-    $.get(
-      testUrl,
-      function(response) {
-        if (response.data[0]) {
-          //if you received a successful return, remove the modal. Either way remove the modal!!
-          var resOutput =
-            '<h4 style="color: white">Modal closed and output displayed!</h4><p style="color: white">This is <b>' +
-            response.data[0].first_name +
-            " " +
-            response.data[0].last_name +
-            '</b></p><img src="' +
-            response.data[0].avatar +
-            '" class="img-responsive img-thumbnail" alt="avatar" style="margin-top: 13px; max-width="200px;">';
-          $("#output").html(resOutput);
-          $("#loadMe").modal("hide");
-        } else {
-          $("#output").html(
-            '<div class="alert alert-warning"><h4>Uh oh!</h4></div>'
-          );
-        }
-      },
-      "json"
-    );
-  });
-});
-
-</script>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, width=device-width" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <title>web-view form</title>
     <style>
       * {
         font-size: 16px;
         font-family: Consolas, sans-serif;
       }
-
-@import url(https://fonts.googleapis.com/css?family=Roboto:300,400);
-body {
-  height: 100%;
-  padding: 0px;
-  margin: 0px;
-  background: #ffffff;
-  font-family: 'Roboto', sans-serif !important;
-  font-size: 1em;
-}
-h1{
-  font-family: 'Roboto', sans-serif;
-  font-size: 30px;
-  color: #999;
-  font-weight: 300;
-  margin-bottom: 55px;
-  margin-top: 45px;
-  text-transform: uppercase;
-}
-h1 small{
-  display: block;
-  font-size: 18px;
-  text-transform: none;
-  letter-spacing: 1.5px;
-  margin-top: 12px;
-}
-.row{
-  max-width: 950px;
-  margin: 0 auto;
-}
-.btn{
-  white-space: normal;
-}
-.button-wrap {
-  position: relative;
-  text-align: center;
-  .btn {
-    font-family: 'Roboto', sans-serif;
-    box-shadow: 0 0 15px 5px rgba(0, 0, 0, 0.5);
-    border-radius: 0px;
-    border-color: #222;
-    cursor: pointer;
-    text-transform: uppercase;
-    font-size: 1.1em;
-    font-weight: 400;
-    letter-spacing: 1px;
-    small {
-      font-size: 0.8rem;
-      letter-spacing: normal;
-      text-transform: none;
-    }
-  }
-}
-
-
-/** SPINNER CREATION **/
-
-.loader {
-  position: relative;
-  text-align: center;
-  margin: 15px auto 35px auto;
-  z-index: 9999;
-  display: block;
-  width: 80px;
-  height: 80px;
-  border: 10px solid rgba(0, 0, 0, .3);
-  border-radius: 50%;
-  border-top-color: #000;
-  animation: spin 1s ease-in-out infinite;
-  -webkit-animation: spin 1s ease-in-out infinite;
-}
-
-@keyframes spin {
-  to {
-    -webkit-transform: rotate(360deg);
-  }
-}
-
-@-webkit-keyframes spin {
-  to {
-    -webkit-transform: rotate(360deg);
-  }
-}
-
-
-/** MODAL STYLING **/
-
-.modal-content {
-  border-radius: 0px;
-  box-shadow: 0 0 20px 8px rgba(0, 0, 0, 0.7);
-}
-
-.modal-backdrop.show {
-  opacity: 0.75;
-}
-
-.loader-txt {
-  p {
-    font-size: 13px;
-    color: #666;
-    small {
-      font-size: 11.5px;
-      color: #999;
-    }
-  }
-}
-
-#output {
-  padding: 25px 15px;
-  background: #222;
-  border: 1px solid #222;
-  max-width: 350px;
-  margin: 35px auto;
-  font-family: 'Roboto', sans-serif !important;
-  p.subtle {
-    color: #555;
-    font-style: italic;
-    font-family: 'Roboto', sans-serif !important;
-  }
-  h4 {
-    font-weight: 300 !important;
-    font-size: 1.1em;
-    font-family: 'Roboto', sans-serif !important;
-  }
-  p {
-    font-family: 'Roboto', sans-serif !important;
-    font-size: 0.9em;
-    b {
-      text-transform: uppercase;
-      text-decoration: underline;
-    }
-  }
-}
-
     </style>
 </head>
 
@@ -298,21 +110,6 @@ h1 small{
         </div>
     </form>
 </center>
-
-<!-- Modal -->
-<div class="modal fade" id="loadMe" tabindex="-1" role="dialog" aria-labelledby="loadMeLabel">
-    <div class="modal-dialog modal-sm" role="document">
-        <div class="modal-content">
-            <div class="modal-body text-center">
-                <div class="loader"></div>
-                <div clas="loader-txt">
-                    <p>Check out this slick bootstrap spinner modal. <br><br><small>We are addicted to Bootstrap... #love</small></p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
 </body>
 
 </html>
