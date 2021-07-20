@@ -449,10 +449,10 @@ public class GlobalService {
         String initialWebView = JsonPath.parse("{" +
                 "  \"type\" : \"initial_web_view\","+
                 "  \"content\": {" +
-                "    \"web_view_url\" : '" + webViewUrl + "?connectionId=" + connectionId + "'," +
+                "    \"web_view_url\" : " + webViewUrl + "?connectionId=" + connectionId + "," +
                 "  }"+
                 "}").jsonString();
-        String body = JsonPath.parse("{ \"content\": " + "\"" + initialWebView  +"\""+ " }").jsonString();
+        String body = JsonPath.parse("{ content: '" + initialWebView  + "' }").jsonString();
         log.info("body: " + body);
 
         String response = client.requestPOST(agentApiUrl + "/connections/" + connectionId + "/send-message", accessToken, body);
