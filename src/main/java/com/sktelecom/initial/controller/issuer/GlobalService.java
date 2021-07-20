@@ -381,23 +381,9 @@ public class GlobalService {
             log.info("Possible Reason: Revoked or Signature mismatch or Predicates unsatisfied");
             return null;
         }
+        /*
         String requestedProof = JsonPath.parse((LinkedHashMap)JsonPath.read(presExRecord, "$.presentation.requested_proof")).jsonString();
         String requested_attributes = JsonPath.parse((LinkedHashMap)JsonPath.read(presExRecord, "$.presentation_request")).jsonString();
-
-        /*
-        LinkedHashMap<String, Object> revealedAttrs = JsonPath.read(requestedProof, "$.revealed_attrs");
-        LinkedHashMap<String, Object> requestedAttrs = JsonPath.read(requested_attributes, "$.requested_attributes");
-        //LinkedHashMap<String, String> attrs = new LinkedHashMap<>();
-        for(String key : requestedAttrs.keySet()) {
-            //attrs.put(key, JsonPath.read(requestedAttrs.get(key), "$.name"));
-            log.info("###### Requested Attribute1 - " + key + ": " + attrs.get(key));
-        }
-        for(String key : revealedAttrs.keySet()) {
-            attrs.put(JsonPath.read(requestedAttrs.get(key), "$.name"), JsonPath.read(revealedAttrs.get(key), "$.raw"));
-            log.info("###### Requested Attribute2 - " + attrs);
-        }
-
-         */
 
         LinkedHashMap<String, Object> revealedAttrs = JsonPath.read(requestedProof, "$.revealed_attrs");
         LinkedHashMap<String, Object> requestedAttrs = JsonPath.read(requested_attributes, "$.requested_attributes");
@@ -419,18 +405,34 @@ public class GlobalService {
             log.info("Requested Predicates - " + key + " is satisfied");
 
         return attrs;
+
+         */
+        String requestedProof = JsonPath.parse((LinkedHashMap)JsonPath.read(presExRecord, "$.presentation.requested_proof")).jsonString();
+
+        LinkedHashMap<String, Object> revealedAttrs = JsonPath.read(requestedProof, "$.revealed_attrs");
+        // LinkedHashMap<String, String> attrs = new LinkedHashMap<>();
+        for(String key : revealedAttrs.keySet())
+            attrs.put(key, JsonPath.read(revealedAttrs.get(key), "$.raw"));
+        for(String key : attrs.keySet())
+            log.info("Requested Attribute - " + key + ": " + attrs.get(key));
+
+        LinkedHashMap<String, Object> predicates = JsonPath.read(requestedProof, "$.predicates");
+        for(String key : predicates.keySet())
+            log.info("Requested Predicates - " + key + " is satisfied");
+
+        return attrs;
     }
 
     public void sendCredentialOffer(String connectionId, LinkedHashMap<String, String> attrs, String selectedItemId, String eng_name) {
         // TODO: need to implement business logic to query information for holder
         // we assume that the value is obtained by querying DB (e.g., attrs.mobileNum and selectedItemId)
         LinkedHashMap<String, String> value = new LinkedHashMap<>();
-        value.put("date_of_birth", attrs.get("date_of_birth"));
+        value.put("date_of_birth", attrs.get("모바일 가입증명 (1.0) date_of_birth"));
         value.put("date_of_test", selectedItemId);
         value.put("english_name", eng_name);
         value.put("exp_date", getRandomInt(2021, 2024) + "0228");
-        value.put("korean_name", attrs.get("person_name"));
-        value.put("registration_number", attrs.get("mobile_num"));
+        value.put("korean_name", attrs.get("모바일 가입증명 (1.0) person_name"));
+        value.put("registration_number", attrs.get("모바일 가입증명 (1.0) mobile_num"));
         value.put("score_of_listening", getRandomInt(100, 444) + "");
         value.put("score_of_reading", "");
         value.put("score_of_total", "990");
