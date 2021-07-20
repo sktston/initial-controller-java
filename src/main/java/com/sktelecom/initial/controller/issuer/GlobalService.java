@@ -472,8 +472,8 @@ public class GlobalService {
     public void revokeCredential(String credExId) {
         log.info("revokeCredential >>> credExId:" + credExId );
         String body = JsonPath.parse("{" +
-                "  cred_ex_id: '" + credExId + "'," +
-                "  publish: true" +
+                "  \"cred_ex_id\": " + credExId + "," +
+                "  \"publish\": "+ true +
                 "}").jsonString();
         String response =  client.requestPOST(agentApiUrl + "/revocation/revoke", accessToken, body);
         log.info("response: " + response);
