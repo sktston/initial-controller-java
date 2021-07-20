@@ -43,6 +43,20 @@
     }
 </script>
 
+<!-- cancel button -->
+<script>
+    function cancel(){
+        //initial app에서 web_view 화면을 종료 하고, 첫화면으로 복귀 하는 code
+        var userAgent = navigator.userAgent.toLowerCase();
+        if (userAgent.search("android") > -1) {
+            Android.failVC ();
+        }
+        else {
+            webkit.messageHandlers.callbackHandler.postMessage("failVC");
+        }
+    }
+</script>
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, width=device-width" />
@@ -78,6 +92,10 @@
     </div>
     <div>
         <input type="button" onclick="ajax_send()" value="발급요청">
+    </div>
+    <p></p>
+    <div>
+        <input type="button" onclick="cancel()" value="취소">
     </div>
 </form>
 </center>
