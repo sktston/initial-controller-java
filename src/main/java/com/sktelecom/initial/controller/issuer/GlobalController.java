@@ -46,7 +46,7 @@ public class GlobalController {
 
         log.info("### apikey : " + apiKey + "### x-api-key : " + xApiKey);
         // API Key Check
-        if(!apiKey.equals(null)) {
+        if(apiKey != null && apiKey.isEmpty()) {
             log.info("### not null apikey : " + apiKey);
             if (!apiKey.equals(xApiKey)) {
                 log.info("##### Inbound IP Address :   " + httpAddr + "   x-api-key :" + apiKey + ", Unauthorized API-KEY");
