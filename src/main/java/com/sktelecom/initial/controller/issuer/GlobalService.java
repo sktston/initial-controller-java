@@ -214,7 +214,7 @@ public class GlobalService {
 
     public void sendCredProblemReport(String credExId, String description) {
         String body = JsonPath.parse("{" +
-                "  description: '" + description + "'" +
+                "  \"description\": \" + description + \"" +
                 "}").jsonString();
         String response = client.requestPOST(agentApiUrl + "/issue-credential/records/" + credExId + "/problem-report", accessToken, body);
         log.info("response: " + response);
@@ -240,93 +240,119 @@ public class GlobalService {
     public void sendPresentationRequest(String connectionId) {
         // sample agreement
         String agreement = JsonPath.parse("{" +
-                "  type: 'initial_agreement',"+
-                "  content: [" +
-                "    {" +
-                "      sequence: 1," +
-                "      title: '개인정보 수집 및 이용 동의서'," +
-                "      is_mandatory: 'true'," +
-                "      terms_id: 'person'," +
-                "      terms_ver: '1.0'," +
-                "      agreement: 'initial서비스(이하“서비스”라 한다)와 관련하여, 본인은 동의 내용을 숙지하였으며, 이에 따라 본인의 개인정보를 귀사(SK텔레콤주식회사)가 수집 및 이용하는 것에 대해 동의 합니다. 본 동의는 서비스의 본질적 기능 제공을 위한 개인정보 수집/이용에 대한 동의로서, 동의를 하는 경우에만 서비스 이용이 가능합니다. 법령에 따른 개인정보의 수집/이용, 계약의 이행/편익 제공을 위한 개인정보 취급 위탁 및 개인정보 취급과 관련된 일반 사항은 서비스의 개인정보 처리 방침에 따릅니다.'," +
-                "      condition: [" +
-                "        {" +
-                "          sub_title: '수집 항목'," +
-                "          target: '이름,생년월일'" +
-                "        }," +
-                "        {" +
-                "          sub_title: '수집 및 이용목적'," +
-                "          target: '서비스 이용에 따른 본인확인'" +
-                "        }," +
-                "        {" +
-                "          sub_title: '이용기간 및 보유/파기'," +
-                "          target: '1년'" +
-                "        }" +
-                "      ]" +
-                "    }," +
-                "    {" +
-                "      sequence: 2," +
-                "      title: '위치정보 수집 및 이용 동의서'," +
-                "      is_mandatory: 'true'," +
-                "      terms_id: 'location'," +
-                "      terms_ver: '1.0'," +
-                "      agreement: '이 약관은 이니셜(SK텔레콤)(이하“회사”)가 제공하는 위치 정보사업 또는 위치기반 서비스 사업과 관련하여 회사와 개인 위치 정보주체와의 권리, 의무 및 책임사항, 기타 필요한 사항을 규정함을 목적으로 합니다.'," +
-                "      condition: [" +
-                "        {" +
-                "          sub_title: '위치정보 수집 방법'," +
-                "          target: 'GPS칩'" +
-                "        }," +
-                "        {" +
-                "          sub_title: '위치정보 이용/제공'," +
-                "          target: '이 약관에 명시되지 않은 사항은 위치정보의 보호 및 이용 등에 관한 법률, 정보통신망 이용촉진 및 정보보호 등에 관한 법률, 전기통신기본법, 전기통신사업법 등 관계법령과 회사의 이용약관 및 개인정보취급방침, 회사가 별도로 정한 지침 등에 의합니다.'" +
-                "        }," +
-                "        {" +
-                "          sub_title: '수집목적'," +
-                "          target: '현재의 위치를 기반으로 하여 주변 매장의 위치 등의 정보를 제공하는 서비스'" +
-                "        }," +
-                "        {" +
-                "          sub_title: '위치정보 보유기간'," +
-                "          target: '1년'" +
-                "        }" +
-                "      ]" +
-                "    }," +
-                "    {" +
-                "      sequence: 3," +
-                "      title: '제3자 정보제공 동의서'," +
-                "      is_mandatory: 'true'," +
-                "      terms_id: '3rdparty'," +
-                "      terms_ver: '1.0'," +
-                "      agreement: 'initial서비스(이하“서비스”라 한다)와 관련하여, 본인은 동의 내용을 숙지하였으며, 이에 따라 본인의 개인정보를 귀사(이슈어)가 수집한 개인정보를 아래와 같이 제3자에게 제공하는 것에 대해 동의 합니다. 고객은 개인정보의 제3자 제공에 대한 동의를 거부할 권리가 있으며, 동의를 거부할 시 받는 별도의 불이익은 없습니다. 단, 서비스 이용이 불가능하거나, 서비스 이용 목적에 따른 서비스 제공에 제한이 따르게 됩니다.'," +
-                "      condition: [" +
-                "        {" +
-                "          sub_title: '제공하는 자'," +
-                "          target: '발급기관'" +
-                "        }," +
-                "        {" +
-                "          sub_title: '제공받는 자'," +
-                "          target: '이니셜(SK텔레콤)'" +
-                "        }," +
-                "        {" +
-                "          sub_title: '제공받는 항목'," +
-                "          target: '생년월일,시험일,성명(영문),만료일,성명(한글),수험번호,듣기점수,읽기점수,총점'" +
-                "        }," +
-                "        {" +
-                "          sub_title: '수집 및 이용목적'," +
-                "          target: '모바일 전자증명서 발급'" +
-                "        }," +
-                "        {" +
-                "          sub_title: '보유 및 이용기간'," +
-                "          target: '모바일 전자증명서 발급을 위해 서버에 임시 저장하였다가, 증명서 발행 후 즉시 삭제(단, 고객 단말기 내부 저장영역에 증명서 형태로 저장/보관)'" +
-                "        }" +
-                "      ]" +
-                "    }" +
-                "  ]"+
+                "\"type\": \"initial_agreement\",\n" +
+                "\"content\": [{\n" +
+                "\"sequence\": 1,\n" +
+                "\"title\": \"개인정보 수집 및 이용 동의서\",\n" +
+                "\"is_mandatory\": \"true\",\n" +
+                "\"terms_id\": \"person\",\n" +
+                "\"terms_ver\": \"1.0\",\n" +
+                "\"agreement\": \"Initial 서비스(이하 “서비스”라한다)와 관련하여, 본인은 동의내용을 숙지하였으며, 이에따라 본인의 개인정보를 귀사(SK텔레콤주식회사)가 수집 및 이용하는 것에 대해 동의합니다. 본동의는 서비스의 본질적 기능제공을 위한 개인정보 수집/이용에 대한 동의로서, 동의를 하는경우에만 서비스 이용이 가능합니다.법령에따른개인정보의수집/이용, 계약의이행/편익제공을위한개인정보취급위탁및개인정보취급과관련된일반사항은서비스의개인정보처리방침에따릅니다.\",\n" +
+                "\"condition\": [{\n" +
+                "\"sub_title\": \"수집 항목\",\n" +
+                "\"target\": \"이름,생년월일\"\n" +
+                "},\n" +
+                "{\n" +
+                "\"sub_title\": \"수집및이용목적\",\n" +
+                "\"target\": \"서비스이용에따른본인확인\"\n" +
+                "},\n" +
+                "{\n" +
+                "\"sub_title\": \"이용기간및보유/파기\",\n" +
+                "\"target\": \"1년\"\n" +
+                "},\n" +
+                "{\n" +
+                "\"sub_title\": \"기타 정보\",\n" +
+                "\"target\": \"기타 내용\"\n" +
+                "}\n" +
+                "]\n" +
+                "},\n" +
+                "{\n" +
+                "\"sequence\": 2,\n" +
+                "\"title\": \"위치정보 수집 및 이용 동의서\",\n" +
+                "\"is_mandatory\": \"true\",\n" +
+                "\"terms_id\": \"location\",\n" +
+                "\"terms_ver\": \"1.0\",\n" +
+                "\"agreement\": \"이 약관은 이니셜(SK텔레콤)(이하 “회사”)가 제공하는 위치정보사업 또는 위치기반서비스사업과 관련하여 회사와 개인위치정보주체와의 권리, 의무 및 책임사항, 기타 필요한 사항을 규정함을 목적으로 합니다.\",\n" +
+                "\"condition\": [{\n" +
+                "\"sub_title\": \"위치정보 수집 방법\",\n" +
+                "\"target\": \"GPS칩\"\n" +
+                "},\n" +
+                "{\n" +
+                "\"sub_title\": \"위치정보 이용/제공\",\n" +
+                "\"target\": \"이 약관에 명시되지 않은 사항은 위치정보의 보호 및 이용 등에 관한 법률, 정보통신망 이용촉진 및 정보보호 등에 관한 법률, 전기통신기본법, 전기통신사업법 등 관계법령과 회사의 이용약관 및 개인정보취급방침, 회사가 별도로 정한 지침 등에 의합니다.\"\n" +
+                "},\n" +
+                "{\n" +
+                "\"sub_title\": \"수집목적\",\n" +
+                "\"target\": \"현재의 위치를 기반으로 하여 주변 매장의 위치 등의 정보를 제공하는 서비스\"\n" +
+                "},\n" +
+                "{\n" +
+                "\"sub_title\": \"위치정보 보유기간\",\n" +
+                "\"target\": \"1년\"\n" +
+                "}\n" +
+                "]\n" +
+                "},\n" +
+                "{\n" +
+                "\"sequence\": 3,\n" +
+                "\"title\": \"테스트 수집 및 이용 동의서\",\n" +
+                "\"is_mandatory\": \"true\",\n" +
+                "\"terms_id\": \"test\",\n" +
+                "\"terms_ver\": \"1.0\",\n" +
+                "\"agreement\": \"이 약관은 이니셜(SK텔레콤)(이하 “회사”)가 제공하는 위치정보사업 또는 위치기반서비스사업과 관련하여 회사와 개인위치정보주체와의 권리, 의무 및 책임사항, 기타 필요한 사항을 규정함을 목적으로 합니다.\",\n" +
+                "\"condition\": [{\n" +
+                "\"sub_title\": \"위치정보 수집 방법\",\n" +
+                "\"target\": \"GPS칩\"\n" +
+                "},\n" +
+                "{\n" +
+                "\"sub_title\": \"위치정보 이용/제공\",\n" +
+                "\"target\": \"이 약관에 명시되지 않은 사항은 위치정보의 보호 및 이용 등에 관한 법률, 정보통신망 이용촉진 및 정보보호 등에 관한 법률, 전기통신기본법, 전기통신사업법 등 관계법령과 회사의 이용약관 및 개인정보취급방침, 회사가 별도>로 정한 지침 등에 의합니다.\"\n" +
+                "},\n" +
+                "{\n" +
+                "\"sub_title\": \"수집목적\",\n" +
+                "\"target\": \"현재의 위치를 기반으로 하여 주변 매장의 위치 등의 정보를 제공하는 서비스\"\n" +
+                "},\n" +
+                "{\n" +
+                "\"sub_title\": \"위치정보 보유기간\",\n" +
+                "\"target\": \"1년\"\n" +
+                "}\n" +
+                "]\n" +
+                "},\n" +
+                "{\n" +
+                "\"sequence\": 4,\n" +
+                "\"title\": \"제3자 정보제공 동의서\",\n" +
+                "\"is_mandatory\": \"true\",\n" +
+                "\"terms_id\": \"3rdparty\",\n" +
+                "\"terms_ver\": \"1.0\",\n" +
+                "\"agreement\": \" initial 서비스(이하 “서비스”라한다)와관련하여, 본인은동의내용을숙지하였으며, 이에따라본인의개인정보를귀사(이슈어)가수집한개인정보를아래와같이제3자에게제공하는것에대해동의합니다. 고객은개인정보의제3자제공에대한동의를거부할권리가있으며, 동의를거부할받는별도의불이익은없습니다. 단, 서비스이용불가능하거나, 서비스이용목적에따른서비스제공에제한이따르게됩니다.\",\n" +
+                "\"condition\": [{\n" +
+                "\"sub_title\": \"제공하는자\",\n" +
+                "\"target\": \"발급기관\"\n" +
+                "},\n" +
+                "{\n" +
+                "\"sub_title\": \"제공받는자\",\n" +
+                "\"target\": \"이니셜(SK텔레콤)\"\n" +
+                "},\n" +
+                "{\n" +
+                "\"sub_title\": \"제공받는 항목\",\n" +
+                "\"target\": \"제공항목(생년월일,시험일,성명(영문),만료일,성명(한글),수험번호,듣기점수,읽기점수,총점)\"\n" +
+                "},\n" +
+                "{\n" +
+                "\"sub_title\": \"수집 및 이용목적\",\n" +
+                "\"target\": \"모바일전자증명서발행\"\n" +
+                "},\n" +
+                "{\n" +
+                "\"sub_title\": \"보유 및 이용기간\",\n" +
+                "\"target\": \"모바일 전자증명서 발급을 위해 서버에 임시 저장하였다가, 증명서 발행 후 즉시 삭제(단, 고객 단말기 내부 저장영역에 증명서 형태로 저장/보관)\"\n" +
+                "}\n" +
+                "]\n" +
+                "}\n" +
+                "]\n" +
+                "\n" +
                 "}").jsonString();
 
         String body = JsonPath.parse("{" +
-                "  connection_id: '" + connectionId + "'," +
-                "  verification_template_id: '" + verifTplId + "'," +
-                "  agreement: " + agreement +
+                "\"connection_id\": \"+ connectionId + \"," +
+                "\"verification_template_id\": \" + verifTplId + \"," +
+                "\"agreement\": " + agreement +
                 "}").jsonString();
         String response = client.requestPOST(agentApiUrl + "/present-proof/send-verification-request", accessToken, body);
         log.info("response: " + response);
@@ -349,11 +375,11 @@ public class GlobalService {
 
     public LinkedHashMap<String, String> getPresentationResult(String presExRecord) {
         String verified = JsonPath.read(presExRecord, "$.verified");
-        //if (!verified.equals("true")) {
-        //    log.info("proof is not verified");
-        //    log.info("Possible Reason: Revoked or Signature mismatch or Predicates unsatisfied");
-        //    return null;
-        //}
+        if (!verified.equals("true")) {
+            log.info("proof is not verified");
+            log.info("Possible Reason: Revoked or Signature mismatch or Predicates unsatisfied");
+            return null;
+        }
         String requestedProof = JsonPath.parse((LinkedHashMap)JsonPath.read(presExRecord, "$.presentation.requested_proof")).jsonString();
 
         LinkedHashMap<String, Object> revealedAttrs = JsonPath.read(requestedProof, "$.revealed_attrs");
@@ -365,7 +391,7 @@ public class GlobalService {
 
         LinkedHashMap<String, Object> predicates = JsonPath.read(requestedProof, "$.predicates");
         for(String key : predicates.keySet())
-            log.info("###### Requested Predicates - " + key + " is satisfied");
+            //log.info("###### Requested Predicates - " + key + " is satisfied");
 
         log.info("###### attrs : "+ attrs);
 
