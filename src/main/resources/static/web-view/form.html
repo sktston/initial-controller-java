@@ -69,6 +69,7 @@
         font-size: 16px;
         font-family: Consolas, sans-serif;
       }
+
     </style>
 </head>
 
@@ -103,7 +104,7 @@
             <input type="text" id="eng_name" name="eng_name"> <br>
         </p>
         <div>
-            <input type="button" onclick="ajax_send()" value="발급요청">
+            <input type="button" onclick="ajax_send()" value="발급요청" class="spinner-border">
         </div>
         <p></p>
         <div>
@@ -111,9 +112,7 @@
         </div>
     </form>
 </center>
-<div class="spinner-border" role="status">
-    <span class="sr-only">Loading...</span>
-</div>
+
 </body>
 
 </html>
