@@ -354,6 +354,7 @@ public class GlobalService {
                 "\"verification_template_id\": \" + verifTplId + \"," +
                 "\"agreement\": " + agreement +
                 "}").jsonString();
+        log.info("response: " + body);
         String response = client.requestPOST(agentApiUrl + "/present-proof/send-verification-request", accessToken, body);
         log.info("response: " + response);
     }
