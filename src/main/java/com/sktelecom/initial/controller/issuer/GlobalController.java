@@ -44,6 +44,7 @@ public class GlobalController {
         String httpAddr = request.getRemoteAddr(); // Webhook Inbound IP Address
         String apiKey = request.getHeader("x-api-key");
 
+        log.info("### apikey : " + apiKey + "### x-api-key : " + xApiKey);
         // API Key Check
         if(!apiKey.equals(null)) {
             log.info("### not null apikey : " + apiKey);
