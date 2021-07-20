@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import static com.sktelecom.initial.controller.utils.Common.*;
+import static com.sktelecom.initial.controller.utils.Common.*;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -58,7 +59,6 @@ public class GlobalController {
     @PostMapping(value = "/web-view/submit")
     public ResponseEntity webViewHandler(@RequestBody String body) {
         globalService.handleWebView(body);
-        //log.info("web_view response : " + body);
         return ResponseEntity.ok().build();
     }
 
