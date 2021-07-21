@@ -381,32 +381,7 @@ public class GlobalService {
             log.info("Possible Reason: Revoked or Signature mismatch or Predicates unsatisfied");
             return null;
         }
-        /*
-        String requestedProof = JsonPath.parse((LinkedHashMap)JsonPath.read(presExRecord, "$.presentation.requested_proof")).jsonString();
-        String requested_attributes = JsonPath.parse((LinkedHashMap)JsonPath.read(presExRecord, "$.presentation_request")).jsonString();
 
-        LinkedHashMap<String, Object> revealedAttrs = JsonPath.read(requestedProof, "$.revealed_attrs");
-        LinkedHashMap<String, Object> requestedAttrs = JsonPath.read(requested_attributes, "$.requested_attributes");
-        LinkedHashMap<String, String> attrs_name = new LinkedHashMap<>();
-        LinkedHashMap<String, String> attrs_value = new LinkedHashMap<>();
-        for(String key : requestedAttrs.keySet())
-            attrs_name.put(key, JsonPath.read(requestedAttrs.get(key), "$.name"));
-        for(String key : revealedAttrs.keySet())
-            attrs_value.put(key, JsonPath.read(revealedAttrs.get(key), "$.raw"));
-        for(String key : requestedAttrs.keySet())
-            attrs.put(attrs_name.get(key), attrs_value.get(key));
-
-        for(String key : attrs.keySet())
-            log.info("### Revealed Attribute - " + key + ": " + attrs.get(key));
-
-
-        LinkedHashMap<String, Object> predicates = JsonPath.read(requestedProof, "$.predicates");
-        for(String key : predicates.keySet())
-            log.info("Requested Predicates - " + key + " is satisfied");
-
-        return attrs;
-
-         */
         String requestedProof = JsonPath.parse((LinkedHashMap)JsonPath.read(presExRecord, "$.presentation.requested_proof")).jsonString();
 
         LinkedHashMap<String, Object> revealedAttrs = JsonPath.read(requestedProof, "$.revealed_attrs");
