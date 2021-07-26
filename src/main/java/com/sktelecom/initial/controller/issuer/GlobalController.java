@@ -39,6 +39,7 @@ public class GlobalController {
     public byte[] getInvitationUrlQRCode() {
         String invitationUrl = globalService.createInvitationUrl();
         String deeplinkUrl = "initial://reqService?process=I&ynCloud=Y" + "&svcPublicDID=DrLbXFSao4Vo8gMfjxPxU1" + "&credDefId="+ credDefId + "&invitation=" + invitationUrl;
+        log.info("##### deeplink url :   " + deeplinkUrl);
         return generateQRCode(deeplinkUrl, 300, 300);
     }
 
