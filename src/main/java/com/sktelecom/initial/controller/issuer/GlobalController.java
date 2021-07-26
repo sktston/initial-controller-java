@@ -18,6 +18,9 @@ public class GlobalController {
     @Value("${x-api-key}")
     private String xApiKey; // controller access token
 
+    @Value("${credDefId}")
+    private String credDefId; // credential definition identifier
+
     @Autowired
     GlobalService globalService;
 
@@ -35,7 +38,7 @@ public class GlobalController {
     @GetMapping(value = "/invitation-qr", produces = MediaType.IMAGE_PNG_VALUE)
     public byte[] getInvitationUrlQRCode() {
         String invitationUrl = globalService.createInvitationUrl();
-        String deeplinkUrl = "initial://reqService?process=I&ynCloud=Y&invitation=" + invitationUrl;
+        String deeplinkUrl = "initial://reqService?process=I&ynCloud=Y" + "&svcPublicDID=DrLbXFSao4Vo8gMfjxPxU1" + "&credDefId="+ credDefId + "&invitation=" + invitationUrl;
         return generateQRCode(deeplinkUrl, 300, 300);
     }
 
