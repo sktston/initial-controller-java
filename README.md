@@ -117,9 +117,8 @@ Holder가 (connections, active) 시점에 credential proposal을 보냄
 | Issuer API | Holder API | Issuer webhook (topic, state, *msg_type) | Holder webhook (topic, state, *msg_type) |
 |---|---|---|---|
 |  | POST /issue-credential/send-proposal | issue_credential, proposal_received | issue_credential, proposal_sent |
-| POST /connections/{conn_id}/send-message |  |  | basicmessages, received, *initial_agreement |
-|  | POST /connections/{conn_id}/send-message | basicmessages, received, *initial_agreement_decision |  |
 | POST /present-proof/send-verification-request |  | present_proof, request_sent | present_proof, request_received |
+|  | POST /connections/{conn_id}/send-message | basicmessages, received, *initial_agreement_decision |  |
 |  | GET /present-proof/records/{presExId}/credentials |  |  |
 |  | POST /present-proof/records/{presExId}/send-presentation | present_proof, presentation_received | present_proof, presentation_sent |
 |  |  | present_proof, verified | present_proof, presentation_acked |
