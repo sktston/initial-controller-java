@@ -157,6 +157,18 @@ public class GlobalService {
     }
 
     void provisionController() {
+        log.info("TEST - Create invitation-url");
+        String invitationUrl = createInvitationUrl();
+        if (invitationUrl == null) {
+            log.info("- FAILED: Check if accessToken is valid - " + accessToken);
+            System.exit(0);
+        }
+        String invitation = parseInvitationUrl(invitationUrl);
+        publicDid = JsonPath.read(invitation, "$.did");
+        orgName = JsonPath.read(invitation, "$.label");
+        orgImageUrl = JsonPath.read(invitation, "$.imageUrl");
+        log.info("- SUCCESS");
+
         if (!credDefId.equals("")) {
             log.info("TEST - Check if credential definition is valid");
             String response = client.requestGET(agentApiUrl + "/credential-definitions/" + credDefId, accessToken);
@@ -191,24 +203,14 @@ public class GlobalService {
             log.info("- SUCCESS : " + verifTplId + " exists");
         }
 
-        log.info("TEST - Create invitation-url");
-        String invitationUrl = createInvitationUrl();
-        if (invitationUrl == null) {
-            log.info("- FAILED: Check if accessToken is valid - " + accessToken);
-            System.exit(0);
-        }
-        String invitation = parseInvitationUrl(invitationUrl);
-        publicDid = JsonPath.read(invitation, "$.did");
-        orgName = JsonPath.read(invitation, "$.label");
-        orgImageUrl = JsonPath.read(invitation, "$.imageUrl");
-        log.info("- SUCCESS");
-
         log.info("TEST - Check if webhook url (in console) is valid");
+        // create non-public invitation to receive webhook message
+        client.requestPOST(agentApiUrl + "/connections/create-invitation", accessToken, "{}");
         try {
-            Thread.sleep(1000); // wait to receive handleEvent for creating connection
+            Thread.sleep(500); // wait to receive webhook message
         } catch (InterruptedException e) {}
         if (!webhookUrlIsValid) {
-            log.info("- FAILED: webhook is not received when creating invitation - Check if it is valid in console configuration");
+            log.info("- FAILED: webhook message is not received - Check if it is valid in console configuration");
             System.exit(0);
         }
         log.info("- SUCCESS");
