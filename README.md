@@ -2,6 +2,8 @@
 initial 플랫폼 서비스를 사용하기 위한 Java기반의 Issuer, Verifier, Holder controller 코드를 제공합니다.
 
 ## Steps to run
+용도에 따라 Issuer 또는 Verifier 를 선택하여 생성하고 테스트 바랍니다.
+
 ### 1. 사전준비 - 이니셜 웹 콘솔
 테스트넷: https://dev-console.myinitial.io
 
@@ -39,7 +41,32 @@ initial 플랫폼 서비스를 사용하기 위한 Java기반의 Issuer, Verifie
 - `Access Token`: `514ac4f8-e0da-43c9-910d-4894279909b2` (예시) **확인**
 - Webhook URL: https://issuer-controller.url/webhooks (**서버 주소 및 webhooks 다시 한번 확인**)
 
-#### Holder 생성 및 설정 (Issuer 동작 확인 위함)
+#### Verifier 생성 및 설정
+기관 생성하기
+- 기관명: Verifier명 (변경되지 앖는 값, 신중하게 작성하세요)
+- 도메인 접속 URL: https://verifier-controller.url (예시)
+- Webhook URL: https://verifier-controller.url/webhooks (webhooks 변경하지 마세요)
+- 도메인 접속 URL: https://verifier-controller.url/invitation-url (invitation-url 변경하지 마세요)
+- 기관 구분: Verifier 선택
+- AppType: Android, iOS 동시 선택
+- App 노출: 미사용 (협의 후 사용)
+- 기관 사용: 미사용 (협의 후 사용)
+
+(아래는 샘플 데모를 수행하기 위함으로, 추후 새로 작성하여 사용하세요)
+
+검증관리 - 검증 양식 생성 - 참여기관별 증명 양식 - (샘플)이니셜모바일가입증명 - 샘플 모바일 가입증명 - 생성하기
+- 검증 양식명: 샘플 모바일 가입 증명 검증 (예시)
+- 양식 설명: 샘플 모바일 가입 증명 검증 (예시)
+- 검증 항목 선택: person_name, mobile_num 등
+
+검증관리 - 검증 양식 관리 - 샘플 모바일 가입 증명 검증 - 상세 보기
+- 검증 양식 ID (`verifTplId`): `0012d683-bdb0-4050-ac85-ae37e59bad09` (예시) **확인**
+
+기관관리 - 기관 정보
+- `Access Token`: `514ac4f8-e0da-43c9-910d-4894279909b2` (예시) **확인**
+- Webhook URL: https://verifier-controller.url/webhooks (**서버 주소 및 webhooks 다시 한번 확인**)
+
+#### Holder 생성 및 설정 (Issuer 또는 Verifier 동작 확인 위함)
 기관 생성하기
 - 기관명: Holder명 (테스트 용도)
 - 도메인 접속 URL: https://holder-controller.url (예시)
@@ -65,14 +92,21 @@ credDefId = 작성한 issuer의 `CredDefId` \
 verifTplId = 작성한 issuer의 `verifTplId` \
 webViewUrl = `https://issuer-controller.url/web-view/form.html` (Optional) Holder 에게 보여줄 Web View 페이지 주소
 
+#### application-verifier.properties
+server.port = 8040 \
+agentApiUrl = https://dev-console.myinitial.io/agent/api (고정) \
+accessToken = verifier `Access Token` \
+verifTplId = 작성한 issuer의 `verifTplId`
+
 #### application-holder.properties
 server.port = 8041 \
 agentApiUrl = https://dev-console.myinitial.io/agent/api (고정) \
 accessToken = holder의 `Access Token` \
-issuerInvitationUrl = `https://issuer-controller.url/invitation-url` invitation-url 을 받을 주소 \
-issuerCredDefId = 작성한 issuer의 `CredDefId`
+serviceType = issuer (또는 verifier) \
+invitationUrl = `https://issuer-controller.url/invitation-url` (또는 `https://verifier-controller.url/invitation-url`) \
+CredDefIdToReceive = 작성한 issuer의 `CredDefId` (또는 빈값)
 
-### 3. issuer 및 holder 실행 - 각 terminal
+### 3. issuer (또는 verifier) 및 holder 실행 - 각 terminal
 #### issuer 실행 (issuer terminal)
 ```
 ./gradlew issuer
@@ -80,7 +114,12 @@ issuerCredDefId = 작성한 issuer의 `CredDefId`
 또는 web view 로직이 들어간 데모를 수행하려는 경우 `./gradlew issuer_webview` \
 또는 revocation 로직이 들어간 데모를 수행하려는 경우 `./gradlew issuer_revoke`
 
-#### 정상 구동 시 메시지 (issuer terminal)
+#### verifier 실행 (verifier terminal)
+```
+./gradlew verifier
+```
+
+#### 정상 구동 시 메시지 (issuer 또는 verifier terminal)
 ```
 [GlobalService.java]initializeAfterStartup(61) : Controller is ready
 ```
@@ -90,15 +129,22 @@ issuerCredDefId = 작성한 issuer의 `CredDefId`
 ./gradlew holder
 ```
 
-#### issuer 의 증명서가 정상 발급 된 경우 메시지 (holder terminal)
+#### issuer 서비스 사용하여 증명서가 정상 발급 된 경우 메시지 (issuer terminal)
 ```
-[GlobalService.java]handleEvent(97) : - Case (topic:issue_credential, state:credential_acked) -> credential received successfully
+2021-08-10 17:25:48 [INFO ] [GlobalService.java]handleEvent(97) : - Case (topic:issue_credential, state:credential_acked) -> credential issued successfully
 ```
 
-## Work flow
+#### verifier 서비스 사용하여 정상 검증된 경우 메시지 (verifier terminal)
+```
+2021-08-10 17:24:38 [INFO ] [GlobalService.java]handleEvent(77) : - Case (topic:present_proof, state:verified) -> getPresentationResult
+2021-08-10 17:24:38 [INFO ] [GlobalService.java]getPresentationResult(283) : Requested Attribute - person_name: 김증명
+2021-08-10 17:24:38 [INFO ] [GlobalService.java]getPresentationResult(283) : Requested Attribute - mobile_num: 01023456789
+```
+
+## Issuer Work flow
 ### Initialization
-Issuer는 accessToken, credDefId, verifTplId 가 valid 한 지 확인 하고 대기함. \
-Holder는 accessToken이 valid 한 지 확인 후, 샘플 모바일 가입증명을 발급 받고, 아래 과정 진행.
+Issuer는 accessToken, credDefId, verifTplId, webhookUrl 이 valid 한 지 확인 하고 대기함. \
+Holder는 accessToken, webhookUrl 이 valid 한 지 확인 후, 샘플 모바일 가입증명을 발급 받고, 아래 과정 진행.
 
 ### Connection
 Holder가 https://issuer-controller.url/invitation-url 호출부터 시작
@@ -157,6 +203,36 @@ Issuer는 (issue_credential, credential_acked) 시점에 webhook 메시지를 �
 
 Revoke된 credential은 Issuer가 (present_proof, verified) 시점에, webhook 메시지를 getPresentationResult 하는 과정에서 verified 가 false 임
 
+## Verifier Work flow
+### Initialization
+Issuer는 accessToken, credDefId, verifTplId, webhookUrl 이 valid 한 지 확인 하고 대기함. \
+Holder는 accessToken, webhookUrl 이 valid 한 지 확인 후, 샘플 모바일 가입증명을 발급 받고, 아래 과정 진행.
+
+### Connection
+Holder가 https://verifier-controller.url/invitation-url 호출부터 시작
+
+| Issuer API | Holder API | Issuer webhook (topic, state) | Holder webhook (topic, state) |
+|---|---|---|---|
+| POST /connections/create-invitation |  |  |  |
+|  | POST /connections/receive-invitation |  | connections, invitation |
+|  |  | connections, request | connections, request |
+|  |  | connections, response | connections, response |
+|  |  | connections, active | connections, active |
+
+### Presentation
+Holder가 (connections, active) 시점에 presentation proposal을 보냄
+
+| Issuer API | Holder API | Issuer webhook (topic, state, *msg_type) | Holder webhook (topic, state, *msg_type) |
+|---|---|---|---|
+|  | POST /present-proof/send-proposal | present_proof, proposal_received | present_proof, proposal_sent |
+| POST /present-proof/send-verification-request |  | present_proof, request_sent | present_proof, request_received |
+|  | POST /connections/{conn_id}/send-message | basicmessages, received, *initial_agreement_decision |  |
+|  | GET /present-proof/records/{presExId}/credentials |  |  |
+|  | POST /present-proof/records/{presExId}/send-presentation | present_proof, presentation_received | present_proof, presentation_sent |
+|  |  | present_proof, verified | present_proof, presentation_acked |
+
+Issuer는 (present_proof, verified) 시점에 webhook 메시지를 getPresentationResult 하여 요구한 정보 획득
+
 ## Production
 뱐경 해야 할 항목만 정리
 
@@ -173,13 +249,21 @@ production 새로 작성
 #### application-issuer-prod.properties
 agentApiUrl = https://console.myinitial.io/agent/api (고정)
 
+#### application-verifier-prod.properties
+agentApiUrl = https://console.myinitial.io/agent/api (고정)
+
 #### application-holder-prod.properties
 agentApiUrl = https://console.myinitial.io/agent/api (고정)
 
-### 3. issuer 및 holder 실행
+### 3. issuer (또는 verifier) 및 holder 실행
 #### issuer 실행
 ```
 ./gradlew issuer_prod
+```
+
+#### verifier 실행
+```
+./gradlew verifier_prod
 ```
 
 #### holder 실행
