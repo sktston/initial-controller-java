@@ -43,7 +43,7 @@ public class GlobalService {
     String orgName;
     String orgImageUrl;
     String publicDid;
-    String phase;
+    String phase = "";
     boolean webhookUrlIsValid = false;
 
     // for manual web view example
@@ -80,6 +80,11 @@ public class GlobalService {
     public void handleEvent(String body) {
         if (!webhookUrlIsValid)
             webhookUrlIsValid = true;
+
+        if (phase.equals("preparation")) {
+            handleEventOnPreparation(body);
+            return;
+        }
 
         String topic = JsonPath.read(body, "$.topic");
         String state = null;

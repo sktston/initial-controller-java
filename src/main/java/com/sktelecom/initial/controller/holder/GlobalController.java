@@ -19,10 +19,7 @@ public class GlobalController {
 
     @PostMapping("/webhooks")
     public ResponseEntity webhooksTopicHandler(@RequestBody String body) {
-        if (globalService.phase.equals("preparation"))
-            globalService.handleEventOnPreparation(body);
-        else
-            globalService.handleEvent(body);
+        globalService.handleEvent(body);
         return ResponseEntity.ok().build();
     }
 
