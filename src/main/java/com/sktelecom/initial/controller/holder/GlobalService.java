@@ -44,6 +44,7 @@ public class GlobalService {
     String orgImageUrl;
     String publicDid;
     String phase;
+    boolean webhookUrlIsValid = false;
 
     // for manual web view example
     static boolean enableManualWebView = Boolean.parseBoolean(System.getenv().getOrDefault("ENABLE_MANUAL_WEBVIEW", "false"));
@@ -77,6 +78,9 @@ public class GlobalService {
     }
 
     public void handleEvent(String body) {
+        if (!webhookUrlIsValid)
+            webhookUrlIsValid = true;
+
         String topic = JsonPath.read(body, "$.topic");
         String state = null;
         try {
@@ -210,6 +214,18 @@ public class GlobalService {
         publicDid = JsonPath.read(invitation, "$.did");
         orgName = JsonPath.read(invitation, "$.label");
         orgImageUrl = JsonPath.read(invitation, "$.imageUrl");
+        log.info("- SUCCESS");
+
+        log.info("TEST - Check if webhook url (in console) is valid");
+        // create non-public invitation to receive webhook message
+        client.requestPOST(agentApiUrl + "/connections/create-invitation", accessToken, "{}");
+        try {
+            Thread.sleep(1000); // wait to receive webhook message
+        } catch (InterruptedException e) {}
+        if (!webhookUrlIsValid) {
+            log.info("- FAILED: webhook message is not received - Check if it is valid in console configuration");
+            System.exit(0);
+        }
         log.info("- SUCCESS");
     }
 
