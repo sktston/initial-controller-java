@@ -30,9 +30,6 @@ public class GlobalService {
     @Value("${verifTplId}")
     private String verifTplId; // verification template identifier
 
-    @Value("${webViewUrl}")
-    private String webViewUrl; // web view form url
-
     String orgName;
     String orgImageUrl;
     String publicDid;
