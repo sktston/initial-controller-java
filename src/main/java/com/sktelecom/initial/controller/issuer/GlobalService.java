@@ -386,7 +386,7 @@ public class GlobalService {
                 "    credential_proposal: {" +
                 "      attributes: [" +
                 "        { name: 'name', value: '" + value.get("name")  + "' }," +
-                "        { name: 'date', value: " + value.get("date") + "' }," +
+                "        { name: 'date', value: '" + value.get("date") + "' }," +
                 "        { name: 'degree', value: '" + value.get("degree") + "' }," +
                 "        { name: 'age', value: '" +  value.get("age")  + "' }," +
                 "        { name: 'photo', value: '" + value.get("photo") + "' }" +
