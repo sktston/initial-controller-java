@@ -65,6 +65,18 @@ task issuer_prod(type:JavaExec) {
 	main = 'com.sktelecom.initial.controller.issuer.Application'
 	args(['--spring.config.location=classpath:/application-issuer-prod.properties'])
 }
+task verifier(type:JavaExec) {
+	group 'application'
+	classpath sourceSets.main.runtimeClasspath
+	main = 'com.sktelecom.initial.controller.issuer.Application'
+	args(['--spring.config.location=classpath:/application-verifier.properties'])
+}
+task verifier_prod(type:JavaExec) {
+	group 'application'
+	classpath sourceSets.main.runtimeClasspath
+	main = 'com.sktelecom.initial.controller.issuer.Application'
+	args(['--spring.config.location=classpath:/application-verifier-prod.properties'])
+}
 task holder(type:JavaExec) {
 	group 'application'
 	classpath sourceSets.main.runtimeClasspath

@@ -34,11 +34,14 @@ public class GlobalService {
     @Value("${accessToken}")
     private String accessToken; // controller access token
 
-    @Value("${issuerInvitationUrl}")
-    private String issuerInvitationUrl; // issuer controller invitation url to receive invitation-url
+    @Value("${serviceType}")
+    private String serviceType; // issuer or verifier
 
-    @Value("${issuerCredDefId}")
-    private String issuerCredDefId; // credential definition identifier to receive
+    @Value("${invitationUrl}")
+    private String invitationUrl; // issuer controller invitation url to receive invitation-url
+
+    @Value("${CredDefIdToReceive}")
+    private String CredDefIdToReceive; // credential definition identifier to receive
 
     String orgName;
     String orgImageUrl;
@@ -60,8 +63,13 @@ public class GlobalService {
         log.info("- organization imageUrl: " + orgImageUrl);
         log.info("- public did: " + publicDid);
         log.info("- controller access token: " + accessToken);
-        log.info("- issuer controller invitation url: " + issuerInvitationUrl);
-        log.info("- credential definition id to receive from issuer: " + issuerCredDefId);
+        if (serviceType.equals("issuer")) {
+            log.info("- issuer controller invitation url: " + invitationUrl);
+            log.info("- credential definition id to receive from issuer: " + CredDefIdToReceive);
+        }
+        else {
+            log.info("- verifier controller invitation url: " + invitationUrl);
+        }
         log.info("------------------------------");
 
         log.info("Preparation - start");
@@ -97,9 +105,16 @@ public class GlobalService {
             case "connections":
                 // 1. connection 이 완료됨 -> credential 을 요청함
                 if (state.equals("active")) {
-                    log.info("- Case (topic:" + topic + ", state:" + state + ") -> sendCredentialProposal");
-                    String connectionId = JsonPath.read(body, "$.connection_id");
-                    sendCredentialProposal(connectionId, issuerCredDefId);
+                    if (serviceType.equals("issuer")) {
+                        log.info("- Case (topic:" + topic + ", state:" + state + ") -> sendCredentialProposal");
+                        String connectionId = JsonPath.read(body, "$.connection_id");
+                        sendCredentialProposal(connectionId, CredDefIdToReceive);
+                    }
+                    else {
+                        log.info("- Case (topic:" + topic + ", state:" + state + ") -> sendPresentationProposal");
+                        String connectionId = JsonPath.read(body, "$.connection_id");
+                        sendPresentationProposal(connectionId);
+                    }
                 }
                 break;
             case "issue_credential":
@@ -261,7 +276,7 @@ public class GlobalService {
     public void startDemo() {
         phase = "started";
         log.info("Receive invitation from issuer controller");
-        receiveInvitationUrl(issuerInvitationUrl);
+        receiveInvitationUrl(invitationUrl);
     }
 
     public void receiveInvitationUrl(String controllerInvitationUrl) {
@@ -283,6 +298,18 @@ public class GlobalService {
                 "  cred_def_id: '" + credDefId + "'," +
                 "}").jsonString();
         String response = client.requestPOST(agentApiUrl + "/issue-credential/send-proposal", accessToken, body);
+        log.info("response: " + response);
+    }
+
+    public void sendPresentationProposal(String connectionId) {
+        String body = JsonPath.parse("{" +
+                "  connection_id: '" + connectionId  + "'," +
+                "  presentation_proposal: {" +
+                "    attributes: []," +
+                "    predicates: []" +
+                "  }" +
+                "}").jsonString();
+        String response = client.requestPOST(agentApiUrl + "/present-proof/send-proposal", accessToken, body);
         log.info("response: " + response);
     }
 
