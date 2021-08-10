@@ -207,7 +207,7 @@ public class GlobalService {
         // create non-public invitation to receive webhook message
         client.requestPOST(agentApiUrl + "/connections/create-invitation", accessToken, "{}");
         try {
-            Thread.sleep(500); // wait to receive webhook message
+            Thread.sleep(1000); // wait to receive webhook message
         } catch (InterruptedException e) {}
         if (!webhookUrlIsValid) {
             log.info("- FAILED: webhook message is not received - Check if it is valid in console configuration");
