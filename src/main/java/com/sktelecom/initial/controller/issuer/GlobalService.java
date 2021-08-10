@@ -38,6 +38,7 @@ public class GlobalService {
     String orgName;
     String orgImageUrl;
     String publicDid;
+    boolean webhookUrlIsValid = false;
 
     LinkedHashMap<String, String> connIdToCredExId = new LinkedHashMap<>(); // cache to keep credential issuing flow
 
@@ -64,6 +65,8 @@ public class GlobalService {
     }
 
     public void handleEvent(String body) {
+        webhookUrlIsValid = true;
+
         String topic = JsonPath.read(body, "$.topic");
         String state = null;
         try {
@@ -153,18 +156,6 @@ public class GlobalService {
     }
 
     void provisionController() {
-        log.info("TEST - Create invitation-url");
-        String invitationUrl = createInvitationUrl();
-        if (invitationUrl == null) {
-            log.info("- FAILED: Check if accessToken is valid - " + accessToken);
-            System.exit(0);
-        }
-        String invitation = parseInvitationUrl(invitationUrl);
-        publicDid = JsonPath.read(invitation, "$.did");
-        orgName = JsonPath.read(invitation, "$.label");
-        orgImageUrl = JsonPath.read(invitation, "$.imageUrl");
-        log.info("- SUCCESS");
-
         if (!credDefId.equals("")) {
             log.info("TEST - Check if credential definition is valid");
             String response = client.requestGET(agentApiUrl + "/credential-definitions/" + credDefId, accessToken);
@@ -198,6 +189,29 @@ public class GlobalService {
             }
             log.info("- SUCCESS : " + verifTplId + " exists");
         }
+
+        log.info("TEST - Create invitation-url");
+        String invitationUrl = createInvitationUrl();
+        if (invitationUrl == null) {
+            log.info("- FAILED: Check if accessToken is valid - " + accessToken);
+            System.exit(0);
+        }
+        String invitation = parseInvitationUrl(invitationUrl);
+        publicDid = JsonPath.read(invitation, "$.did");
+        orgName = JsonPath.read(invitation, "$.label");
+        orgImageUrl = JsonPath.read(invitation, "$.imageUrl");
+        log.info("- SUCCESS");
+
+        log.info("TEST - Check if webhook url (in console) is valid");
+        try {
+            Thread.sleep(1000); // wait to receive handleEvent for creating connection
+        } catch (InterruptedException e) {}
+        if (!webhookUrlIsValid) {
+            log.info("- FAILED: webhook is not received when creating invitation - Check if it is valid in console configuration");
+            System.exit(0);
+        }
+        log.info("- SUCCESS");
+
     }
 
     public String createInvitationUrl() {
