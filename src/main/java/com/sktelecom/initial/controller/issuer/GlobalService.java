@@ -65,7 +65,8 @@ public class GlobalService {
     }
 
     public void handleEvent(String body) {
-        webhookUrlIsValid = true;
+        if (!webhookUrlIsValid)
+            webhookUrlIsValid = true;
 
         String topic = JsonPath.read(body, "$.topic");
         String state = null;
