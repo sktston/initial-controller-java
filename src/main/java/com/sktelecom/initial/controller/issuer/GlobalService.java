@@ -40,8 +40,6 @@ public class GlobalService {
     String publicDid;
     boolean webhookUrlIsValid = false;
 
-    LinkedHashMap<String, String> connIdToCredExId = new LinkedHashMap<>(); // cache to keep credential issuing flow
-
     // for revocation example
     static boolean enableRevoke = Boolean.parseBoolean(System.getenv().getOrDefault("ENABLE_REVOKE", "false"));
 
@@ -217,21 +215,19 @@ public class GlobalService {
 
         // value insertion
         String body = JsonPath.parse("{" +
-                "  counter_proposal: {" +
-                "    cred_def_id: '" + credDefId + "'," +
-                "    credential_proposal: {" +
-                "      attributes: [" +
-                "        { name: 'name', value: '" + value.get("name")  + "' }," +
-                "        { name: 'date', value: '" + value.get("date") + "' }," +
-                "        { name: 'degree', value: '" + value.get("degree") + "' }," +
-                "        { name: 'age', value: '" +  value.get("age")  + "' }," +
-                "        { name: 'photo', value: '" + value.get("photo") + "' }" +
-                "      ]" +
-                "    }" +
+                "  connection_id: '" + connectionId  + "'," +
+                "  cred_def_id: '" + credDefId + "'," +
+                "  credential_proposal: {" +
+                "    attributes: [" +
+                "      { name: 'name', value: '" + value.get("name")  + "' }," +
+                "      { name: 'date', value: '" + value.get("date") + "' }," +
+                "      { name: 'degree', value: '" + value.get("degree") + "' }," +
+                "      { name: 'age', value: '" +  value.get("age")  + "' }," +
+                "      { name: 'photo', value: '" + value.get("photo") + "' }" +
+                "    ]" +
                 "  }" +
                 "}").jsonString();
-        String credExId = connIdToCredExId.get(connectionId);
-        String response = client.requestPOST(agentApiUrl + "/issue-credential/records/" + credExId + "/send-offer", accessToken, body);
+        String response = client.requestPOST(agentApiUrl + "/issue-credential/send", accessToken, body);
         log.info("response: " + response);
     }
 
