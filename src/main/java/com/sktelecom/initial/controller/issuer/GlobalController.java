@@ -17,6 +17,17 @@ public class GlobalController {
     @Autowired
     GlobalService globalService;
 
+    @GetMapping(value = "/oob-invitation")
+    public String oobInvitationHandler() {
+        String invitationUrl = globalService.createOobInvitationUrl();
+        return parseInvitationUrl(invitationUrl);
+    }
+
+    @GetMapping(value = "/oob-invitation-url")
+    public String oobInvitationUrlHandler() {
+        return globalService.createOobInvitationUrl();
+    }
+
     @GetMapping(value = "/invitation")
     public String invitationHandler() {
         String invitationUrl = globalService.createInvitationUrl();

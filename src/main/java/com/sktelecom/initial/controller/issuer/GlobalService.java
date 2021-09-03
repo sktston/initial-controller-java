@@ -228,6 +228,20 @@ public class GlobalService {
         }
     }
 
+    public String createOobInvitationUrl() {
+        String body = JsonPath.parse("{" +
+                "  handshake_protocols: ['connections/1.0']," +
+                "  use_public_did: true" +
+                "}").jsonString();
+        String response = client.requestPOST(agentApiUrl + "/out-of-band/create-invitation", accessToken, body);
+        log.info("response: " + response);
+        try {
+            return JsonPath.read(response, "$.invitation_url");
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
+    }
+
     public void sendCredProblemReport(String credExId, String description) {
         String body = JsonPath.parse("{" +
                 "  description: '" + description + "'" +
