@@ -47,6 +47,15 @@ public class Common {
         return new String(Base64.decodeBase64(encodedInvitation));
     }
 
+    public static String parseOobInvitationUrl(String invitationUrl) {
+        String[] tokens = invitationUrl.split("\\?oob=");
+        if (tokens.length != 2)
+            return null;
+
+        String encodedInvitation = tokens[1];
+        return new String(Base64.decodeBase64(encodedInvitation));
+    }
+
     public static byte[] generateQRCode(String text, int width, int height) {
 
         Assert.hasText(text, "text must not be empty");

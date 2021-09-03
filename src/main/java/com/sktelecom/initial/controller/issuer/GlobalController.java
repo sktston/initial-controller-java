@@ -20,7 +20,7 @@ public class GlobalController {
     @GetMapping(value = "/oob-invitation")
     public String oobInvitationHandler() {
         String invitationUrl = globalService.createOobInvitationUrl();
-        return parseInvitationUrl(invitationUrl);
+        return parseOobInvitationUrl(invitationUrl);
     }
 
     @GetMapping(value = "/oob-invitation-url")
