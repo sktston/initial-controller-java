@@ -388,7 +388,6 @@ public class GlobalService {
         String requestedProof = JsonPath.parse((LinkedHashMap)JsonPath.read(presExRecord, "$.presentation.requested_proof")).jsonString();
 
         LinkedHashMap<String, Object> revealedAttrs = JsonPath.read(requestedProof, "$.revealed_attrs");
-        LinkedHashMap<String, String> attrs = new LinkedHashMap<>();
         for(String key : revealedAttrs.keySet())
             attrs.put(key, JsonPath.read(revealedAttrs.get(key), "$.raw"));
         for(String key : attrs.keySet())
