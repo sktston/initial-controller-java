@@ -29,8 +29,11 @@ public class GlobalService {
     @Value("${credDefId}")
     private String credDefId; // credential definition identifier
 
-    @Value("${verifTplId}")
-    private String verifTplId; // verification template identifier
+    @Value("${mobileVerifTplId}")
+    private String mobileVerifTplId; // verification template identifier
+
+    @Value("${toeicVerifTplId}")
+    private String toeicVerifTplId; // Toeic verification template identifier
 
     @Value("${webViewUrl}")
     private String webViewUrl; // web view form url
@@ -59,7 +62,7 @@ public class GlobalService {
         log.info("- organization imageUrl: " + orgImageUrl);
         log.info("- public did: " + publicDid);
         log.info("- credential definition id: " + credDefId);
-        log.info("- verification template id: " + verifTplId);
+        log.info("- verification template id: " + mobileVerifTplId);
         log.info("- controller access token: " + accessToken);
         log.info("------------------------------");
         log.info("Controller is ready");
@@ -197,16 +200,16 @@ public class GlobalService {
                 log.info("- YES : This controller can issue with " + credDefId);
         }
 
-        if (!verifTplId.equals("")) {
+        if (!mobileVerifTplId.equals("")) {
             log.info("TEST - Check if verification template is valid");
-            String response = client.requestGET(agentApiUrl + "/verification-templates/" + verifTplId, accessToken);
+            String response = client.requestGET(agentApiUrl + "/verification-templates/" + mobileVerifTplId, accessToken);
             log.info("response: " + response);
             LinkedHashMap<String, Object> verifTpl = JsonPath.read(response, "$.verification_template");
             if (verifTpl == null) {
-                log.info("- FAILED: " + verifTplId + " does not exists - Check if it is valid");
+                log.info("- FAILED: " + mobileVerifTplId + " does not exists - Check if it is valid");
                 System.exit(0);
             }
-            log.info("- SUCCESS : " + verifTplId + " exists");
+            log.info("- SUCCESS : " + mobileVerifTplId + " exists");
         }
 
         log.info("TEST - Check if webhook url (in console) is valid");
@@ -361,7 +364,7 @@ public class GlobalService {
 
         String body = JsonPath.parse("{" +
                 "  connection_id: '" + connectionId + "'," +
-                "  verification_template_id: '" + verifTplId + "'," +
+                "  verification_template_id: '" + mobileVerifTplId + "'," +
                 "  agreement: " + agreement +
                 "}").jsonString();
         String response = client.requestPOST(agentApiUrl + "/present-proof/send-verification-request", accessToken, body);
@@ -456,7 +459,7 @@ public class GlobalService {
 
         String body = JsonPath.parse("{" +
                 "  connection_id: '" + connectionId + "'," +
-                "  verification_template_id: '" + verifTplId + "'," +
+                "  verification_template_id: '" + toeicVerifTplId + "'," +
                 "  agreement: " + agreement +
                 "}").jsonString();
         String response = client.requestPOST(agentApiUrl + "/present-proof/send-verification-request", accessToken, body);
@@ -515,7 +518,7 @@ public class GlobalService {
         value.put("english_name", eng_name);
         value.put("exp_date", getRandomInt(2021, 2024) + "0228");
         value.put("korean_name", attrs.get("모바일 가입증명 (1.0) person_name"));
-        value.put("registration_number", attrs.get("모바일 가입증명 (1.0) mobile_num"));
+        value.put("registration_number", "123456789-987654321");
         value.put("score_of_listening", getRandomInt(100, 444) + "");
         value.put("score_of_reading", "");
         value.put("score_of_total", "990");

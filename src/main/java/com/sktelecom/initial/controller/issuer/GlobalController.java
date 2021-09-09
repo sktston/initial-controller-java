@@ -49,10 +49,18 @@ public class GlobalController {
         return globalService.createInvitationUrl();
     }
 
-    @GetMapping(value = "/invitation-qr", produces = MediaType.IMAGE_PNG_VALUE)
-    public byte[] getInvitationUrlQRCode() {
+    @GetMapping(value = "/invitation-issue-qr", produces = MediaType.IMAGE_PNG_VALUE)
+    public byte[] getIssueInvitationUrlQRCode() {
         String invitationUrl = globalService.createInvitationUrl();
-        String deeplinkUrl = "initial://reqService?process=I&ynCloud=Y" + "&svcPublicDID=DrLbXFSao4Vo8gMfjxPxU1" + "&credDefId="+ credDefId + "&invitation=" + invitationUrl;
+        String deeplinkUrl = "initial://reqService?process=I&ynCloud=Y" + "&svcPublicDID=DrLbXFSao4Vo8gMfjxPxU1" + "&nonce=123456789-987654321" + "&credDefId="+ credDefId + "&invitation=" + invitationUrl;
+        log.info("##### deeplink url :   " + deeplinkUrl);
+        return generateQRCode(deeplinkUrl, 300, 300);
+    }
+
+    @GetMapping(value = "/invitation-verify-qr", produces = MediaType.IMAGE_PNG_VALUE)
+    public byte[] getVerifyInvitationUrlQRCode() {
+        String invitationUrl = globalService.createInvitationUrl();
+        String deeplinkUrl = "initial://reqService?process=V&ynCloud=Y" + "&svcPublicDID=DrLbXFSao4Vo8gMfjxPxU1" + "&nonce=123456789-987654321" + "&credDefId="+ credDefId + "&invitation=" + invitationUrl;
         log.info("##### deeplink url :   " + deeplinkUrl);
         return generateQRCode(deeplinkUrl, 300, 300);
     }
