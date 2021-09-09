@@ -402,7 +402,7 @@ public class GlobalService {
     }
 
     public String getPresentationName(String presExRecord) {
-        String requestedProofName = JsonPath.parse((LinkedHashMap)JsonPath.read(presExRecord, "$.presentation_request.name")).jsonString();
+        String requestedProofName = JsonPath.read(presExRecord, "$.presentation_request.name");
             log.info("Requested Proof Name - " + requestedProofName);
         return requestedProofName;
     }
