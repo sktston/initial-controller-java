@@ -289,4 +289,16 @@ public class GlobalService {
         return attrs;
     }
 
+    public String getPresentationName(String presExRecord) {
+        String verified = JsonPath.read(presExRecord, "$.verified");
+        if (!verified.equals("true")) {
+            log.info("proof is not verified");
+            log.info("Possible Reason: Revoked or Signature mismatch or Predicates unsatisfied");
+            return null;
+        }
+        String requestedProofName = JsonPath.parse((LinkedHashMap)JsonPath.read(presExRecord, "$.presentation_request.name")).jsonString();
+
+        return requestedProofName;
+    }
+
 }

@@ -9,10 +9,20 @@ import org.springframework.web.bind.annotation.*;
 
 import static com.sktelecom.initial.controller.utils.Common.*;
 
+import org.springframework.beans.factory.annotation.Value;
+import javax.servlet.http.HttpServletRequest;
+
+
 @RequiredArgsConstructor
 @Slf4j
 @RestController
 public class GlobalController {
+
+    @Value("${x-api-key}")
+    private String xApiKey; // controller access token
+
+    @Value("${credDefId}")
+    private String credDefId; // credential definition identifier
 
     @Autowired
     GlobalService globalService;
@@ -42,11 +52,24 @@ public class GlobalController {
     @GetMapping(value = "/invitation-qr", produces = MediaType.IMAGE_PNG_VALUE)
     public byte[] getInvitationUrlQRCode() {
         String invitationUrl = globalService.createInvitationUrl();
-        return generateQRCode(invitationUrl, 300, 300);
+        String deeplinkUrl = "initial://reqService?process=I&ynCloud=Y" + "&svcPublicDID=DrLbXFSao4Vo8gMfjxPxU1" + "&credDefId="+ credDefId + "&invitation=" + invitationUrl;
+        log.info("##### deeplink url :   " + deeplinkUrl);
+        return generateQRCode(deeplinkUrl, 300, 300);
     }
 
     @PostMapping(value = "/webhooks")
-    public ResponseEntity webhooksTopicHandler(@RequestBody String body) {
+    public ResponseEntity webhooksTopicHandler(@RequestBody String body, HttpServletRequest request) {
+        //Http header x-api-key 정보 확인
+        String httpAddr = request.getRemoteAddr(); // Webhook Inbound IP Address
+        String apiKey = request.getHeader("x-api-key");
+
+        // API Key Check
+        if(apiKey != null && apiKey.isEmpty()) {
+            if (!apiKey.equals(xApiKey)) {
+                //log.info("##### Inbound IP Address :   " + httpAddr + "   x-api-key :" + apiKey + ", Unauthorized API-KEY");
+                return ResponseEntity.badRequest().build();
+            }
+        }
         globalService.handleEvent(body);
         return ResponseEntity.ok().build();
     }

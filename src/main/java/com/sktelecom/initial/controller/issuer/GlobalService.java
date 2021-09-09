@@ -41,6 +41,7 @@ public class GlobalService {
     boolean webhookUrlIsValid = false;
 
     LinkedHashMap<String, String> connIdToCredExId = new LinkedHashMap<>(); // cache to keep credential issuing flow
+    LinkedHashMap<String, String> attrs = new LinkedHashMap<>(); // cache to keep credential issuing flow
 
     // for revocation example
     static boolean enableRevoke = Boolean.parseBoolean(System.getenv().getOrDefault("ENABLE_REVOKE", "false"));
@@ -128,7 +129,7 @@ public class GlobalService {
                 else if (state.equals("verified")) {
                     log.info("- Case (topic:" + topic + ", state:" + state + ") -> getPresentationResult");
                     LinkedHashMap<String, String> attrs = getPresentationResult(body);
-
+                    String name = getPresentationName(body);
                     if (enableWebView) {
                         // 3-1. 검증 값 정보로 발행할 증명서가 한정되지 않는 경우 추가 정보 요구
                         log.info("Web View enabled -> sendWebView");
@@ -139,7 +140,7 @@ public class GlobalService {
                         // 3-2. 검증 값 정보 만으로 발행할 증명서가 한정되는 경우 증명서 바로 발행
                         log.info("Web View is not used -> sendCredentialOffer");
                         String connectionId = JsonPath.read(body, "$.connection_id");
-                        sendCredentialOffer(connectionId, attrs, null);
+                        sendCredentialOffer(connectionId, attrs, null, null);
                     }
                 }
                 break;
@@ -400,27 +401,43 @@ public class GlobalService {
         return attrs;
     }
 
-    public void sendCredentialOffer(String connectionId, LinkedHashMap<String, String> attrs, String selectedItemId) {
+    public String getPresentationName(String presExRecord) {
+        String requestedProofName = JsonPath.parse((LinkedHashMap)JsonPath.read(presExRecord, "$.presentation_request.name")).jsonString();
+            log.info("Requested Proof Name - " + requestedProofName);
+        return requestedProofName;
+    }
+
+    public void sendCredentialOffer(String connectionId, LinkedHashMap<String, String> attrs, String selectedItemId, String eng_name) {
         // TODO: need to implement business logic to query information for holder
         // we assume that the value is obtained by querying DB (e.g., attrs.mobileNum and selectedItemId)
         LinkedHashMap<String, String> value = new LinkedHashMap<>();
-        value.put("name", "김증명");
-        value.put("date", "20180228");
-        value.put("degree", "컴퓨터공학");
-        value.put("age", "25");
-        value.put("photo", "JpegImageBase64EncodedBinary");
+        value.put("date_of_birth", attrs.get("모바일 가입증명 (1.0) date_of_birth"));
+        value.put("date_of_test", selectedItemId);
+        value.put("english_name", eng_name);
+        value.put("exp_date", getRandomInt(2021, 2024) + "0228");
+        value.put("korean_name", attrs.get("모바일 가입증명 (1.0) person_name"));
+        value.put("registration_number", attrs.get("모바일 가입증명 (1.0) mobile_num"));
+        value.put("score_of_listening", getRandomInt(100, 444) + "");
+        value.put("score_of_reading", "");
+        value.put("score_of_total", "990");
 
         // value insertion
         String body = JsonPath.parse("{" +
-                "  counter_proposal: {" +
-                "    cred_def_id: '" + credDefId + "'," +
-                "    credential_proposal: {" +
-                "      attributes: [" +
-                "        { name: 'name', value: '" + value.get("name")  + "' }," +
-                "        { name: 'date', value: '" + value.get("date") + "' }," +
-                "        { name: 'degree', value: '" + value.get("degree") + "' }," +
-                "        { name: 'age', value: '" +  value.get("age")  + "' }," +
-                "        { name: 'photo', value: '" + value.get("photo") + "' }" +
+                "  \"counter_proposal\": {" +
+                "    \"cred_def_id\": " + credDefId + "," +
+                "    \"auto_remove\": true," +
+                "    \"comment\": \"JJ Test\"," +
+                "    \"credential_proposal\": {" +
+                "      \"attributes\": [" +
+                "        { \"name\": \"date_of_birth\", \"value\": \"" + value.get("date_of_birth")  + "\" }," +
+                "        { \"name\": \"date_of_test\", \"value\": \"" + value.get("date_of_test") + "\" }," +
+                "        { \"name\": \"english_name\", \"value\": \"" + value.get("english_name") + "\" }," +
+                "        { \"name\": \"exp_date\", \"value\": \"" +  value.get("exp_date")  + "\" }," +
+                "        { \"name\": \"korean_name\", \"value\": \"" + value.get("korean_name") + "\" }" +
+                "        { \"name\": \"registration_number\", \"value\": \"" + value.get("registration_number") + "\" }" +
+                "        { \"name\": \"score_of_listening\", \"value\": \"" + value.get("score_of_listening") + "\" }" +
+                "        { \"name\": \"score_of_reading\", \"value\": \"" + value.get("score_of_reading") + "\" }" +
+                "        { \"name\": \"score_of_total\", \"value\": \"" + value.get("score_of_total") + "\" }" +
                 "      ]" +
                 "    }" +
                 "  }" +
@@ -451,10 +468,11 @@ public class GlobalService {
 
         String connectionId = JsonPath.read(body, "$.connectionId");
         String selectedItemId = JsonPath.read(body, "$.selectedItemId");
+        String eng_name = JsonPath.read(body, "$.eng_name");
 
         // 3-1-1. 추가 정보 기반으로 증명서 발행
-        log.info("sendCredentialOffer with connectionId:" + connectionId + ", selectedItemId:" + selectedItemId);
-        sendCredentialOffer(connectionId, null, selectedItemId);
+        log.info("###### sendCredentialOffer with connectionId:" + connectionId + ", selectedItemId:" + selectedItemId + ", eng_name:" + eng_name);
+        sendCredentialOffer(connectionId, attrs, selectedItemId, eng_name);
     }
 
     public void revokeCredential(String credExId) {
