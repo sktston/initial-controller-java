@@ -27,28 +27,8 @@ import java.util.concurrent.ThreadLocalRandom;
 @RequiredArgsConstructor
 @Slf4j
 public class Common {
-    public static String prettyJson(String jsonString) {
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        return gson.toJson(JsonParser.parseString(jsonString));
-    }
-
-    public static int getRandomInt(int min, int max) {
-        if (min >= max)
-            throw new IllegalArgumentException("max must be greater than min");
-        return ThreadLocalRandom.current().nextInt(min, max);
-    }
-
     public static String parseInvitationUrl(String invitationUrl) {
         String[] tokens = invitationUrl.split("\\?c_i=");
-        if (tokens.length != 2)
-            return null;
-
-        String encodedInvitation = tokens[1];
-        return new String(Base64.decodeBase64(encodedInvitation));
-    }
-
-    public static String parseOobInvitationUrl(String invitationUrl) {
-        String[] tokens = invitationUrl.split("\\?oob=");
         if (tokens.length != 2)
             return null;
 
