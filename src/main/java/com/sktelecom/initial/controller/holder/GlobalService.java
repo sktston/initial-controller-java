@@ -52,6 +52,10 @@ public class GlobalService {
     // for manual web view example
     static boolean enableManualWebView = Boolean.parseBoolean(System.getenv().getOrDefault("ENABLE_MANUAL_WEBVIEW", "false"));
 
+    // time calc
+    static long beforeTime;
+    static long afterTime;
+
     @EventListener(ApplicationReadyEvent.class)
     public void initialize() {
         provisionController();
@@ -74,15 +78,9 @@ public class GlobalService {
 
         log.info("Preparation - start");
         phase = "preparation";
-        if (existSampleMobileCredential()) {
-            log.info("Use existing sample mobile credential");
-            log.info("Preparation - done");
-            startDemo();
-        }
-        else {
-            log.info("Receive sample mobile credential");
-            receiveInvitationUrl(sampleMobileIssuerInvitationUrl);
-        }
+        log.info("Receive sample mobile credential");
+        beforeTime = System.currentTimeMillis();
+        receiveInvitationUrl(sampleMobileIssuerInvitationUrl);
     }
 
     public void handleEvent(String body) {
@@ -188,9 +186,12 @@ public class GlobalService {
         switch(topic) {
             case "connections":
                 if (state.equals("active")) {
-                    log.info("- Case (topic:" + topic + ", state:" + state + ") -> sendCredentialProposal");
-                    String connectionId = JsonPath.read(body, "$.connection_id");
-                    sendCredentialProposal(connectionId, sampleMobileCredDefId);
+                    afterTime = System.currentTimeMillis();
+                    long secDiffTime = afterTime - beforeTime;
+                    log.info("Elapsed time (ms) : " + secDiffTime);
+
+                    beforeTime = System.currentTimeMillis();
+                    receiveInvitationUrl(sampleMobileIssuerInvitationUrl);
                 }
                 break;
             case "issue_credential":
