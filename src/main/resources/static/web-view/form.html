@@ -102,7 +102,8 @@
         width: 100%;
       }
     }
-  </style>
+
+</style>
 
 <!-- get parameters -->
 <script type="text/javascript">
@@ -123,7 +124,8 @@
       }
     }
     var request = new Request();
-  </script>
+
+</script>
 
 <!-- json submit -->
 <script>
@@ -138,12 +140,22 @@
         },
         error: function(xhr, status, error){
           alert(status);
+        },
+        complete : function(){
+          var userAgent = navigator.userAgent.toLowerCase();
+            if (userAgent.search("android") > -1) {
+                Android.submitVC ();
+            }
+            else {
+                webkit.messageHandlers.callbackHandler.postMessage("submitVC");
+          }
         }
       });
       modal.style.display = "block";
       return false;
     }
-  </script>
+
+</script>
 
 <!-- cancel button -->
 <!-- initial App에서 web_view 화면을 닫고, 첫페이지로 이동하는 취소 버튼 code -->
@@ -157,31 +169,38 @@
         webkit.messageHandlers.callbackHandler.postMessage("failVC");
       }
     }
-  </script>
+
+</script>
 
 
-
+a
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, width=device-width" />
+    <meta name="viewport"
+          content="user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, width=device-width"/>
     <title>web-view form</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous"></head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+</head>
 <body>
 
 <center>
     <form id="dataForm">
-        <input type="hidden" name="connectionId" id="connectionId" value="connectionIdValue" />
+        <input type="hidden" name="connectionId" id="connectionId" value="connectionIdValue"/>
         <script>
           var connectionIdValue = request.getParameter('connectionId');
           document.getElementById("connectionId").value = connectionIdValue
+
         </script>
         <br><br><br><br>
         <div class="card" style="width: 18rem;">
-            <img src="https://play-lh.googleusercontent.com/XpMUfVBitD2tSCYEvKcp8NEtOfBjU9Pp9FFjnLWQRcPLFdGnETxe7_6aIS7E_3shR2A" class="card-img-top" alt="...">
+            <img src="https://play-lh.googleusercontent.com/XpMUfVBitD2tSCYEvKcp8NEtOfBjU9Pp9FFjnLWQRcPLFdGnETxe7_6aIS7E_3shR2A"
+                 class="card-img-top" alt="...">
             <div class="card-body">
                 <h5 class="card-title">Web View 테스트</h5>
                 <p class="card-text">VC를 발급 받기 위해서는 날짜를 선택하고 영어 이름을 입력하고 아래 '발급요청' 버튼을 클릭하세요. 화면은 자동 종료 됩니다. </p>
-                <a href="https://github.com/sktston/initial-controller-java/blob/cloud_demo_v2/src/main/resources/static/web-view/form.html" class="btn btn-primary">Web_view Sample</a>
+                <a href="https://github.com/sktston/initial-controller-java/blob/cloud_demo_v2/src/main/resources/static/web-view/form.html"
+                   class="btn btn-primary">Web_view Sample</a>
             </div>
         </div>
         <br><br>
@@ -194,7 +213,7 @@
             <p>
                 <input class="form-check-input" type="radio" id="itemChoice2"
                        name="selectedItemId" value="20200305">
-                <label class="form-check-label"for="itemChoice2">2020.03.05 토익성적 증명서</label>
+                <label class="form-check-label" for="itemChoice2">2020.03.05 토익성적 증명서</label>
             </p>
             <p>
                 <input class="form-check-input" type="radio" id="itemChoice3"
@@ -204,7 +223,13 @@
         </div>
         <p>
         <div class="input-group mb-3">
-            <span class="input-group-text" id="basic-addon1">English name :</span><input type="text" class="form-control" id="eng_name" placeholder="English name" aria-label="Username" aria-describedby="basic-addon1" name="eng_name"> <br>
+            <span class="input-group-text" id="basic-addon1">English name :</span><input type="text"
+                                                                                         class="form-control"
+                                                                                         id="eng_name"
+                                                                                         placeholder="English name"
+                                                                                         aria-label="Username"
+                                                                                         aria-describedby="basic-addon1"
+                                                                                         name="eng_name"> <br>
         </div>
         </p>
         <div>
@@ -235,6 +260,7 @@
     //    modal.style.display = "none";
     //  }
     //}
+
 </script>
 
 </body>
