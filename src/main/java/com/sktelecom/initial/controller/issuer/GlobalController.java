@@ -11,7 +11,10 @@ import static com.sktelecom.initial.controller.utils.Common.*;
 
 import org.springframework.beans.factory.annotation.Value;
 import javax.servlet.http.HttpServletRequest;
-
+import javax.servlet.*;
+import javax.servlet.http.*;
+import java.util.*;
+import java.io.*;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -45,7 +48,9 @@ public class GlobalController {
     }
 
     @GetMapping(value = "/invitation-url")
-    public String invitationUrlHandler() {
+    public String invitationUrl(HttpServletRequest request)  {
+        String httpAddr = request.getRemoteAddr(); // Webhook Inbound IP Address
+                log.info("##### Inbound IP Address :   " + httpAddr);
         return globalService.createInvitationUrl();
     }
 
@@ -70,15 +75,25 @@ public class GlobalController {
         //Http header x-api-key 정보 확인
         String httpAddr = request.getRemoteAddr(); // Webhook Inbound IP Address
         String apiKey = request.getHeader("x-api-key");
+	//String host = request.getHeeader("host");
+	
+	Enumeration eHeader = request.getHeaderNames();
+		while (eHeader.hasMoreElements()) {
+		String request_Name = (String)eHeader.nextElement();
+		String request_Value = request.getHeader(request_Name);
+		System.out.println("request_Name : " + request_Name + " | request_Value : " + request_Value);	       
+	}
 
+	log.info("JJ Request body : " + body);
         // API Key Check
-        if(apiKey != null && apiKey.isEmpty()) {
-            if (!apiKey.equals(xApiKey)) {
-                //log.info("##### Inbound IP Address :   " + httpAddr + "   x-api-key :" + apiKey + ", Unauthorized API-KEY");
-                return ResponseEntity.badRequest().build();
-            }
-        }
+        //if(apiKey != null && apiKey.isEmpty()) {
+        //    if (!apiKey.equals(xApiKey)) {
+        //        log.info("##### Inbound IP Address :   " + httpAddr);
+        //        return ResponseEntity.badRequest().build();
+        //    }
+        //}
         globalService.handleEvent(body);
+	//log.info("JJ Request body : " + body);
         return ResponseEntity.ok().build();
     }
 
