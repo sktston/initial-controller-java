@@ -89,6 +89,11 @@ public class GlobalService {
                     String credExId = JsonPath.read(body, "$.credential_exchange_id");
                     String credentialProposal = JsonPath.parse((LinkedHashMap)JsonPath.read(body, "$.credential_proposal_dict")).jsonString();
                     if(checkCredentialProposal(connectionId, credExId, credentialProposal)) {
+                        /**
+                        * Send Presentation Request API 
+                        * Guide : https://initial-v2-platform.readthedocs.io/ko/master/open_api_proof/#step-1-mandatory-verifier-holder-verification-request
+                        * Swagger : https://app.swaggerhub.com/apis-docs/khujin1/initial_Cloud_Agent_Open_API/1.0.4#/present-proof%20v1.0/post_present_proof_send_verification_request
+                        */
                         sendPresentationRequest(connectionId);
                     }
                 }
@@ -101,6 +106,11 @@ public class GlobalService {
                     if (enableRevoke) {
                         String connectionId = JsonPath.read(body, "$.connection_id");
                         String credExId = connIdToCredExId.get(connectionId);
+                        /**
+                        * Revocation Credential Request API 
+                        * Guide : https://initial-v2-platform.readthedocs.io/ko/master/open_api_revocation/
+                        * Swagger : https://app.swaggerhub.com/apis-docs/khujin1/initial_Cloud_Agent_Open_API/1.0.4#/revocation/post_revocation_revoke
+                        */
                         revokeCredential(credExId);
                     }
                 }
@@ -133,12 +143,22 @@ public class GlobalService {
                         // 3-1. 검증 값 정보로 발행할 증명서가 한정되지 않는 경우 추가 정보 요구
                         log.info("Web View enabled -> sendWebView");
                         String connectionId = JsonPath.read(body, "$.connection_id");
+                        /**
+                        * Send Message Request API 
+                        * Guide : https://initial-v2-platform.readthedocs.io/ko/master/open_api_message/#1-webview-spec
+                        * Swagger : https://app.swaggerhub.com/apis-docs/khujin1/initial_Cloud_Agent_Open_API/1.0.4#/basicmessage/post_connections__conn_id__send_message
+                        */
                         sendWebView(connectionId, attrs, body);
                     }
                     else {
                         // 3-2. 검증 값 정보 만으로 발행할 증명서가 한정되는 경우 증명서 바로 발행
                         log.info("Web View is not used -> sendCredentialOffer");
                         String connectionId = JsonPath.read(body, "$.connection_id");
+                        /**
+                        * Send Credential Offer Request API 
+                        * Guide : https://initial-v2-platform.readthedocs.io/ko/master/open_api_auto_credential/#step-1-mandatory-holder
+                        * Swagger : https://app.swaggerhub.com/apis-docs/khujin1/initial_Cloud_Agent_Open_API/1.0.4#/issue-credential%20v1.0/post_issue_credential_records__cred_ex_id__send_offer
+                        */
                         sendCredentialOffer(connectionId, attrs, null);
                     }
                 }
