@@ -130,7 +130,9 @@ public class GlobalService {
                 }
                 else if (state.equals("proposal_received")) {
                     String connectionId = JsonPath.read(body, "$.connection_id");
-                    sendToeicPresentationRequest(connectionId);
+                    // (For Test) 모바일 가입 증명 요청
+                    //sendToeicPresentationRequest(connectionId);
+                    sendMobilePresentationRequest(connectionId);
                 }
                 // 3. holder 가 보낸 모바일 가입증명 검증 완료
                 else if (state.equals("verified")) {
