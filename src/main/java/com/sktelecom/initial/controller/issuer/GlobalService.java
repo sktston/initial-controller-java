@@ -45,7 +45,6 @@ public class GlobalService {
 
     LinkedHashMap<String, String> connIdToCredExId = new LinkedHashMap<>(); // cache to keep credential issuing flow
     LinkedHashMap<String, String> attrs = new LinkedHashMap<>(); // cache to keep credential issuing flow
-    LinkedHashMap<String, Boolean> connIdEnableWebview = new LinkedHashMap<>(); // cache to keep credential issuing flow
 
     // for revocation example
     static boolean enableRevoke = Boolean.parseBoolean(System.getenv().getOrDefault("ENABLE_REVOKE", "false"));
@@ -140,15 +139,16 @@ public class GlobalService {
                     log.info("- Case (topic:" + topic + ", state:" + state + ") -> getPresentationResult");
                     LinkedHashMap<String, String> attrs = getPresentationResult(body);
                     String name = getPresentationName(body);
-                    String connectionId = JsonPath.read(body, "$.connection_id");
                     if (name.equals("모바일 가입증명 검증")) {
-                        if (connIdEnableWebview.get(connectionId)) {
+                        if (enableWebView) {
                             // 3-1. 검증 값 정보로 발행할 증명서가 한정되지 않는 경우 추가 정보 요구
                             log.info("Web View enabled -> sendWebView");
+                            String connectionId = JsonPath.read(body, "$.connection_id");
                             sendWebView(connectionId, attrs, body);
                         } else {
                             // 3-2. 검증 값 정보 만으로 발행할 증명서가 한정되는 경우 증명서 바로 발행
                             log.info("Web View is not used -> sendCredentialOffer");
+                            String connectionId = JsonPath.read(body, "$.connection_id");
                             sendCredentialOffer(connectionId, attrs, null, null);
                         }
                     }
@@ -266,18 +266,6 @@ public class GlobalService {
             String requestedCredDefId = JsonPath.read(credentialProposal, "$.cred_def_id");
             if (requestedCredDefId.equals(credDefId)){
                 connIdToCredExId.put(connectionId, credExId);
-
-                // store issue type
-                try {
-                    String comment = JsonPath.read(credentialProposal, "$.comment");
-                    if (comment.equals("disable_webview"))
-                        connIdEnableWebview.put(connectionId, false);
-                    else
-                        connIdEnableWebview.put(connectionId, true);
-                } catch (PathNotFoundException e) {
-                    connIdEnableWebview.put(connectionId, true);
-                }
-
                 return true;
             }
             log.warn("This issuer can issue credDefId:" + credDefId);
