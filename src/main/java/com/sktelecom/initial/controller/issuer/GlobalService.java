@@ -565,12 +565,11 @@ public class GlobalService {
 
         // value insertion
         String body = JsonPath.parse("{" +
-                "  \"counter_proposal\": {" +
                 "    \"cred_def_id\": " + credDefId + "," +
                 "    \"connection_id\": " + connectionId + "," +
                 "    \"auto_remove\": true," +
                 "    \"comment\": \"JJ Test\"," +
-                "    \"credential_proposal\": {" +
+                "    \"credential_preview\": {" +
                 "      \"attributes\": [" +
                 "        { \"name\": \"date_of_birth\", \"value\": \"" + value.get("date_of_birth")  + "\" }," +
                 "        { \"name\": \"date_of_test\", \"value\": \"" + value.get("date_of_test") + "\" }," +
@@ -583,7 +582,6 @@ public class GlobalService {
                 "        { \"name\": \"score_of_total\", \"value\": \"" + value.get("score_of_total") + "\" }" +
                 "      ]" +
                 "    }" +
-                "  }" +
                 "}").jsonString();
         //String credExId = connIdToCredExId.get(connectionId);
         String response = client.requestPOST(agentApiUrl + "/issue-credential/send-offer", accessToken, body);
