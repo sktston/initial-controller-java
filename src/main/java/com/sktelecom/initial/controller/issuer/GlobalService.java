@@ -147,7 +147,7 @@ public class GlobalService {
                             // 3-2. 검증 값 정보 만으로 발행할 증명서가 한정되는 경우 증명서 바로 발행
                             log.info("Web View is not used -> sendCredentialOffer");
                             String connectionId = JsonPath.read(body, "$.connection_id");
-                            sendCredentialOffer(connectionId, attrs, null, null);
+                            sendCredentialOfferConnectionId(connectionId, attrs, null, null);
                         }
                     }
                 }
