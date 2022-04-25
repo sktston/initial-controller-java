@@ -549,6 +549,47 @@ public class GlobalService {
         log.info("response: " + response);
     }
 
+    public void sendCredentialOfferConnectionId(String connectionId, LinkedHashMap<String, String> attrs, String selectedItemId, String eng_name) {
+        // TODO: need to implement business logic to query information for holder
+        // we assume that the value is obtained by querying DB (e.g., attrs.mobileNum and selectedItemId)
+        LinkedHashMap<String, String> value = new LinkedHashMap<>();
+        value.put("date_of_birth", attrs.get("모바일 가입증명 (1.0) date_of_birth"));
+        value.put("date_of_test", selectedItemId);
+        value.put("english_name", eng_name);
+        value.put("exp_date", getRandomInt(2021, 2024) + "0228");
+        value.put("korean_name", attrs.get("모바일 가입증명 (1.0) person_name"));
+        value.put("registration_number", "123456789-987654321");
+        value.put("score_of_listening", getRandomInt(100, 444) + "");
+        value.put("score_of_reading", "");
+        value.put("score_of_total", "990");
+
+        // value insertion
+        String body = JsonPath.parse("{" +
+                "  \"counter_proposal\": {" +
+                "    \"cred_def_id\": " + credDefId + "," +
+                "    \"connection_id\": " + connectionId + "," +
+                "    \"auto_remove\": true," +
+                "    \"comment\": \"JJ Test\"," +
+                "    \"credential_proposal\": {" +
+                "      \"attributes\": [" +
+                "        { \"name\": \"date_of_birth\", \"value\": \"" + value.get("date_of_birth")  + "\" }," +
+                "        { \"name\": \"date_of_test\", \"value\": \"" + value.get("date_of_test") + "\" }," +
+                "        { \"name\": \"english_name\", \"value\": \"" + value.get("english_name") + "\" }," +
+                "        { \"name\": \"exp_date\", \"value\": \"" +  value.get("exp_date")  + "\" }," +
+                "        { \"name\": \"korean_name\", \"value\": \"" + value.get("korean_name") + "\" }" +
+                "        { \"name\": \"registration_number\", \"value\": \"" + value.get("registration_number") + "\" }" +
+                "        { \"name\": \"score_of_listening\", \"value\": \"" + value.get("score_of_listening") + "\" }" +
+                "        { \"name\": \"score_of_reading\", \"value\": \"" + value.get("score_of_reading") + "\" }" +
+                "        { \"name\": \"score_of_total\", \"value\": \"" + value.get("score_of_total") + "\" }" +
+                "      ]" +
+                "    }" +
+                "  }" +
+                "}").jsonString();
+        //String credExId = connIdToCredExId.get(connectionId);
+        String response = client.requestPOST(agentApiUrl + "/issue-credential/records/send-offer", accessToken, body);
+        log.info("response: " + response);
+    }
+
     public void sendWebView(String connectionId, LinkedHashMap<String, String> attrs, String presExRecord) {
         // TODO: need to implement business logic to query information for holder and prepare web view
         // we send web view form page (GET webViewUrl?connectionId={connectionId}) to holder in order to select a item by user
@@ -574,7 +615,8 @@ public class GlobalService {
 
         // 3-1-1. 추가 정보 기반으로 증명서 발행
         log.info("###### sendCredentialOffer with connectionId:" + connectionId + ", selectedItemId:" + selectedItemId + ", eng_name:" + eng_name);
-        sendCredentialOffer(connectionId, attrs, selectedItemId, eng_name);
+        //sendCredentialOffer(connectionId, attrs, selectedItemId, eng_name);
+        sendCredentialOfferConnectionId(connectionId, attrs, selectedItemId, eng_name);
     }
 
     public void revokeCredential(String credExId) {
