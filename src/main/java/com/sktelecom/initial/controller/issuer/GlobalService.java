@@ -585,7 +585,7 @@ public class GlobalService {
                 "}").jsonString();
         //String credExId = connIdToCredExId.get(connectionId);
         String response = client.requestPOST(agentApiUrl + "/issue-credential/send-offer", accessToken, body);
-        log.info("response: " + response);
+        log.info("sendCredentialOfferConnectionId response: " + response);
     }
 
     public void sendWebView(String connectionId, LinkedHashMap<String, String> attrs, String presExRecord) {
