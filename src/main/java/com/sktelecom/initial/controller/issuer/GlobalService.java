@@ -147,7 +147,9 @@ public class GlobalService {
                             // 3-2. 검증 값 정보 만으로 발행할 증명서가 한정되는 경우 증명서 바로 발행
                             log.info("Web View is not used -> sendCredentialOffer");
                             String connectionId = JsonPath.read(body, "$.connection_id");
-                            sendCredentialOfferConnectionId(connectionId, attrs, null, null);
+                            //sendCredentialOfferConnectionId(connectionId, attrs, null, null);
+                            sendCredentialOffer(connectionId, attrs, null, null);
+
                         }
                     }
                 }
@@ -613,8 +615,8 @@ public class GlobalService {
 
         // 3-1-1. 추가 정보 기반으로 증명서 발행
         log.info("###### sendCredentialOffer with connectionId:" + connectionId + ", selectedItemId:" + selectedItemId + ", eng_name:" + eng_name);
-        //sendCredentialOffer(connectionId, attrs, selectedItemId, eng_name);
-        sendCredentialOfferConnectionId(connectionId, attrs, selectedItemId, eng_name);
+        sendCredentialOffer(connectionId, attrs, selectedItemId, eng_name);
+        //sendCredentialOfferConnectionId(connectionId, attrs, selectedItemId, eng_name);
     }
 
     public void revokeCredential(String credExId) {
