@@ -51,7 +51,7 @@ task issuer_webview(type:JavaExec) {
 	main = 'com.sktelecom.initial.controller.issuer.Application'
 	args(['--spring.config.location=classpath:/application-issuer.properties'])
 	environment("ENABLE_WEB_VIEW", "true")
-	environment("ENABLE_REVOKE", "true")
+	//environment("ENABLE_REVOKE", "true")
 }
 task issuer_revoke(type:JavaExec) {
 	group 'application'
