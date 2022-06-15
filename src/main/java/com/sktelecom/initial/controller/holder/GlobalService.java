@@ -101,14 +101,15 @@ public class GlobalService {
         try {
             state = JsonPath.read(body, "$.state");
         } catch (PathNotFoundException e) {}
-        log.info("handleEvent >>> topic:" + topic + ", state:" + state + ", body:" + body);
+        log.info("handleEvent >>> topic:" + topic + ", state:" + state);
 
         switch(topic) {
             case "connections":
                 // 1. connection 이 완료됨 -> credential 을 요청함
                 if (state.equals("active")) {
                     log.info("connection established count:" + ++count);
-                    break;
+                    deleteConnection(JsonPath.read(body, "$.connection_id"));
+                    receiveInvitationUrl(invitationUrl);
 /*                    if (serviceType.equals("issuer")) {
                         log.info("- Case (topic:" + topic + ", state:" + state + ") -> sendCredentialProposal");
                         String connectionId = JsonPath.read(body, "$.connection_id");
@@ -179,6 +180,12 @@ public class GlobalService {
             default:
                 log.warn("- Warning: Unexpected topic:" + topic);
         }
+    }
+
+    void deleteConnection(String connId) {
+        String response = client.requestDELETE(agentApiUrl + "/connections/" + connId, accessToken);
+        log.debug("response: " + response);
+        log.info("connId:" + connId + " is deleted");
     }
 
     public void handleEventOnPreparation(String body) {
