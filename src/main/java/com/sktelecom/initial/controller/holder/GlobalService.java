@@ -49,6 +49,8 @@ public class GlobalService {
     String phase = "";
     boolean webhookUrlIsValid = false;
 
+    int count = 0;
+
     // for manual web view example
     static boolean enableManualWebView = Boolean.parseBoolean(System.getenv().getOrDefault("ENABLE_MANUAL_WEBVIEW", "false"));
 
@@ -105,7 +107,9 @@ public class GlobalService {
             case "connections":
                 // 1. connection 이 완료됨 -> credential 을 요청함
                 if (state.equals("active")) {
-                    if (serviceType.equals("issuer")) {
+                    log.info("connection established count:" + ++count);
+                    break;
+/*                    if (serviceType.equals("issuer")) {
                         log.info("- Case (topic:" + topic + ", state:" + state + ") -> sendCredentialProposal");
                         String connectionId = JsonPath.read(body, "$.connection_id");
                         sendCredentialProposal(connectionId, CredDefIdToReceive);
@@ -114,7 +118,7 @@ public class GlobalService {
                         log.info("- Case (topic:" + topic + ", state:" + state + ") -> sendPresentationProposal");
                         String connectionId = JsonPath.read(body, "$.connection_id");
                         sendPresentationProposal(connectionId);
-                    }
+                    }*/
                 }
                 break;
             case "issue_credential":
