@@ -486,6 +486,7 @@ public class GlobalService {
                 "        non_revoked: { from: 0, to: " + curUnixTime + " }," +
                 "        restrictions: [ {cred_def_id: '" + mobile_credDefId + "'} ]" +
                 "      }" +
+                "    }," +
                 "    requested_predicates: {" +
                 "    }" +
                 "  }" +
