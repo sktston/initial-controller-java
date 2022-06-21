@@ -95,8 +95,8 @@ public class GlobalService {
                     String credExId = JsonPath.read(body, "$.credential_exchange_id");
                     String credentialProposal = JsonPath.parse((LinkedHashMap)JsonPath.read(body, "$.credential_proposal_dict")).jsonString();
                     if(checkCredentialProposal(connectionId, credExId, credentialProposal)) {
-                        sendMobilePresentationRequest(connectionId);
-                        //sendManualMobilePresentationRequest(connectionId); //JJ self attested test
+                        //sendMobilePresentationRequest(connectionId);
+                        sendManualMobilePresentationRequest(connectionId); //JJ self attested test
                     }
                 }
                 // 4. holder 가 증명서를 정상 저장하였음 -> 완료 (revocation 은 아래 코드 참조)
@@ -468,7 +468,7 @@ public class GlobalService {
                 "  comment: '" + agreement + "'," +
                 "  connection_id: '" + connectionId + "'," +
                 "  proof_request: {" +
-                "    name: '모바일가입증명 검증'," +
+                "    name: '모바일 가입증명 검증'," +
                 "    version: '1.0'," +
                 "    requested_attributes: {" +
                 "      person_name: {" +
