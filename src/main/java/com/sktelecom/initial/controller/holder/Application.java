@@ -22,8 +22,8 @@ public class Application {
     static final String logLevel = "INFO"; // INFO DEBUG
 
     // Case of runType issue (모바일가입증명 제출 후 발급)
-    static String testIssuerInvitationUrl = "http://221.168.33.78:8050/invitation-url"; // test issuer (default: dev ybm issuer)
-    static String testCredDefId = "DrLbXFSao4Vo8gMfjxPxU1:3:CL:1617698238:81df0010-62b4-45b1-bd00-8d0ad74762fd"; // test issuer (default: dev ybm issuer)
+    static String testIssuerInvitationUrl = "https://50c9-203-236-8-219.jp.ngrok.io/invitation-url"; // test issuer (default: dev ybm issuer)
+    static String testCredDefId = "B88XyWA53B6pBcy6ncWsgh:3:CL:1618984624:c71cc71b-5e98-431e-a201-fba005fe787d"; // test issuer (default: dev ybm issuer)
 
     // Case of runType verify (모바일가입증명 제출 후 완료)
     static String testVerifierInvitationUrl = "http://221.168.33.105:8041/invitation-url"; // test verifier (default: dev mobile verifier)
@@ -57,6 +57,7 @@ public class Application {
         switch (logLevel) {
             case "DEBUG":
                 log.setLevel(Level.DEBUG);
+                break;
             default:
                 log.setLevel(Level.INFO);
         }
@@ -173,7 +174,7 @@ public class Application {
 
         // Send Presentation of mobile identification credential
         log.info("Receive presentation request for mobile identification credential");
-        String presExId = receivePresentationRequest(connectionId);
+        String presExId = receiveIdByTopicAndState(connectionId, "present_proof", "request_received");
         log.info("presentation exchange id: " + presExId);
 
         log.info("Print agreement");
@@ -186,12 +187,12 @@ public class Application {
 
         // Receive last Event
         log.info("Receive last event to check the topic is basicmessages or issue_credential");
-        String topic = receiveLastEventTopic(connectionId);
+        String topic = receiveTopicByCondition(connectionId);
 
         if (topic.equals("basicmessages")) {
             // (Webview) Receive Basic Message
             log.info("Receive basic message to get webview url");
-            String msgId = receiveBasicMessage(connectionId);
+            String msgId = receiveIdByTopicAndState(connectionId, "basicmessages", "received");
             printWebviewUrl(msgId);
             log.info("Click above webviewUrl and Submit");
         }
@@ -230,7 +231,7 @@ public class Application {
 
         // Send Presentation of mobile identification credential
         log.info("Receive presentation request for mobile identification credential");
-        String presExId = receivePresentationRequest(connectionId);
+        String presExId = receiveIdByTopicAndState(connectionId, "present_proof", "request_received");
         log.info("presentation exchange id: " + presExId);
 
         log.info("Print agreement");
@@ -448,57 +449,58 @@ public class Application {
         System.exit(-1);
     }
 
-    static String receivePresentationRequest(String connectionId) {
-        log.info("Wait until presentation exchange (state: request_received)");
+    static String receiveIdByTopicAndState(String connectionId, String topic, String state) {
+        log.info("Wait until last event (" + topic + ", " + state + ")");
         for (int retry=0; retry < pollingRetryMax; retry++) {
-            String params = "?state=request_received&connection_id=" + connectionId;
-            String response = client.requestGET(agentDataStoreUrl + "/present-proof/records" + params, accessToken);
+            String params = "?connection_id=" + connectionId;
+            String response = client.requestGET(agentDataStoreUrl + "/events/last" + params, accessToken);
             log.debug("response: " + response);
-            ArrayList<Object> presExes = JsonPath.read(response, "$.results");
-            log.info("the number of presentation exchange (state: request_received) : " + presExes.size());
-            if (!presExes.isEmpty())
-                return JsonPath.read(presExes.get(0), "$.presentation_exchange_id");
+            String resTopic = JsonPath.read(response, "$.topic");
+            String resState = JsonPath.read(response, "$.state");
+            log.info("last event: (" + resTopic + ", " + resState + ")");
+            if (resState.equals("abandoned")) {
+                log.info("error message: " + JsonPath.read(response, "$.error_msg"));
+                System.exit(-1);
+            }
+            if (resTopic.equals(topic) && resState.equals(state)) {
+                switch (topic) {
+                    case "issue_credential":
+                        return JsonPath.read(response, "$.credential_exchange_id");
+                    case "present_proof":
+                        return JsonPath.read(response, "$.presentation_exchange_id");
+                    case "basicmessages":
+                        return JsonPath.read(response, "$.message_id");
+                    default:
+                        return null;
+                }
+            }
             Common.sleep(pollingCyclePeriod);
         }
-        log.error("timeout - presentation exchange is not (state: request_received)");
+        log.error("timeout - last event is not (" + topic + ", " + state + ")");
         System.exit(-1);
         return null;
     }
 
-    static String receiveBasicMessage(String connectionId) {
-        log.info("Wait until basic message (state: received)");
-        for (int retry=0; retry < pollingRetryMax; retry++) {
-            String params = "?state=received&connection_id=" + connectionId;
-            String response = client.requestGET(agentDataStoreUrl + "/basic-messages" + params, accessToken);
-            log.debug("response: " + response);
-            ArrayList<Object> basicMsgs = JsonPath.read(response, "$.results");
-            log.info("the number of basic message (state: received) : " + basicMsgs.size());
-            if (!basicMsgs.isEmpty())
-                return JsonPath.read(basicMsgs.get(0), "$.message_id");
-            Common.sleep(pollingCyclePeriod);
-        }
-        log.error("timeout - basic message is not (state: received)");
-        System.exit(-1);
-        return null;
-    }
-
-    static String receiveLastEventTopic(String connectionId) {
+    static String receiveTopicByCondition(String connectionId) {
         log.info("Wait until last event (basicmessages, received) or (issue_credential, offer_received)");
         for (int retry=0; retry < pollingRetryMax; retry++) {
             String params = "?connection_id=" + connectionId;
             String response = client.requestGET(agentDataStoreUrl + "/events/last" + params, accessToken);
             log.debug("response: " + response);
-            String topic = JsonPath.read(response, "$.topic");
-            String state = JsonPath.read(response, "$.state");
-            log.info("the last event : (" + topic + ", " + state + ")");
-            if (
-                    (topic.equals("basicmessages") && state.equals("received"))
-                            || (topic.equals("issue_credential") && state.equals("offer_received"))
-            )
-                return topic;
+            String resTopic = JsonPath.read(response, "$.topic");
+            String resState = JsonPath.read(response, "$.state");
+            log.info("last event: (" + resTopic + ", " + resState + ")");
+            if (resState.equals("abandoned")) {
+                log.info("error message: " + JsonPath.read(response, "$.error_msg"));
+                System.exit(-1);
+            }
+            if ((resTopic.equals("basicmessages") && resState.equals("received"))
+                    || (resTopic.equals("issue_credential") && resState.equals("offer_received"))) {
+                return resTopic;
+            }
             Common.sleep(pollingCyclePeriod);
         }
-        log.error("timeout - last event (basicmessages, received) or (issue_credential, offer_received)");
+        log.error("timeout - last event is not (basicmessages, received) or (issue_credential, offer_received)");
         System.exit(-1);
         return null;
     }
