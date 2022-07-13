@@ -23,14 +23,14 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
-    compileOnly 'org.projectlombok:lombok:1.18.20'
-    annotationProcessor 'org.projectlombok:lombok:1.18.20'
+    compileOnly 'org.projectlombok:lombok:1.18.24'
+    annotationProcessor 'org.projectlombok:lombok:1.18.24'
 
-    implementation 'com.squareup.okhttp3:okhttp:4.9.2'
-    implementation 'com.google.code.gson:gson:2.8.8'
-    implementation 'com.jayway.jsonpath:json-path:2.6.0'
+    implementation 'com.squareup.okhttp3:okhttp:4.10.0'
+    implementation 'com.google.code.gson:gson:2.9.0'
+    implementation 'com.jayway.jsonpath:json-path:2.7.0'
     implementation 'org.apache.commons:commons-lang3:3.12.0'
-    implementation 'com.google.zxing:javase:3.4.1'
+    implementation 'com.google.zxing:javase:3.5.0'
     implementation 'commons-codec:commons-codec:1.15'
     implementation 'commons-io:commons-io:2.11.0'
 }
@@ -51,13 +51,6 @@ task issuer_webview(type:JavaExec) {
 	main = 'com.sktelecom.initial.controller.issuer.Application'
 	args(['--spring.config.location=classpath:/application-issuer.properties'])
 	environment("ENABLE_WEB_VIEW", "true")
-}
-task issuer_revoke(type:JavaExec) {
-	group 'application'
-	classpath sourceSets.main.runtimeClasspath
-	main = 'com.sktelecom.initial.controller.issuer.Application'
-	args(['--spring.config.location=classpath:/application-issuer.properties'])
-	environment("ENABLE_REVOKE", "true")
 }
 task issuer_prod(type:JavaExec) {
 	group 'application'
@@ -82,17 +75,4 @@ task holder(type:JavaExec) {
 	classpath sourceSets.main.runtimeClasspath
 	main = 'com.sktelecom.initial.controller.holder.Application'
 	args(['--spring.config.location=classpath:/application-holder.properties'])
-}
-task holder_manual_webview(type:JavaExec) {
-	group 'application'
-	classpath sourceSets.main.runtimeClasspath
-	main = 'com.sktelecom.initial.controller.holder.Application'
-	args(['--spring.config.location=classpath:/application-holder.properties'])
-	environment("ENABLE_MANUAL_WEBVIEW", "true")
-}
-task holder_prod(type:JavaExec) {
-	group 'application'
-	classpath sourceSets.main.runtimeClasspath
-	main = 'com.sktelecom.initial.controller.holder.Application'
-	args(['--spring.config.location=classpath:/application-holder-prod.properties'])
 }
