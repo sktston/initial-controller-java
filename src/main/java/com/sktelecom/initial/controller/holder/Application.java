@@ -418,12 +418,12 @@ public class Application {
             log.debug("response: " + response);
             String resState = JsonPath.read(response, "$.state");
             log.info("credential exchange state: " + resState);
-            if (resState.equals(state))
-                return;
-            else if (resState.equals("problem_reported")) {
-                log.error("received error - " + JsonPath.read(response, "$.error_msg"));
+            if (resState.equals("abandoned")) {
+                log.info("error message: " + JsonPath.read(response, "$.error_msg"));
                 System.exit(-1);
             }
+            if (resState.equals(state))
+                return;
             Common.sleep(pollingCyclePeriod);
         }
         log.error("timeout - credential exchange is not (state: " + state + ")");
@@ -437,12 +437,12 @@ public class Application {
             log.debug("response: " + response);
             String resState = JsonPath.read(response, "$.state");
             log.info("presentation exchange state: " + resState);
-            if (resState.equals(state))
-                return;
-            else if (resState.equals("problem_reported")) {
-                log.error("received error - " + JsonPath.read(response, "$.error_msg"));
+            if (resState.equals("abandoned")) {
+                log.info("error message: " + JsonPath.read(response, "$.error_msg"));
                 System.exit(-1);
             }
+            if (resState.equals(state))
+                return;
             Common.sleep(pollingCyclePeriod);
         }
         log.error("timeout - presentation exchange is not (state: " + state + ")");
