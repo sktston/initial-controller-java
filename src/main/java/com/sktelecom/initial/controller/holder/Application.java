@@ -18,15 +18,15 @@ public class Application {
     // CONFIGURATION
     // EDIT THIS
     static final String appMode = "dev"; // dev prod
-    static final String runType = "verify"; // issue verify none
+    static final String runType = "issue"; // issue verify none
     static final String logLevel = "INFO"; // INFO DEBUG
 
     // Case of runType issue (모바일가입증명 제출 후 발급)
-    static String testIssuerInvitationUrl = "https://50c9-203-236-8-219.jp.ngrok.io/invitation-url"; // test issuer (default: dev ybm issuer)
-    static String testCredDefId = "B88XyWA53B6pBcy6ncWsgh:3:CL:1618984624:c71cc71b-5e98-431e-a201-fba005fe787d"; // test issuer (default: dev ybm issuer)
+    static String testIssuerInvitationUrl = "http://221.168.33.78:8050/invitation-url"; // test issuer (default: dev ybm issuer)
+    static String testCredDefId = "DrLbXFSao4Vo8gMfjxPxU1:3:CL:1617698238:81df0010-62b4-45b1-bd00-8d0ad74762fd"; // test issuer (default: dev ybm issuer)
 
     // Case of runType verify (모바일가입증명 제출 후 완료)
-    static String testVerifierInvitationUrl = "https://e0de-203-236-8-219.jp.ngrok.io/invitation-url"; // test verifier (default: dev mobile verifier)
+    static String testVerifierInvitationUrl = "http://221.168.33.105:8041/invitation-url"; // test verifier (default: dev mobile verifier)
 
     // STATIC
     // DO NOT CHANGE THIS
