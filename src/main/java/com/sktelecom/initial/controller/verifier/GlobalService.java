@@ -55,48 +55,34 @@ public class GlobalService {
             webhookUrlIsValid = true;
 
         String topic = JsonPath.read(body, "$.topic");
-        String state = null;
-        try {
-            state = JsonPath.read(body, "$.state");
-        } catch (PathNotFoundException e) {}
+        String state = JsonPath.read(body, "$.state");
         log.info("handleEvent >>> topic:" + topic + ", state:" + state + ", body:" + body);
 
         switch(topic) {
             case "present_proof":
-                if (state == null) {
-                    log.warn("- Case (topic:" + topic + ", ProblemReport) -> Print Error Message");
-                    String errorMsg = JsonPath.read(body, "$.error_msg");
-                    log.warn("  - error_msg: " + errorMsg);
-                }
-                else if (state.equals("proposal_received")) {
+                // 1. holder 가 모바일 가입증명 검증 요청을 요청
+                if (state.equals("proposal_received")) {
                     String connectionId = JsonPath.read(body, "$.connection_id");
                     sendPresentationRequest(connectionId);
                 }
-                // 3. holder 가 보낸 모바일 가입증명 검증 완료
+                // 2. holder 가 보낸 모바일 가입증명 검증 완료
                 else if (state.equals("verified")) {
                     log.info("- Case (topic:" + topic + ", state:" + state + ") -> getPresentationResult");
                     LinkedHashMap<String, String> attrs = getPresentationResult(body);
                     // TODO: store user information
                 }
-                break;
-            case "basicmessages":
-                String content = JsonPath.read(body, "$.content");
-                String type = getTypeFromBasicMessage(content);
-                // 2. holder 가 개인정보이용 동의를 보냄 -> 동의 내용 저장
-                if (type != null && type.equals("initial_agreement_decision")) {
-                    if (isAgreementAgreed(content)) {
-                        log.info("- Case (topic:" + topic + ", state:" + state + ", type:" + type + ") -> AgreementAgreed");
-                        // TODO: store agreement decision
-                    }
+                else if (state.equals("abandoned")) {
+                    log.info("- Case (topic:" + topic + ", state:" + state + ") -> Print Error Message");
+                    String errorMsg = JsonPath.read(body, "$.error_msg");
+                    log.warn("  - error_msg: " + errorMsg);
                 }
-                else
-                    log.warn("- Warning: Unexpected type:" + type);
                 break;
             case "problem_report":
                 log.warn("- Case (topic:" + topic + ") -> Print body");
                 log.warn("  - body:" + body);
                 break;
-            case "connections":
+            case "connections":;
+            case "basicmessages":
             case "issue_credential":
             case "revocation_registry":
             case "issuer_cred_rev":
@@ -249,21 +235,6 @@ public class GlobalService {
                 "}").jsonString();
         String response = client.requestPOST(agentApiUrl + "/present-proof/send-verification-request", accessToken, body);
         log.info("response: " + response);
-    }
-
-    public boolean isAgreementAgreed(String content) {
-        try {
-            String decisionContent = JsonPath.parse((LinkedHashMap)JsonPath.read(content, "$.content")).jsonString();
-            log.info("decisionContent: " + decisionContent);
-            String agree = JsonPath.read(decisionContent, "$.agree_yn");
-            if (agree.equals("Y"))
-                return true;
-            log.warn("Agreement is not Agreed  -> Ignore");
-        } catch (PathNotFoundException e) {
-            log.warn("Invalid content format  -> Ignore");
-        }
-
-        return false;
     }
 
     public LinkedHashMap<String, String> getPresentationResult(String presExRecord) {
