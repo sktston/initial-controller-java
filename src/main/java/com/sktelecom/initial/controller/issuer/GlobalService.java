@@ -69,21 +69,13 @@ public class GlobalService {
             webhookUrlIsValid = true;
 
         String topic = JsonPath.read(body, "$.topic");
-        String state = null;
-        try {
-            state = JsonPath.read(body, "$.state");
-        } catch (PathNotFoundException e) {}
+        String state = JsonPath.read(body, "$.state");
         log.info("handleEvent >>> topic:" + topic + ", state:" + state + ", body:" + body);
 
         switch(topic) {
             case "issue_credential":
-                if (state == null) {
-                    log.warn("- Case (topic:" + topic + ", ProblemReport) -> Print Error Message");
-                    String errorMsg = JsonPath.read(body, "$.error_msg");
-                    log.warn("  - error_msg: " + errorMsg);
-                }
                 // 1. holder 가 credential 을 요청함 -> 모바일 가입증명 검증 요청
-                else if (state.equals("proposal_received")) {
+                if (state.equals("proposal_received")) {
                     log.info("- Case (topic:" + topic + ", state:" + state + ") -> checkCredentialProposal && sendPresentationRequest");
                     String connectionId = JsonPath.read(body, "$.connection_id");
                     String credExId = JsonPath.read(body, "$.credential_exchange_id");
@@ -97,13 +89,14 @@ public class GlobalService {
                         sendPresentationRequest(connectionId);
                     }
                 }
-                // 4. holder 가 증명서를 정상 저장하였음 -> 완료 (revocation 은 아래 코드 참조)
+                // 3. holder 가 증명서를 정상 저장하였음 -> 완료
                 else if (state.equals("credential_acked")) {
                     log.info("- Case (topic:" + topic + ", state:" + state + ") -> credential issued successfully");
 
                     // TODO: should store credential_exchange_id to revoke this credential
                     // connIdToCredExId is simple example for this
                     if (enableRevoke) {
+                        log.info("Revoke is enabled -> revokeCredential");
                         String connectionId = JsonPath.read(body, "$.connection_id");
                         String credExId = connIdToCredExId.get(connectionId);
                         /**
@@ -114,33 +107,20 @@ public class GlobalService {
                         revokeCredential(credExId);
                     }
                 }
-                break;
-            case "basicmessages":
-                String content = JsonPath.read(body, "$.content");
-                String type = getTypeFromBasicMessage(content);
-                // 2. holder 가 개인정보이용 동의를 보냄 -> 동의 내용 저장
-                if (type != null && type.equals("initial_agreement_decision")) {
-                    if (isAgreementAgreed(content)) {
-                        log.info("- Case (topic:" + topic + ", state:" + state + ", type:" + type + ") -> AgreementAgreed");
-                        // TODO: store agreement decision
-                    }
-                }
-                else
-                    log.warn("- Warning: Unexpected type:" + type);
-                break;
-            case "present_proof":
-                if (state == null) {
-                    log.warn("- Case (topic:" + topic + ", ProblemReport) -> Print Error Message");
+                else if (state.equals("abandoned")) {
+                    log.info("- Case (topic:" + topic + ", state:" + state + ") -> Print Error Message");
                     String errorMsg = JsonPath.read(body, "$.error_msg");
                     log.warn("  - error_msg: " + errorMsg);
                 }
-                // 3. holder 가 보낸 모바일 가입증명 검증 완료
-                else if (state.equals("verified")) {
+                break;
+            case "present_proof":
+                // 2. holder 가 보낸 모바일 가입증명 검증 완료 -> 증명서 발행
+                if (state.equals("verified")) {
                     log.info("- Case (topic:" + topic + ", state:" + state + ") -> getPresentationResult");
                     LinkedHashMap<String, String> attrs = getPresentationResult(body);
 
                     if (enableWebView) {
-                        // 3-1. 검증 값 정보로 발행할 증명서가 한정되지 않는 경우 추가 정보 요구
+                        // 2-1. 검증 값 정보로 발행할 증명서가 한정되지 않는 경우 추가 정보 요구
                         log.info("Web View enabled -> sendWebView");
                         String connectionId = JsonPath.read(body, "$.connection_id");
                         /**
@@ -151,7 +131,7 @@ public class GlobalService {
                         sendWebView(connectionId, attrs, body);
                     }
                     else {
-                        // 3-2. 검증 값 정보 만으로 발행할 증명서가 한정되는 경우 증명서 바로 발행
+                        // 2-2. 검증 값 정보 만으로 발행할 증명서가 한정되는 경우 증명서 바로 발행
                         log.info("Web View is not used -> sendCredentialOffer");
                         String connectionId = JsonPath.read(body, "$.connection_id");
                         /**
@@ -162,12 +142,18 @@ public class GlobalService {
                         sendCredentialOffer(connectionId, attrs, null);
                     }
                 }
+                else if (state.equals("abandoned")) {
+                    log.info("- Case (topic:" + topic + ", state:" + state + ") -> Print Error Message");
+                    String errorMsg = JsonPath.read(body, "$.error_msg");
+                    log.warn("  - error_msg: " + errorMsg);
+                }
                 break;
             case "problem_report":
                 log.warn("- Case (topic:" + topic + ") -> Print body");
                 log.warn("  - body:" + body);
                 break;
             case "connections":
+            case "basicmessages":
             case "revocation_registry":
             case "issuer_cred_rev":
                 break;
@@ -366,21 +352,6 @@ public class GlobalService {
                 "}").jsonString();
         String response = client.requestPOST(agentApiUrl + "/present-proof/send-verification-request", accessToken, body);
         log.info("response: " + response);
-    }
-
-    public boolean isAgreementAgreed(String content) {
-        try {
-            String decisionContent = JsonPath.parse((LinkedHashMap)JsonPath.read(content, "$.content")).jsonString();
-            log.info("decisionContent: " + decisionContent);
-            String agree = JsonPath.read(decisionContent, "$.agree_yn");
-            if (agree.equals("Y"))
-                return true;
-            log.warn("Agreement is not Agreed  -> Ignore");
-        } catch (PathNotFoundException e) {
-            log.warn("Invalid content format  -> Ignore");
-        }
-
-        return false;
     }
 
     public LinkedHashMap<String, String> getPresentationResult(String presExRecord) {

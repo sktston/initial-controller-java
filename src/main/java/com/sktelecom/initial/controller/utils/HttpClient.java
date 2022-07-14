@@ -38,10 +38,11 @@ public class HttpClient {
         return raw(request);
     }
 
-    public String requestPOSTBasicAuth(String url, String username, String password, String json) {
+    public String requestPOSTBasicAuth(String url, String username, String password, String form) {
         Request request = new Request.Builder()
                 .url(url)
-                .post(RequestBody.create(json, JSON_TYPE))
+                .post(RequestBody.create(form, MediaType.parse("application/x-www-form-urlencoded")))
+                .addHeader("Content-Type", "application/x-www-form-urlencoded")
                 .build();
         request = addBasic(request, username, password);
         return raw(request);
