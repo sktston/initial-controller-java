@@ -18,7 +18,7 @@ public class Application {
     // CONFIGURATION
     // EDIT THIS
     static final String appMode = "dev"; // dev prod
-    static final String runType = "issue"; // issue verify none
+    static final String runType = "issue"; // issue verify
     static final String logLevel = "INFO"; // INFO DEBUG
 
     // Case of runType issue (모바일가입증명 제출 후 발급)
