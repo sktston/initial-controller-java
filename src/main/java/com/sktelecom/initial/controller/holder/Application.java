@@ -22,11 +22,11 @@ public class Application {
     static final String logLevel = "INFO"; // INFO DEBUG
 
     // Case of runType issue (모바일가입증명 제출 후 발급)
-    static String testIssuerInvitationUrl = "http://221.168.33.78:8050/invitation-url"; // test issuer (default: dev ybm issuer)
-    static String testCredDefId = "DrLbXFSao4Vo8gMfjxPxU1:3:CL:1617698238:81df0010-62b4-45b1-bd00-8d0ad74762fd"; // test issuer (default: dev ybm issuer)
+    static String tpIssuerInvitationUrl = "http://221.168.33.78:8050/invitation-url"; // test issuer (default: dev ybm issuer)
+    static String tpCredDefId = "DrLbXFSao4Vo8gMfjxPxU1:3:CL:1617698238:81df0010-62b4-45b1-bd00-8d0ad74762fd"; // test issuer (default: dev ybm issuer)
 
     // Case of runType verify (모바일가입증명 제출 후 완료)
-    static String testVerifierInvitationUrl = "http://221.168.33.105:8041/invitation-url"; // test verifier (default: dev mobile verifier)
+    static String tpVerifierInvitationUrl = "http://221.168.33.105:8041/invitation-url"; // test verifier (default: dev mobile verifier)
 
     // STATIC
     // DO NOT CHANGE THIS
@@ -162,7 +162,7 @@ public class Application {
 
         // Establish Connection
         log.info("Receive invitation to establish connection");
-        String connectionId = receiveInvitation(testIssuerInvitationUrl);
+        String connectionId = receiveInvitation(tpIssuerInvitationUrl);
         log.info("connection id: " + connectionId);
         waitUntilConnectionState(connectionId, "active");
         log.info("connection established");
@@ -220,7 +220,7 @@ public class Application {
 
         // Establish Connection
         log.info("Receive invitation to establish connection");
-        String connectionId = receiveInvitation(testVerifierInvitationUrl);
+        String connectionId = receiveInvitation(tpVerifierInvitationUrl);
         log.info("connection id: " + connectionId);
         waitUntilConnectionState(connectionId, "active");
         log.info("connection established");
@@ -283,7 +283,7 @@ public class Application {
     static String sendTpCredentialProposal(String connectionId) {
         String body = JsonPath.parse("{" +
                 "  connection_id: '" + connectionId  + "'," +
-                "  cred_def_id: '" + testCredDefId + "'," +
+                "  cred_def_id: '" + tpCredDefId + "'," +
                 "}").jsonString();
         String response = client.requestPOST(agentApiUrl + "/issue-credential/send-proposal", accessToken, body);
         log.debug("response: " + response);
