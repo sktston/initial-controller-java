@@ -227,7 +227,7 @@ public class Application {
 
         // Send Presentation Proposal
         log.info("Send presentation proposal");
-        sendTpPresentationProposal(connectionId);
+        sendMobilePresentationProposal(connectionId);
 
         // Send Presentation of mobile identification credential
         log.info("Receive presentation request for mobile identification credential");
@@ -290,7 +290,7 @@ public class Application {
         return JsonPath.read(response, "$.credential_exchange_id");
     }
 
-    static void sendTpPresentationProposal(String connectionId) {
+    static void sendMobilePresentationProposal(String connectionId) {
         String body = JsonPath.parse("{" +
                 "  connection_id: '" + connectionId  + "'," +
                 "  presentation_proposal: {" +
