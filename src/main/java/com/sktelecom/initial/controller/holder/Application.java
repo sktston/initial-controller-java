@@ -22,8 +22,8 @@ public class Application {
     static final String logLevel = "INFO"; // INFO DEBUG
 
     // Case of runType issue (모바일가입증명 제출 후 발급)
-    static String tpIssuerInvitationUrl = "http://221.168.33.78:8050/invitation-url"; // test issuer (default: dev ybm issuer)
-    static String tpCredDefId = "DrLbXFSao4Vo8gMfjxPxU1:3:CL:1617698238:81df0010-62b4-45b1-bd00-8d0ad74762fd"; // test issuer (default: dev ybm issuer)
+    static String tpIssuerInvitationUrl = "http://221.168.33.105:8042/invitation-url"; // test issuer (default: dev degree issuer)
+    static String tpCredDefId = "S78qLFsHgWEs43S6QLQY8N:3:CL:1618984624:3ea6dc69-3ae5-41c9-a920-a2d08f45322f"; // test issuer (default: dev degree issuer)
 
     // Case of runType verify (모바일가입증명 제출 후 완료)
     static String tpVerifierInvitationUrl = "http://221.168.33.105:8041/invitation-url"; // test verifier (default: dev mobile verifier)
