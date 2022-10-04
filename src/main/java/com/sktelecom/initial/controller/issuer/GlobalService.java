@@ -11,6 +11,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.concurrent.TimeUnit;
 
 import static com.sktelecom.initial.controller.utils.Common.*;
 
@@ -145,6 +146,12 @@ public class GlobalService {
                             // 3-1. 검증 값 정보로 발행할 증명서가 한정되지 않는 경우 추가 정보 요구
                             log.info("Web View enabled -> sendWebView");
                             String connectionId = JsonPath.read(body, "$.connection_id");
+                            
+                            try {
+                                TimeUnit.SECONDS.sleep(1);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
                             sendWebView(connectionId, attrs, body);
                         } else {
                             // 3-2. 검증 값 정보 만으로 발행할 증명서가 한정되는 경우 증명서 바로 발행
