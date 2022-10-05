@@ -453,8 +453,14 @@ public class Application {
         log.info("Wait until last event (" + topic + ", " + state + ")");
         for (int retry=0; retry < pollingRetryMax; retry++) {
             String params = "?connection_id=" + connectionId;
+            params += "&topic=" + topic;
             String response = client.requestGET(agentDataStoreUrl + "/events/last" + params, accessToken);
             log.debug("response: " + response);
+            // no event yet
+            if (response == null) {
+                Common.sleep(pollingCyclePeriod);
+                continue;
+            }
             String resTopic = JsonPath.read(response, "$.topic");
             String resState = JsonPath.read(response, "$.state");
             log.info("last event: (" + resTopic + ", " + resState + ")");
@@ -485,8 +491,14 @@ public class Application {
         log.info("Wait until last event (basicmessages, received) or (issue_credential, offer_received)");
         for (int retry=0; retry < pollingRetryMax; retry++) {
             String params = "?connection_id=" + connectionId;
+            params += "&topic=issue_credential,basicmessages";
             String response = client.requestGET(agentDataStoreUrl + "/events/last" + params, accessToken);
             log.debug("response: " + response);
+            // no event yet
+            if (response == null) {
+                Common.sleep(pollingCyclePeriod);
+                continue;
+            }
             String resTopic = JsonPath.read(response, "$.topic");
             String resState = JsonPath.read(response, "$.state");
             log.info("last event: (" + resTopic + ", " + resState + ")");
