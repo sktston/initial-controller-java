@@ -145,6 +145,8 @@
           var userAgent = navigator.userAgent.toLowerCase();
             if (userAgent.search("android") > -1) {
                 Android.submitVC ();
+            } else if(userAgent.search("flutter") > -1) {
+                callbackHandler.postMessage("submitVC");
             }
             else {
                 webkit.messageHandlers.callbackHandler.postMessage("submitVC");
@@ -164,6 +166,8 @@
       var userAgent = navigator.userAgent.toLowerCase();
       if (userAgent.search("android") > -1) {
         Android.failVC ();
+      } else if(userAgent.search("flutter") > -1) {
+          callbackHandler.postMessage("failVC");
       }
       else {
         webkit.messageHandlers.callbackHandler.postMessage("failVC");

@@ -149,6 +149,7 @@ public class GlobalService {
                             
                             try {
                                 TimeUnit.SECONDS.sleep(1);
+                                log.info("time delay 1s");
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
