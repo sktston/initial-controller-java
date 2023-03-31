@@ -666,9 +666,7 @@ public class GlobalService {
         // todo
         LinkedHashMap<String, Object> selfAttestedAttrs = JsonPath.read(requestedProof, "$.self_attested_attrs");
         for(String key : selfAttestedAttrs.keySet())
-            attrs.put(key, JsonPath.read(selfAttestedAttrs.get(key), "$.raw"));
-        for(String key : attrs.keySet())
-            log.info("Self-Attested Attribute - " + key + ": " + attrs.get(key));
+            log.info("Self-Attested Attribute - " + key);
 
         return attrs;
     }
