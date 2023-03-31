@@ -653,13 +653,13 @@ public class GlobalService {
         String presentation = JsonPath.parse((LinkedHashMap)JsonPath.read(presExRecord, "$.presentation")).jsonString();
 
 
-        LinkedHashMap<String, Object> revealedAttrs = JsonPath.read(requestedProof, "$.presentation.revealed_attrs");
+        LinkedHashMap<String, Object> revealedAttrs = JsonPath.read(presentation, "$.presentation.revealed_attrs");
         for(String key : revealedAttrs.keySet())
             attrs.put(key, JsonPath.read(revealedAttrs.get(key), "$.raw"));
         for(String key : attrs.keySet())
             log.info("Requested Attribute - " + key + ": " + attrs.get(key));
 
-        LinkedHashMap<String, Object> predicates = JsonPath.read(requestedProof, "$.presentation.predicates");
+        LinkedHashMap<String, Object> predicates = JsonPath.read(presentation, "$.presentation.predicates");
         for(String key : predicates.keySet())
             log.info("Requested Predicates - " + key + " is satisfied");
 
