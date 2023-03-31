@@ -649,16 +649,26 @@ public class GlobalService {
             return null;
         }
         String requestedProof = JsonPath.parse((LinkedHashMap)JsonPath.read(presExRecord, "$.presentation.requested_proof")).jsonString();
+        String selfAttestedProof = JsonPath.parse((LinkedHashMap)JsonPath.read(presExRecord, "$.presentation.self_attested_attrs")).jsonString();
+        String presentation = JsonPath.parse((LinkedHashMap)JsonPath.read(presExRecord, "$.presentation")).jsonString();
 
-        LinkedHashMap<String, Object> revealedAttrs = JsonPath.read(requestedProof, "$.revealed_attrs");
+
+        LinkedHashMap<String, Object> revealedAttrs = JsonPath.read(requestedProof, "$.presentation.revealed_attrs");
         for(String key : revealedAttrs.keySet())
             attrs.put(key, JsonPath.read(revealedAttrs.get(key), "$.raw"));
         for(String key : attrs.keySet())
             log.info("Requested Attribute - " + key + ": " + attrs.get(key));
 
-        LinkedHashMap<String, Object> predicates = JsonPath.read(requestedProof, "$.predicates");
+        LinkedHashMap<String, Object> predicates = JsonPath.read(requestedProof, "$.presentation.predicates");
         for(String key : predicates.keySet())
             log.info("Requested Predicates - " + key + " is satisfied");
+
+        // todo
+        LinkedHashMap<String, Object> selfAttestedAttrs = JsonPath.read(presentation, "$.self_attested_attrs");
+        for(String key : selfAttestedAttrs.keySet())
+            attrs.put(key, JsonPath.read(selfAttestedAttrs.get(key), "$.raw"));
+        for(String key : attrs.keySet())
+            log.info("Self-Attested Attribute - " + key + ": " + attrs.get(key));
 
         return attrs;
     }
