@@ -141,7 +141,8 @@ public class GlobalService {
                     log.info("- Case (topic:" + topic + ", state:" + state + ") -> getPresentationResult");
                     LinkedHashMap<String, String> attrs = getPresentationResult(body);
                     String name = getPresentationName(body);
-                    if (name.equals("모바일 가입증명 검증")) {
+                    //if (name.equals("모바일 가입증명 검증")) {
+                    if (name != null) {
                         if (enableWebView) {
                             // 3-1. 검증 값 정보로 발행할 증명서가 한정되지 않는 경우 추가 정보 요구
                             log.info("Web View enabled -> sendWebView");
