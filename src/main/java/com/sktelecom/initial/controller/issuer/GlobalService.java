@@ -676,7 +676,7 @@ public class GlobalService {
         value.put("date_of_birth", attrs.get("모바일 가입증명 (1.0) date_of_birth"));
         value.put("date_of_test", selectedItemId);
         value.put("english_name", eng_name);
-        value.put("exp_date", getRandomInt(2023, 2025) + "0228");
+        value.put("exp_date", getRandomInt(2024, 2026) + "0228");
         value.put("korean_name", attrs.get("모바일 가입증명 (1.0) person_name"));
         value.put("registration_number", "123456789-987654321");
         value.put("score_of_listening", getRandomInt(100, 444) + "");
