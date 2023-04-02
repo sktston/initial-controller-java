@@ -661,13 +661,14 @@ public class GlobalService {
         for(String key : predicates.keySet())
             log.info("Requested Predicates - " + key + " is satisfied");
 
-        // TODO
+        // TODO self-attested attribute를 출력
         LinkedHashMap<String, Object> selfAttestedAttrs = JsonPath.read(requestedProof, "$.self_attested_attrs");
         for(String key : selfAttestedAttrs.keySet())
             selfAttrs.put(key, JsonPath.read(selfAttestedAttrs.get(key), "$"));
-        for(String key : selfAttrs.keySet())
+        for (String key : selfAttrs.keySet()) {
             log.info("Self-Attested Attribute - " + key + ": " + selfAttrs.get(key));
-
+            checkSchoolId(selfAttrs.get(key));
+        }
         return attrs;
     }
 
@@ -793,5 +794,23 @@ public class GlobalService {
                 "}").jsonString();
         String response =  client.requestPOST(agentApiUrl + "/revocation/revoke", accessToken, body);
         log.info("response: " + response);
+    }
+
+    public boolean checkSchoolId(String schoolId) {
+
+        try {
+            if (schoolId != "99999"){
+                log.warn("This school_id is OK");
+                return true;
+            } else {
+                log.warn("This school_id is nor OK");
+                //sendCredProblemReport(credExId, "학번을 찾을 수가 없습니다.");
+            }
+
+        } catch (PathNotFoundException e) {
+            log.warn("Requested credDefId does not exist -> problemReport");
+            //sendCredProblemReport(credExId, "학번을 입력하지 않았습니다.");
+        }
+        return false;
     }
 }
