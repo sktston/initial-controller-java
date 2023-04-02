@@ -807,7 +807,7 @@ public class GlobalService {
 
     public boolean checkSchoolId(String presExId, String schoolId) {
         try {
-            if (schoolId != "99999"){
+            if (schoolId != "1111"){
                 log.warn("This school_id is OK");
                 return true;
             } else {
