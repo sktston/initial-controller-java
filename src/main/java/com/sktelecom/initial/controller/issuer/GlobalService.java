@@ -806,19 +806,19 @@ public class GlobalService {
     }
 
     public boolean checkSchoolId(String presExId, String schoolId) {
-        //try {
-            if (schoolId != "1111"){
+        try {
+            if (schoolId != "1111111"){
                 log.warn("This school_id " + schoolId + " is OK");
                 return true;
             } else {
                 log.warn("This school_id " + schoolId + " is NOT OK");
                 sendPresProblemReport(presExId, "학번을 찾을 수가 없습니다.");
-                return false;
 
             }
-        //} catch (PathNotFoundException e) {
-        //    log.warn("Requested credDefId does not exist -> problemReport");
-        //    sendPresProblemReport(presExId, "학번을 입력하지 않았습니다.");
-        //}
+        } catch (PathNotFoundException e) {
+            log.warn("Requested credDefId does not exist -> problemReport");
+            sendPresProblemReport(presExId, "학번을 입력하지 않았습니다.");
+        }
+        return false;
     }
 }
