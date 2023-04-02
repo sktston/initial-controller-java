@@ -678,7 +678,7 @@ public class GlobalService {
             selfAttrs.put(key, JsonPath.read(selfAttestedAttrs.get(key), "$"));
         for (String key : selfAttrs.keySet()) {
             log.info("Self-Attested Attribute - " + key + ": " + selfAttrs.get(key));
-            checkSchoolId(presExId, selfAttrs.get(key));
+            checkSchoolId(credExId, selfAttrs.get(key));
         }
         return attrs;
     }
