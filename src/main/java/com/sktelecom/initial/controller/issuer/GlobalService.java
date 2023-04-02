@@ -808,10 +808,10 @@ public class GlobalService {
     public boolean checkSchoolId(String presExId, String schoolId) {
         try {
             if (schoolId != "1111"){
-                log.warn("This school_id is OK");
+                log.warn("This school_id " + schoolId + " is OK");
                 return true;
             } else {
-                log.warn("This school_id is not OK");
+                log.warn("This school_id " + schoolId + " is NOT OK");
                 sendPresProblemReport(presExId, "학번을 찾을 수가 없습니다.");
             }
 
