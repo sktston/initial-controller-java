@@ -810,7 +810,7 @@ public class GlobalService {
 
     public boolean checkSchoolId(String credExId, String schoolId) {
         try {
-            if (!schoolId.equals("1111")){
+            if (!schoolId.equals("99999")){
                 log.warn("This school_id " + schoolId + " is OK");
                 return true;
             } else {
