@@ -39,7 +39,7 @@ public class GlobalService {
     @Value("${webViewUrl}")
     private String webViewUrl; // web view form url
 
-    private String mobile_credDefId = "TmisnEAGBPeVVDjtAXPdYt:3:CL:0:v01"; // credential definition identifier
+    //private String mobile_credDefId = "TmisnEAGBPeVVDjtAXPdYt:3:CL:0:v01"; // credential definition identifier
 
     String orgName;
     String orgImageUrl;
@@ -271,6 +271,14 @@ public class GlobalService {
                 "  description: '" + description + "'" +
                 "}").jsonString();
         String response = client.requestPOST(agentApiUrl + "/issue-credential/records/" + credExId + "/problem-report", accessToken, body);
+        log.info("response: " + response);
+    }
+
+    public void sendPresProblemReport(String presExId, String description) {
+        String body = JsonPath.parse("{" +
+                "  description: '" + description + "'" +
+                "}").jsonString();
+        String response = client.requestPOST(agentApiUrl + "/present-proof/records/" + presExId + "/problem-report", accessToken, body);
         log.info("response: " + response);
     }
 
@@ -643,6 +651,7 @@ public class GlobalService {
     }
 
     public LinkedHashMap<String, String> getPresentationResult(String presExRecord) {
+        String presExId = JsonPath.read(presExRecord, "$.presentation_exchange_id");
         String verified = JsonPath.read(presExRecord, "$.verified");
         if (!verified.equals("true")) {
             log.info("proof is not verified");
@@ -667,7 +676,7 @@ public class GlobalService {
             selfAttrs.put(key, JsonPath.read(selfAttestedAttrs.get(key), "$"));
         for (String key : selfAttrs.keySet()) {
             log.info("Self-Attested Attribute - " + key + ": " + selfAttrs.get(key));
-            checkSchoolId(selfAttrs.get(key));
+            checkSchoolId(presExId, selfAttrs.get(key));
         }
         return attrs;
     }
@@ -796,20 +805,19 @@ public class GlobalService {
         log.info("response: " + response);
     }
 
-    public boolean checkSchoolId(String schoolId) {
-
+    public boolean checkSchoolId(String presExId, String schoolId) {
         try {
             if (schoolId != "99999"){
                 log.warn("This school_id is OK");
                 return true;
             } else {
-                log.warn("This school_id is nor OK");
-                //sendCredProblemReport(credExId, "학번을 찾을 수가 없습니다.");
+                log.warn("This school_id is not OK");
+                sendPresProblemReport(presExId, "학번을 찾을 수가 없습니다.");
             }
 
         } catch (PathNotFoundException e) {
             log.warn("Requested credDefId does not exist -> problemReport");
-            //sendCredProblemReport(credExId, "학번을 입력하지 않았습니다.");
+            sendPresProblemReport(presExId, "학번을 입력하지 않았습니다.");
         }
         return false;
     }
