@@ -48,6 +48,7 @@ public class GlobalService {
 
     LinkedHashMap<String, String> connIdToCredExId = new LinkedHashMap<>(); // cache to keep credential issuing flow
     LinkedHashMap<String, String> attrs = new LinkedHashMap<>(); // cache to keep credential issuing flow
+    LinkedHashMap<String, String> selfAttrs = new LinkedHashMap<>(); // cache to keep credential issuing flow
 
     // for revocation example
     static boolean enableRevoke = Boolean.parseBoolean(System.getenv().getOrDefault("ENABLE_REVOKE", "false"));
@@ -649,9 +650,6 @@ public class GlobalService {
             return null;
         }
         String requestedProof = JsonPath.parse((LinkedHashMap)JsonPath.read(presExRecord, "$.presentation.requested_proof")).jsonString();
-        //String selfAttestedProof = JsonPath.parse((LinkedHashMap)JsonPath.read(presExRecord, "$.presentation.self_attested_attrs")).jsonString();
-        //String presentation = JsonPath.parse((LinkedHashMap)JsonPath.read(presExRecord, "$.presentation")).jsonString();
-
 
         LinkedHashMap<String, Object> revealedAttrs = JsonPath.read(requestedProof, "$.revealed_attrs");
         for(String key : revealedAttrs.keySet())
@@ -663,13 +661,12 @@ public class GlobalService {
         for(String key : predicates.keySet())
             log.info("Requested Predicates - " + key + " is satisfied");
 
-        // todo
+        // TODO
         LinkedHashMap<String, Object> selfAttestedAttrs = JsonPath.read(requestedProof, "$.self_attested_attrs");
         for(String key : selfAttestedAttrs.keySet())
-//            log.info("Self-Attested Attribute - " + key);
-            attrs.put(key, JsonPath.read(selfAttestedAttrs.get(key), "$"));
-        for(String key : attrs.keySet())
-            log.info("Self-Attested Attribute - " + key + ": " + attrs.get(key));
+            selfAttrs.put(key, JsonPath.read(selfAttestedAttrs.get(key), "$"));
+        for(String key : selfAttrs.keySet())
+            log.info("Self-Attested Attribute - " + key + ": " + selfAttrs.get(key));
 
         return attrs;
     }
