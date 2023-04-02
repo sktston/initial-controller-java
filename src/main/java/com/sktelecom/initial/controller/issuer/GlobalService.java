@@ -39,7 +39,7 @@ public class GlobalService {
     @Value("${webViewUrl}")
     private String webViewUrl; // web view form url
 
-    //private String mobile_credDefId = "TmisnEAGBPeVVDjtAXPdYt:3:CL:0:v01"; // credential definition identifier
+    private String mobile_credDefId = "TmisnEAGBPeVVDjtAXPdYt:3:CL:0:v01"; // credential definition identifier
 
     String orgName;
     String orgImageUrl;
