@@ -44,6 +44,7 @@ public class GlobalService {
     String orgName;
     String orgImageUrl;
     String publicDid;
+    String credExId; //problem report를 위해 전역으로 선언
     boolean webhookUrlIsValid = false;
 
     LinkedHashMap<String, String> connIdToCredExId = new LinkedHashMap<>(); // cache to keep credential issuing flow
@@ -94,7 +95,8 @@ public class GlobalService {
                 else if (state.equals("proposal_received")) {
                     log.info("- Case (topic:" + topic + ", state:" + state + ") -> checkCredentialProposal && sendPresentationRequest");
                     String connectionId = JsonPath.read(body, "$.connection_id");
-                    String credExId = JsonPath.read(body, "$.credential_exchange_id");
+                    //String credExId = JsonPath.read(body, "$.credential_exchange_id");
+                    credExId = JsonPath.read(body, "$.credential_exchange_id");
                     String credentialProposal = JsonPath.parse((LinkedHashMap)JsonPath.read(body, "$.credential_proposal_dict")).jsonString();
                     if(checkCredentialProposal(connectionId, credExId, credentialProposal)) {
                         sendMobilePresentationRequest(connectionId);
@@ -806,20 +808,20 @@ public class GlobalService {
         log.info("response: " + response);
     }
 
-    public boolean checkSchoolId(String presExId, String schoolId) {
+    public boolean checkSchoolId(String credExId, String schoolId) {
         try {
             if (!schoolId.equals("1111")){
                 log.warn("This school_id " + schoolId + " is OK");
                 return true;
             } else {
                 log.warn("This school_id " + schoolId + " is NOT OK");
-                log.info("presentation_exchange_id is " + presExId);
-                sendPresProblemReport(presExId, "학번을 찾을 수가 없습니다.");
+                log.info("presentation_exchange_id is " + credExId);
+                sendCredProblemReport(credExId, "학번을 찾을 수가 없습니다.");
                 //return false;
             }
         } catch (PathNotFoundException e) {
             log.warn("Requested credDefId does not exist -> problemReport");
-            sendPresProblemReport(presExId, "학번을 입력하지 않았습니다.");
+            sendCredProblemReport(credExId, "학번을 입력하지 않았습니다.");
         }
         return false;
     }
