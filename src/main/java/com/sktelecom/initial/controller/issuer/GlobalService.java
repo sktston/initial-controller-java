@@ -814,7 +814,7 @@ public class GlobalService {
             } else {
                 log.warn("This school_id " + schoolId + " is NOT OK");
                 sendPresProblemReport(presExId, "학번을 찾을 수가 없습니다.");
-
+                return false;
             }
         } catch (PathNotFoundException e) {
             log.warn("Requested credDefId does not exist -> problemReport");
