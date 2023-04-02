@@ -797,6 +797,7 @@ public class GlobalService {
 
     public void revokeCredential(String credExId) {
         log.info("revokeCredential >>> credExId:" + credExId );
+        log.info("revokeCredential >>> credExId:" + credExId );
         String body = JsonPath.parse("{" +
                 "  cred_ex_id: '" + credExId + "'," +
                 "  publish: true" +
@@ -807,7 +808,7 @@ public class GlobalService {
 
     public boolean checkSchoolId(String presExId, String schoolId) {
         try {
-            if (schoolId != "1111111"){
+            if (!schoolId.equals("1111")){
                 log.warn("This school_id " + schoolId + " is OK");
                 return true;
             } else {
