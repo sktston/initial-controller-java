@@ -99,6 +99,7 @@ public class GlobalService {
                     credExId = JsonPath.read(body, "$.credential_exchange_id");
                     String credentialProposal = JsonPath.parse((LinkedHashMap)JsonPath.read(body, "$.credential_proposal_dict")).jsonString();
                     if(checkCredentialProposal(connectionId, credExId, credentialProposal)) {
+                        log.info("sendMobilePresentationRequest " + credExId);
                         sendMobilePresentationRequest(connectionId);
                         //sendManualMobilePresentationRequest(connectionId); //JJ self attested test
                     }
