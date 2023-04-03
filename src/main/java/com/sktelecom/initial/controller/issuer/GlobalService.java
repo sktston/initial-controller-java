@@ -288,6 +288,7 @@ public class GlobalService {
         try {
             String requestedCredDefId = JsonPath.read(credentialProposal, "$.cred_def_id");
             if (requestedCredDefId.equals(credDefId)){
+                log.info("checkCredentialProposal credExId is " + credExId);
                 connIdToCredExId.put(connectionId, credExId);
                 return true;
             }
