@@ -3,6 +3,7 @@ package com.sktelecom.initial.controller.holder;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.PathNotFoundException;
 import com.sktelecom.initial.controller.utils.Common;
 import com.sktelecom.initial.controller.utils.HttpClient;
 import org.slf4j.LoggerFactory;
@@ -180,6 +181,9 @@ public class Application {
         log.info("Print agreement");
         printAgreement(presExId);
 
+        log.info("Print self attested attributes");
+        printSelfAttestedAttrs(presExId);
+
         log.info("Send presentation");
         sendPresentation(presExId);
         waitUntilPresentationExchangeState(presExId, "presentation_acked");
@@ -236,6 +240,9 @@ public class Application {
 
         log.info("Print agreement");
         printAgreement(presExId);
+
+        log.info("Print self attested attributes");
+        printSelfAttestedAttrs(presExId);
 
         log.info("Send presentation");
         sendPresentation(presExId);
@@ -380,8 +387,20 @@ public class Application {
         String response = client.requestGET(agentDataStoreUrl + "/present-proof/records/" + presExId, accessToken);
         log.debug("response: " + response);
         String comment = JsonPath.read(response, "$.presentation_request_dict.comment");
-        String agreement = JsonPath.parse((LinkedHashMap)JsonPath.read(comment, "$.agreement")).jsonString();
-        log.info("agreement: " + agreement);
+        try {
+            String agreement = JsonPath.parse((LinkedHashMap) JsonPath.read(comment, "$.agreement")).jsonString();
+            log.info("agreement: " + agreement);
+        } catch (PathNotFoundException ignored){}
+    }
+
+    static void printSelfAttestedAttrs(String presExId) {
+        String response = client.requestGET(agentDataStoreUrl + "/present-proof/records/" + presExId, accessToken);
+        log.debug("response: " + response);
+        String comment = JsonPath.read(response, "$.presentation_request_dict.comment");
+        try {
+            String selfAttestedAttrs = JsonPath.parse((ArrayList) JsonPath.read(comment, "$.self_attested_attrs")).jsonString();
+            log.info("self attested attributes: " + selfAttestedAttrs);
+        } catch (PathNotFoundException ignored){}
     }
 
     static void deleteCredential(String credId) {
