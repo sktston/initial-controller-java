@@ -389,7 +389,7 @@ public class GlobalService {
                 "  ]"+
                 "}").jsonString();
 
-                String selfAttestedAttrs = JsonPath.parse("[" +
+        String selfAttestedAttrs = JsonPath.parse("[" +
                 "{"+
                 "  type: 'hint',"+
                 "  content: [" +
@@ -423,8 +423,8 @@ public class GlobalService {
         String body = JsonPath.parse("{" +
                 "  connection_id: '" + connectionId + "'," +
                 "  verification_template_id: '" + mobileVerifTplId + "'," +
-                "  agreement: " + agreement +
-                "  self_attested_attrs: " + selfAttestedAttrs +
+                "  agreement: " + agreement + "'," +
+                "  self_attested_attrs: " + selfAttestedAttrs + "'," +
                 "}").jsonString();
         String response = client.requestPOST(agentApiUrl + "/present-proof/send-verification-request", accessToken, body);
         log.info("response: " + response);
