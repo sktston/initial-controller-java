@@ -2,6 +2,7 @@ package com.sktelecom.initial.controller.issuer;
 
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.PathNotFoundException;
+import com.sktelecom.initial.controller.utils.Aes256Util;
 import com.sktelecom.initial.controller.utils.HttpClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +36,15 @@ public class GlobalService {
     @Value("${webViewUrl}")
     private String webViewUrl; // web view form url
 
+    @Value("${isEncrypted}")
+    private Boolean isEncrypted; // encryption support
+
+    @Value("${cipherKey}")
+    private String cipherKey; // cipherKey to decrypt
+
+    @Value("${cipherIvKey}")
+    private String cipherIvKey; // cipherIvKey to decrypt
+
     String orgName;
     String orgImageUrl;
     String publicDid;
@@ -67,6 +77,16 @@ public class GlobalService {
     public void handleEvent(String body) {
         if (!webhookUrlIsValid)
             webhookUrlIsValid = true;
+
+        if (isEncrypted) {
+            Aes256Util aes256Util = new Aes256Util();
+            String encodeData = JsonPath.read(body, "$.encode_data");
+            try {
+                body = aes256Util.decrypt(cipherKey, cipherIvKey, encodeData);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
 
         String topic = JsonPath.read(body, "$.topic");
         String state = JsonPath.read(body, "$.state");
