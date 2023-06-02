@@ -159,7 +159,10 @@ public class GlobalService {
                         * Guide : https://initial-v2-platform.readthedocs.io/ko/master/open_api_auto_credential/#step-1-mandatory-holder
                         * Swagger : https://app.swaggerhub.com/apis-docs/khujin1/initial_Cloud_Agent_Open_API/1.0.4#/issue-credential%20v1.0/post_issue_credential_records__cred_ex_id__send_offer
                         */
-                        sendCredentialOffer(connectionId, attrs, null);
+                        if (isEncrypted)
+                            sendCredentialOfferEnc(connectionId, attrs, null);
+                        else
+                            sendCredentialOffer(connectionId, attrs, null);
                     }
                 }
                 else if (state.equals("abandoned")) {
@@ -458,6 +461,52 @@ public class GlobalService {
         log.info("response: " + response);
     }
 
+    public void sendCredentialOfferEnc(String connectionId, LinkedHashMap<String, String> attrs, String selectedItemId) {
+        // TODO: need to implement business logic to query information for holder
+        // we assume that the value is obtained by querying DB (e.g., attrs.mobileNum and selectedItemId)
+        LinkedHashMap<String, String> value = new LinkedHashMap<>();
+        value.put("name", "김증명");
+        value.put("date", "20180228");
+        value.put("degree", "컴퓨터공학");
+        value.put("age", "25");
+        value.put("photo", "JpegImageBase64EncodedBinary");
+
+        // value insertion
+        String body = JsonPath.parse("{" +
+                "  counter_proposal: {" +
+                "    cred_def_id: '" + credDefId + "'," +
+                "    credential_proposal: {" +
+                "      attributes: [" +
+                "        { name: 'name', value: '" + value.get("name")  + "' }," +
+                "        { name: 'date', value: '" + value.get("date") + "' }," +
+                "        { name: 'degree', value: '" + value.get("degree") + "' }," +
+                "        { name: 'age', value: '" +  value.get("age")  + "' }," +
+                "        { name: 'photo', value: '" + value.get("photo") + "' }" +
+                "      ]" +
+                "    }" +
+                "  }" +
+                "}").jsonString();
+        Aes256Util aes256Util = new Aes256Util();
+        String encodeData;
+        try {
+            encodeData = aes256Util.encrypt(cipherKey, cipherIvKey, body);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        String encBody = JsonPath.parse("{}").put("$", "encode_data", encodeData).jsonString();
+        String credExId = connIdToCredExId.get(connectionId);
+        String response = client.requestPOST(agentApiUrl + "/enc/issue-credential/records/" + credExId + "/send-offer", accessToken, encBody);
+        log.info("response: " + response);
+
+        String resBody;
+        try {
+            resBody = aes256Util.decrypt(cipherKey, cipherIvKey, JsonPath.read(response, "$.encode_data"));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        log.info("resBody: " + resBody);
+    }
+
     public void sendWebView(String connectionId, LinkedHashMap<String, String> attrs, String presExRecord) {
         // TODO: need to implement business logic to query information for holder and prepare web view
         // we send web view form page (GET webViewUrl?connectionId={connectionId}) to holder in order to select a item by user
@@ -482,7 +531,10 @@ public class GlobalService {
 
         // 3-1-1. 추가 정보 기반으로 증명서 발행
         log.info("sendCredentialOffer with connectionId:" + connectionId + ", selectedItemId:" + selectedItemId);
-        sendCredentialOffer(connectionId, null, selectedItemId);
+        if (isEncrypted)
+            sendCredentialOfferEnc(connectionId, null, selectedItemId);
+        else
+            sendCredentialOffer(connectionId, null, selectedItemId);
     }
 
     public void revokeCredential(String credExId) {
