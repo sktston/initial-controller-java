@@ -493,7 +493,9 @@ public class GlobalService {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        String encBody = JsonPath.parse("{}").put("$", "encode_data", encodeData).jsonString();
+        String encBody = JsonPath.parse("{" +
+                "  encode_data: '" + encodeData + "'" +
+                "}").jsonString();
         String credExId = connIdToCredExId.get(connectionId);
         String response = client.requestPOST(agentApiUrl + "/enc/issue-credential/records/" + credExId + "/send-offer", accessToken, encBody);
         log.info("response: " + response);
