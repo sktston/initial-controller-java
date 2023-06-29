@@ -245,7 +245,7 @@ public class GlobalService {
     }
 
     public String createInvitationUrl() {
-        String params = "?public=false";
+        String params = "?public=false&alias=0CFA227D-F551-459D-9073-A57A27234B41";
         String response = client.requestPOST(agentApiUrl + "/connections/create-invitation" + params, accessToken, "{}");
         log.info("response: " + response);
         try {
