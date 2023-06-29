@@ -191,7 +191,7 @@ public class GlobalService {
             System.exit(0);
         }
         String invitation = parseInvitationUrl(invitationUrl);
-        publicDid = JsonPath.read(invitation, "$.did");
+        //publicDid = JsonPath.read(invitation, "$.did");
         orgName = JsonPath.read(invitation, "$.label");
         orgImageUrl = JsonPath.read(invitation, "$.imageUrl");
         log.info("- SUCCESS");
