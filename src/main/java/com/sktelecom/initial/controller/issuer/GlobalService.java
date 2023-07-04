@@ -394,22 +394,10 @@ public class GlobalService {
                 "  type: 'hint',"+
                 "  content: [" +
                 "    {" +
-                "      attr: 'school_id'," +
-                "      hintText: '학번을 입력해주세요.'," +
+                "      attr: 'test_id'," +
+                "      hintText: '수헙번호를 입력해주세요.'," +
                 "      tooltip: {" +
-                "        title: '동물등록정보를 잊어버리셨나요?'," +
-                "        content: '동물보호관리시스템(https://www.animal.go.kr)'," +
-                "        linkButton: {" +
-                "          text: '자세히보기'," +
-                "          url: 'https://www.animal.go.kr'" +
-                "        }" +
-                "      }" +
-                "    }," +
-                "    {" +
-                "      attr: 'date_o_fbirth'," +
-                "      hintText: '새일을 입력해주세요.'," +
-                "      tooltip: {" +
-                "        title: '동물등록정보를 잊어버리셨나요?'," +
+                "        title: '수험번호를 잊어버리셨나요?'," +
                 "        content: '동물보호관리시스템(https://www.animal.go.kr)'," +
                 "        linkButton: {" +
                 "          text: '자세히보기'," +
@@ -417,6 +405,7 @@ public class GlobalService {
                 "        }" +
                 "      }" +
                 "    }" +
+
                 "  ]" +
                 "}]").jsonString();
                 
