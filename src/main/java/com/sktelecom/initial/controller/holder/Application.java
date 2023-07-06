@@ -23,8 +23,8 @@ public class Application {
     static final String logLevel = "INFO"; // INFO DEBUG
 
     // Case of runType issue (모바일가입증명 제출 후 발급)
-    static String tpIssuerInvitationUrl = "http://221.168.33.105:8042/invitation-url"; // test issuer (default: dev degree issuer)
-    static String tpCredDefId = "S78qLFsHgWEs43S6QLQY8N:3:CL:1618984624:3ea6dc69-3ae5-41c9-a920-a2d08f45322f"; // test issuer (default: dev degree issuer)
+    static String tpIssuerInvitationUrl = "http://221.168.33.105:8043/invitation-url"; // test issuer (default: dev degree issuer)
+    static String tpCredDefId = "SxK6LzvMTgmCPTBm3LwRvG:3:CL:1618984624:2b100704-a533-46c1-ba09-8bd36330d779"; // test issuer (default: dev degree issuer)
 
     // Case of runType verify (모바일가입증명 제출 후 완료)
     static String tpVerifierInvitationUrl = "http://221.168.33.105:8041/invitation-url"; // test verifier (default: dev mobile verifier)
@@ -69,16 +69,16 @@ public class Application {
                 mwpUrl = "https://dev.mobile-wallet.co.kr"; // dev
                 authUsername = "4e37046d-4dca-4fd0-b69f-df2ee1b2"; // dev
                 authPassword = "6ea32d8d-4a04-4a0c-a664-50a950ee"; // dev
-                mobileIssuerInvitationUrlApi = "https://dev-console.myinitial.io/mobile-issuer/invitation-url"; // dev
-                mobileCredDefId = "TmisnEAGBPeVVDjtAXPdYt:3:CL:0:v01"; // dev
+                mobileIssuerInvitationUrlApi = "https://dev-console.myinitial.io/mobile-issuer-v2/invitation-url"; // dev
+                mobileCredDefId = "TBz5HEP6gzwqDDMw3Ci7BU:3:CL:1618987943:4224f310-cd2b-4836-843b-07b666c2bf6b"; // dev
                 mobileCredProposalEncodeData = "9INN4y9uwW5M6lZ6GvvaLUjfPoq25xDuD2XZVF7GlpIbKLwf7SJJgRoIhnx3hXwYfc99b5HQ0QFSMQb4BoDXjnV3/WgeAXjgeP4WACN0OSyneD8DhB9nRmda1zkQVQ2WseKtjLD4FZRsbtZWVu5m5fJ1+P76bmYd7nFA3p1HX6oUocY0QVbGhsYRr/nCNccr/5+zOc2ghzVpD2P3KREOx6rZD1DDWWR2PMl6GOth3QXqF9aXSBdbXWKi9imG/QfsVDQwNxbqY6i2yRfkjGYM1P+eIKknUoNJueMzDgEib3K7sV7YZUm+KH2K7ePvAs09"; // dev
                 break;
             case "prod":
                 mwpUrl = "https://www.mobile-wallet.co.kr"; // prod
                 authUsername = "092d9926-f73c-46ea-9c1a-11479de8"; // prod
                 authPassword = "d74c243a-d282-43d3-bdde-eb749c78"; // prod
-                mobileIssuerInvitationUrlApi = "https://console.myinitial.io/mobile-issuer/invitation-url"; // prod
-                mobileCredDefId = "3fZJD68zkyJwzsME3rDk7e:3:CL:0:v01"; // prod
+                mobileIssuerInvitationUrlApi = "https://console.myinitial.io/mobile-issuer-v2/invitation-url"; // prod
+                mobileCredDefId = "SWiirNiJX7PdVS6Ji8a5tB:3:CL:101:6e43d3b8-ca11-48b5-83be-5adb240520ad"; // prod
                 mobileCredProposalEncodeData = "X4BWcp2XFp77xtGlaSTHNmWuziTyQTkW8x9XRHd7OJnaFIoDCv6yUPbBBNV7JEVtNUMdY4goKKEO65A5ctIrtJOxP9DdUv02q7MWaV+J4ML9d+hfhrd7K0BDuD/P1hUssCBTS4dVNJII5VRvCmrnoRKtndfitUqRbYPnCAvUBvRJSxW21fjM2Q40D3wLOb4OdvXS/NY+nB/Xj2QPuYl594zdAEODgDrjdjw+LIILl486HHG+LUgg/jHSn/n7XYk7aWCu2ZHalJIrglalPldTrey/fZSH1rpBf4jUf5LskvULFneq/gvNSL2MQTkYoJR4"; // prod
                 break;
             default:
