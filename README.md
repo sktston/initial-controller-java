@@ -71,7 +71,7 @@ initial 플랫폼 서비스를 사용하기 위한 Java기반의 Issuer, Verifie
 
 #### application-issuer.properties
 server.port = 8040 \
-agentApiUrl = https://dev-console.myinitial.io/agent/api (고정) \
+agentApiUrl = https://dev-console.myinitial.io/agent/api 혹은 https://dev-console.myinitial.io/agent/v2/api (기관 설정 값에서 확인) \
 accessToken = issuer의 `Access Token` \
 credDefId = 작성한 issuer의 `CredDefId` \
 verifTplId = 작성한 issuer의 `verifTplId` \
@@ -79,7 +79,7 @@ webViewUrl = `https://issuer-controller.url/web-view/form.html` (Optional) Holde
 
 #### application-verifier.properties
 server.port = 8040 \
-agentApiUrl = https://dev-console.myinitial.io/agent/api (고정) \
+agentApiUrl = https://dev-console.myinitial.io/agent/api 혹은 https://dev-console.myinitial.io/agent/v2/api (기관 설정 값에서 확인) \
 accessToken = verifier `Access Token` \
 verifTplId = 작성한 issuer의 `verifTplId`
 
