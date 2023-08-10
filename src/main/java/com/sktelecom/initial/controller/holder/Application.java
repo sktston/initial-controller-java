@@ -24,7 +24,7 @@ public class Application {
 
     // Case of runType issue (모바일가입증명 제출 후 발급)
     static String tpIssuerInvitationUrl = "http://221.168.33.105:8043/invitation-url"; // test issuer (default: dev degree issuer)
-    static String tpCredDefId = "SxK6LzvMTgmCPTBm3LwRvG:3:CL:1618984624:2b100704-a533-46c1-ba09-8bd36330d779"; // test issuer (default: dev degree issuer)
+    static String tpCredDefId = "SxK6LzvMTgmCPTBm3LwRvG:3:CL:1618984624:43769670-fa4d-4aa8-94c6-e281a46726f0"; // test issuer (default: dev degree issuer)
 
     // Case of runType verify (모바일가입증명 제출 후 완료)
     static String tpVerifierInvitationUrl = "http://221.168.33.105:8041/invitation-url"; // test verifier (default: dev mobile verifier)
