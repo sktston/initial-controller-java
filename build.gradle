@@ -80,5 +80,10 @@ task holder(type:JavaExec) {
 	group 'application'
 	classpath sourceSets.main.runtimeClasspath
 	main = 'com.sktelecom.initial.controller.holder.Application'
-	args(['--spring.config.location=classpath:/application-holder.properties'])
+}
+task holder_webhook(type:JavaExec) {
+	group 'application'
+	classpath sourceSets.main.runtimeClasspath
+	main = 'com.sktelecom.initial.controller.holder_webhook.Application'
+	args(['--spring.config.location=classpath:/application-holder_webhook.properties'])
 }
